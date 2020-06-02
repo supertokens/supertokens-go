@@ -1,0 +1,99 @@
+import (
+    "github.com/supertokens/supertokens-go/sessions/gin/supertokens"
+)
+
+r := gin.Default()
+
+r.POST("/login", loginHandler)
+
+r.POST("/auth/refresh", supertokens.Middleware(),refreshHandler)
+
+r.POST("/auth/logout", supertokens.Middleware(),logoutHandler)
+
+r.GET("/user/info", supertokens.Middleware(true),getUserInfoHandler)
+
+r.PUT("/user/info", supertokens.Middleware(),putUserInfoHandler)
+
+r.Run(":8000")
+
+supertokens.Config("localhost:8000;...")
+
+
+supertokens.OnTokenTheftDetected( func( sessionHandle string, userId string, c *gin.Context){
+
+})
+
+supertokens.OnUnauthorised( func( err error, c *gin.Context){
+
+})
+
+supertokens.OnTryRefreshToken( func( err error, c *gin.Context){
+
+})
+
+supertokens.OnGeneralError( func( err error, c *gin.Context){
+
+})
+
+
+func loginHandler(c *gin.Context){
+
+    userId := "User1"
+
+    jwtPayload :=  map[string]interface{}{
+                        "key" : "value"
+    }
+    sessionData := map[string]interface{}{
+        "awesomeThings": [...]string{"info","moreInfo"}
+
+    }
+
+    _, err := supertokens.CreateNewSession(c, userId,jwtPayload, sessionData)
+
+    if err != nil {
+        return supertokens.HandleErrorAndRespond(err)
+    }
+
+    c.JSON(200, gin.H{
+		"message": "success",
+	})
+}
+
+func refreshHandler(c *gin.Context){
+    c.JSON(200, gin.H{
+		"message": "success",
+	})
+}
+
+func logoutHandler (c *gin.Context){
+    session :=  c.Value(supertokens.sessionContext)
+    err := session.RevokeSession()
+    if err != nil {
+        return supertokens.HandleErrorAndRespond(err)
+    }
+
+    c.JSON(200, gin.H{
+		"success": "true",
+	})
+}
+
+func getUserInfoHandler (c *gin.Context){
+    session := c.Value(supertokens.sessionContext)
+    userId := session.UserID()
+
+    c.JSON(200, gin.H{
+		"message": userId
+	})
+}
+
+func putUserInfoHandler(c *gin.Context){
+
+    newUserInfo,_:= ioutil.ReadAll(c.request.Body)
+    
+    //update user data
+    userId := session.UserID()
+
+    c.JSON(200, gin.H{
+		"success": true
+	})
+}
