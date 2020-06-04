@@ -70,3 +70,23 @@ func GetJWTPayload(sessionHandle string) map[string]interface{} {
 func UpdateJWTPayload(sessionHandle string, newJWTPayload map[string]interface{}) {
 	core.UpdateJWTPayload(sessionHandle, newJWTPayload)
 }
+
+// OnTokenTheftDetected function to override default behaviour of handling token thefts
+func OnTokenTheftDetected(handler func(string, string, http.ResponseWriter)) {
+	(*core.GetInstance()).OnTokenTheftDetectedErrorHandler = handler
+}
+
+// OnUnauthorised function to override default behaviour of handling unauthorised error
+func OnUnauthorised(handler func(error, http.ResponseWriter)) {
+	(*core.GetInstance()).OnUnauthorisedErrorHandler = handler
+}
+
+// OnTryRefreshToken function to override default behaviour of handling try refresh token errors
+func OnTryRefreshToken(handler func(error, http.ResponseWriter)) {
+	(*core.GetInstance()).OnTryRefreshTokenErrorHandler = handler
+}
+
+// OnGeneralError function to override default behaviour of handling general errors
+func OnGeneralError(handler func(error, http.ResponseWriter)) {
+	(*core.GetInstance()).OnGeneralErrorHandler = handler
+}
