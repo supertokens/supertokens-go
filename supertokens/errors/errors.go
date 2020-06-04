@@ -1,40 +1,40 @@
-package supertokens
+package errors
 
 // GeneralError used for non specific exceptions
 type GeneralError struct {
-	msg         string
-	actualError *error
+	Msg         string
+	ActualError *error
 }
 
 func (err GeneralError) Error() string {
-	return err.msg
+	return err.Msg
 }
 
 // TryRefreshTokenError used for when the refresh API needs to be called
 type TryRefreshTokenError struct {
-	msg string
+	Msg string
 }
 
 func (err TryRefreshTokenError) Error() string {
-	return err.msg
+	return err.Msg
 }
 
 // TokenTheftDetectedError used for when token theft has happened for a session
 type TokenTheftDetectedError struct {
-	msg           string
+	Msg           string
 	SessionHandle string
 	UserID        string
 }
 
 func (err TokenTheftDetectedError) Error() string {
-	return err.msg
+	return err.Msg
 }
 
 // UnauthorisedError used for when the user has been logged out
 type UnauthorisedError struct {
-	msg string
+	Msg string
 }
 
 func (err UnauthorisedError) Error() string {
-	return err.msg
+	return err.Msg
 }

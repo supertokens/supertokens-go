@@ -6,6 +6,11 @@ import (
 	"github.com/supertokens/supertokens-go/supertokens/core"
 )
 
+// Config used to set locations of SuperTokens instances
+func Config(hosts string) error {
+	return core.Config(hosts)
+}
+
 // CreateNewSession function used to create a new SuperTokens session
 func CreateNewSession(response *http.ResponseWriter,
 	userID string, payload ...map[string]interface{}) Session {

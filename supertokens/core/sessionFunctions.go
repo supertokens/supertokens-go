@@ -2,6 +2,11 @@ package core
 
 import "net/http"
 
+// Config used to set locations of SuperTokens instances
+func Config(hosts string) error {
+	return InitQuerier(hosts)
+}
+
 // SessionInfo carrier of session token information
 type SessionInfo struct {
 	// some of the fields are points cause they can be nil too

@@ -17,7 +17,6 @@ type handshakeInfo struct {
 }
 
 var handshakeInfoInstantiated *handshakeInfo
-var handshakeInfoOnce sync.Once
 
 // GetHandshakeInfoInstance returns handshake info.
 func GetHandshakeInfoInstance() *handshakeInfo {
