@@ -28,18 +28,18 @@ func defaultGeneralErrorHandler(err error, response http.ResponseWriter) {
 	// TODO:
 }
 
-var instantiated *errorHandlers
-var once sync.Once
+var errorHandlerInstantiated *errorHandlers
+var errorHandlersOnce sync.Once
 
-// GetInstance returns all the error handlers.
-func GetInstance() *errorHandlers {
-	once.Do(func() {
-		instantiated = &errorHandlers{
+// GetErrorHandlersInstance returns all the error handlers.
+func GetErrorHandlersInstance() *errorHandlers {
+	errorHandlersOnce.Do(func() {
+		errorHandlerInstantiated = &errorHandlers{
 			OnTokenTheftDetectedErrorHandler: defaultTokenTheftDetectedErrorHandler,
 			OnUnauthorisedErrorHandler:       defaultUnauthorisedErrorHandler,
 			OnTryRefreshTokenErrorHandler:    defaultTryRefreshTokenErrorHandler,
 			OnGeneralErrorHandler:            defaultGeneralErrorHandler,
 		}
 	})
-	return instantiated
+	return errorHandlerInstantiated
 }

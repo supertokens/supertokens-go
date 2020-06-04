@@ -6,7 +6,7 @@ type GeneralError struct {
 	actualError *error
 }
 
-func (err *GeneralError) Error() string {
+func (err GeneralError) Error() string {
 	return err.msg
 }
 
@@ -15,7 +15,7 @@ type TryRefreshTokenError struct {
 	msg string
 }
 
-func (err *TryRefreshTokenError) Error() string {
+func (err TryRefreshTokenError) Error() string {
 	return err.msg
 }
 
@@ -26,7 +26,7 @@ type TokenTheftDetectedError struct {
 	UserID        string
 }
 
-func (err *TokenTheftDetectedError) Error() string {
+func (err TokenTheftDetectedError) Error() string {
 	return err.msg
 }
 
@@ -35,6 +35,6 @@ type UnauthorisedError struct {
 	msg string
 }
 
-func (err *UnauthorisedError) Error() string {
+func (err UnauthorisedError) Error() string {
 	return err.msg
 }
