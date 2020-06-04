@@ -9,7 +9,7 @@ frontendDriverArray=`echo $frontendDriverJson | jq ".versions"`
 echo "got frontend driver relations"
 
 # get driver version
-version=`cat ./sessions/constants.go | grep -e 'const VERSION'`
+version=`cat ./supertokens/constants.go | grep -e 'const VERSION'`
 while IFS='"' read -ra ADDR; do
     counter=0
     for i in "${ADDR[@]}"; do
