@@ -20,3 +20,19 @@ func setIDRefreshTokenInHeaderAndCookie(response *http.ResponseWriter, token str
 func setAntiCsrfTokenInHeaders(response *http.ResponseWriter, antiCsrfToken string) {
 
 }
+
+func saveFrontendInfoFromRequest(request *http.Request) {
+
+}
+
+func getAccessTokenFromCookie(request *http.Request) *string {
+	return nil
+}
+
+func getAntiCsrfTokenFromHeaders(request *http.Request) *string {
+	return nil
+}
+
+func getIDRefreshTokenFromCookie(request *http.Request) *string {
+	return nil
+}

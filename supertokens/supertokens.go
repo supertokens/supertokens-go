@@ -58,7 +58,7 @@ func CreateNewSession(response *http.ResponseWriter,
 		idRefreshToken.SameSite,
 	)
 
-	if *session.AntiCsrfToken != "" {
+	if session.AntiCsrfToken != nil {
 		setAntiCsrfTokenInHeaders(response, *session.AntiCsrfToken)
 	}
 
@@ -75,6 +75,20 @@ func CreateNewSession(response *http.ResponseWriter,
 func GetSession(response *http.ResponseWriter, request *http.Request,
 	doAntiCsrfCheck bool) Session {
 	// TODO:
+	saveFrontendInfoFromRequest(request)
+
+	accessToken := getAccessTokenFromCookie(request)
+
+	if accessToken == nil {
+		// maybe the access token has expired.
+		// return try refresh token error msg:"access token missing in cookies"
+	}
+
+	// antiCsrfToken := getAntiCsrfTokenFromHeaders(request)
+	// idRefreshToken := getIDRefreshTokenFromCookie(request)
+
+	// session := core.GetSession(response, request, doAntiCsrfCheck)
+
 	return Session{}
 }
 
