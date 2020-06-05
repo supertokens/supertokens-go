@@ -42,6 +42,12 @@ func setAntiCsrfTokenInHeaders(response *http.ResponseWriter, antiCsrfToken stri
 
 func saveFrontendInfoFromRequest(request *http.Request) {
 
+	name := getHeader(request, frontendSDKNameHeaderKey)
+	version := getHeader(request, frontendSDKVersionHeaderKey)
+	if name != nil && version != nil {
+		//TODO: add to device Driver info
+	}
+
 }
 
 func getAccessTokenFromCookie(request *http.Request) *string {
