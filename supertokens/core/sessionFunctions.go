@@ -1,6 +1,10 @@
 package core
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/supertokens/supertokens-go/supertokens/errors"
+)
 
 // Config used to set locations of SuperTokens instances
 func Config(hosts string) error {
@@ -47,8 +51,38 @@ func CreateNewSession(userID string, jwtPayload map[string]interface{},
 
 // GetSession function used to verify a session
 func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool, idRefreshToken *string) (SessionInfo, error) {
-	// TODO:
-	return SessionInfo{}, nil
+	// TODO: Try verifying it here
+
+	body := map[string]interface{}{
+		"accessToken":     accessToken,
+		"doAntiCsrfCheck": doAntiCsrfCheck,
+	}
+	if antiCsrfToken != nil {
+		body["antiCsrfToken"] = *antiCsrfToken
+	}
+	response, err := getQuerierInstance().SendPostRequest("/session/verify", body)
+	if err != nil {
+		return SessionInfo{}, err
+	}
+	if response["status"] == "OK" {
+		handShakeInfo, handShakeError := GetHandshakeInfoInstance()
+		if handShakeError != nil {
+			if err != nil {
+				return SessionInfo{}, handShakeError
+			}
+		}
+		handShakeInfo.UpdateJwtSigningPublicKeyInfo(
+			response["jwtSigningPublicKey"].(string), response["jwtSigningPublicKeyExpiryTime"].(uint64))
+		return convertJSONResponseToSessionInfo(response), nil
+	} else if response["status"] == "UNAUTHORISED" {
+		return SessionInfo{}, errors.UnauthorisedError{
+			Msg: response["message"].(string),
+		}
+	} else {
+		return SessionInfo{}, errors.TryRefreshTokenError{
+			Msg: response["message"].(string),
+		}
+	}
 }
 
 // RefreshSession function used to refresh a session
@@ -63,11 +97,16 @@ func RefreshSession(refreshToken string) (SessionInfo, error) {
 	if response["status"] == "OK" {
 		return convertJSONResponseToSessionInfo(response), nil
 	} else if response["status"] == "UNAUTHORISED" {
-		// TODO:
+		return SessionInfo{}, errors.UnauthorisedError{
+			Msg: response["message"].(string),
+		}
 	} else {
-		// TODO:
+		return SessionInfo{}, errors.TokenTheftDetectedError{
+			Msg:           "Token theft detected",
+			SessionHandle: (response["session"].(map[string]interface{}))["handle"].(string),
+			UserID:        (response["session"].(map[string]interface{}))["userId"].(string),
+		}
 	}
-	return SessionInfo{}, nil
 }
 
 // RevokeAllSessionsForUser function used to revoke all sessions for a user
