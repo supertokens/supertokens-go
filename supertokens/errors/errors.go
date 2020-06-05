@@ -3,7 +3,7 @@ package errors
 // GeneralError used for non specific exceptions
 type GeneralError struct {
 	Msg         string
-	ActualError *error
+	ActualError error
 }
 
 func (err GeneralError) Error() string {

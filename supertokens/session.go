@@ -12,19 +12,21 @@ type Session struct {
 }
 
 // RevokeSession function used to revoke a session for this session
-func (session *Session) RevokeSession() {
+func (session *Session) RevokeSession() error {
 	// TODO:
+	return nil
 }
 
 // GetSessionData function used to get session data for this session
-func (session *Session) GetSessionData() map[string]interface{} {
+func (session *Session) GetSessionData() (map[string]interface{}, error) {
 	// TODO:
-	return map[string]interface{}{}
+	return map[string]interface{}{}, nil
 }
 
 // UpdateSessionData function used to update session data for this session
-func (session *Session) UpdateSessionData(newSessionData map[string]interface{}) {
+func (session *Session) UpdateSessionData(newSessionData map[string]interface{}) error {
 	// TODO:
+	return nil
 }
 
 // GetUserID function gets the user for this session
@@ -48,6 +50,7 @@ func (session *Session) GetAccessToken() string {
 }
 
 // UpdateJWTPayload function used to update jwt payload for this session
-func (session *Session) UpdateJWTPayload(newJWTPayload map[string]interface{}) {
+func (session *Session) UpdateJWTPayload(newJWTPayload map[string]interface{}) error {
 	// TODO:
+	return nil
 }
