@@ -2,8 +2,10 @@ package supertokens
 
 import (
 	"net/http"
+	"reflect"
 
 	"github.com/supertokens/supertokens-go/supertokens/core"
+	"github.com/supertokens/supertokens-go/supertokens/errors"
 )
 
 // Config used to set locations of SuperTokens instances
@@ -90,12 +92,38 @@ func GetSession(response *http.ResponseWriter, request *http.Request,
 		// return try refresh token error msg:"access token missing in cookies"
 	}
 
-	// antiCsrfToken := getAntiCsrfTokenFromHeaders(request)
-	// idRefreshToken := getIDRefreshTokenFromCookie(request)
+	antiCsrfToken := getAntiCsrfTokenFromHeaders(request)
+	idRefreshToken := getIDRefreshTokenFromCookie(request)
 
-	// session := core.GetSession(response, request, doAntiCsrfCheck)
+	session, err := core.GetSession(*accessToken, antiCsrfToken, doAntiCsrfCheck, idRefreshToken)
+	if err != nil {
+		if reflect.TypeOf(err) == reflect.TypeOf(errors.UnauthorisedError{}) {
+			// handShakeInfo := core.GetHandshakeInfoInstance()
+			// clearSessionFromCookie(response,
+			// 	handShakeInfo.CookieDomain,
+			// 	handShakeInfo.)
+		}
+	}
 
-	return Session{}, nil
+	if session.AccessToken != nil {
+		attachAccessTokenToCookie(
+			response,
+			session.AccessToken.Token,
+			session.AccessToken.Expiry,
+			session.AccessToken.Domain,
+			session.AccessToken.CookiePath,
+			session.AccessToken.CookieSecure,
+			session.AccessToken.SameSite,
+		)
+	}
+
+	return Session{
+		accessToken:   *accessToken,
+		response:      response,
+		sessionHandle: session.Handle,
+		userDataInJWT: session.UserDataInJWT,
+		userID:        session.UserID,
+	}, nil
 }
 
 // RefreshSession function used to refresh a session

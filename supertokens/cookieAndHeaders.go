@@ -36,3 +36,8 @@ func getAntiCsrfTokenFromHeaders(request *http.Request) *string {
 func getIDRefreshTokenFromCookie(request *http.Request) *string {
 	return nil
 }
+
+func clearSessionFromCookie(response *http.ResponseWriter, domain string,
+	secure bool, accessTokenPath string, refreshTokenPath string, idRefreshTokenPath string, sameSite string) {
+
+}
