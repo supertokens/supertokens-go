@@ -41,3 +41,7 @@ func clearSessionFromCookie(response *http.ResponseWriter, domain string,
 	secure bool, accessTokenPath string, refreshTokenPath string, idRefreshTokenPath string, sameSite string) {
 
 }
+
+func getRefreshTokenFromCookie(request *http.Request) *string {
+	return nil
+}
