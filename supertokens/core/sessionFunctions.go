@@ -10,24 +10,24 @@ func Config(hosts string) error {
 // SessionInfo carrier of session token information
 type SessionInfo struct {
 	// some of the fields are points cause they can be nil too
-	handle         string
-	userID         string
-	userDataInJWT  map[string]interface{}
-	accessToken    *TokenInfo
-	refreshToken   *TokenInfo
-	idRefreshToken *TokenInfo
-	antiCsrfToken  *string
+	Handle         string
+	UserID         string
+	UserDataInJWT  map[string]interface{}
+	AccessToken    *TokenInfo
+	RefreshToken   *TokenInfo
+	IdRefreshToken *TokenInfo
+	AntiCsrfToken  *string
 }
 
 // TokenInfo carrier of cookie related info for a token
 type TokenInfo struct {
-	token        string
-	expiry       uint64
-	createdTime  uint64
-	cookiePath   string
-	cookieSecure bool
-	domain       string
-	sameSite     string
+	Token        string
+	Expiry       uint64
+	CreatedTime  uint64
+	CookiePath   string
+	CookieSecure bool
+	Domain       string
+	SameSite     string
 }
 
 // CreateNewSession function used to create a new SuperTokens session
