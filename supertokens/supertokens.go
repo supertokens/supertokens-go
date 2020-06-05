@@ -15,7 +15,60 @@ func Config(hosts string) error {
 func CreateNewSession(response *http.ResponseWriter,
 	userID string, payload ...map[string]interface{}) Session {
 	// TODO:
-	return Session{}
+
+	//check for size of payload <= 2
+	if len(payload) > 2 {
+		//handle error
+	}
+
+	session := core.CreateNewSession(userID, payload[0], payload[1])
+
+	//attach token to cookies
+	accessToken := session.AccessToken
+	refreshToken := session.RefreshToken
+	idRefreshToken := session.IdRefreshToken
+
+	attachAccessTokenToCookie(
+		response,
+		accessToken.Token,
+		accessToken.Expiry,
+		accessToken.Domain,
+		accessToken.CookiePath,
+		accessToken.CookieSecure,
+		accessToken.SameSite,
+	)
+
+	attachRefreshTokenToCookie(
+		response,
+		refreshToken.Token,
+		refreshToken.Expiry,
+		refreshToken.Domain,
+		refreshToken.CookiePath,
+		refreshToken.CookieSecure,
+		refreshToken.SameSite,
+	)
+
+	setIDRefreshTokenInHeaderAndCookie(
+		response,
+		idRefreshToken.Token,
+		idRefreshToken.Expiry,
+		idRefreshToken.Domain,
+		idRefreshToken.CookiePath,
+		idRefreshToken.CookieSecure,
+		idRefreshToken.SameSite,
+	)
+
+	if *session.AntiCsrfToken != "" {
+		setAntiCsrfTokenInHeaders(response, *session.AntiCsrfToken)
+	}
+
+	return Session{
+		accessToken:   accessToken.Token,
+		sessionHandle: session.Handle,
+		userID:        session.UserID,
+		userDataInJWT: session.UserDataInJWT,
+		response:      response,
+	}
 }
 
 // GetSession function used to verify a session
