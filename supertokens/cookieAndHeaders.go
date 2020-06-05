@@ -18,17 +18,17 @@ const frontendSDKNameHeaderKey = "supertokens-sdk-name"
 const frontendSDKVersionHeaderKey = "supertokens-sdk-version"
 
 func attachAccessTokenToCookie(response *http.ResponseWriter, token string,
-	expiry uint64, domain string, path string, secure bool, sameSite string) {
+	expiry uint64, domain string, secure bool, path string, sameSite string) {
 	setCookie(response, accessTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
 func attachRefreshTokenToCookie(response *http.ResponseWriter, token string,
-	expiry uint64, domain string, path string, secure bool, sameSite string) {
+	expiry uint64, domain string, secure bool, path string, sameSite string) {
 	setCookie(response, refreshTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
 func setIDRefreshTokenInHeaderAndCookie(response *http.ResponseWriter, token string,
-	expiry uint64, domain string, path string, secure bool, sameSite string) {
+	expiry uint64, domain string, secure bool, path string, sameSite string) {
 	setHeader(response, idRefreshTokenHeaderKey, token+";"+fmt.Sprint(expiry))
 	setHeader(response, "Access-Control-Expose-Headers", idRefreshTokenHeaderKey)
 
@@ -78,6 +78,13 @@ func getRefreshTokenFromCookie(request *http.Request) *string {
 func setCookie(response *http.ResponseWriter, name string, value string,
 	domain string, secure bool, httpOnly bool, expires uint64, path string, sameSite string) {
 
+	var sameSiteField = http.SameSiteNoneMode
+	if sameSite == "lax" {
+		sameSiteField = http.SameSiteLaxMode
+	} else if sameSite == "strict" {
+		sameSiteField = http.SameSiteStrictMode
+	}
+
 	cookie := http.Cookie{
 		Name:     name,
 		Value:    value,
@@ -86,8 +93,9 @@ func setCookie(response *http.ResponseWriter, name string, value string,
 		HttpOnly: httpOnly,
 		Expires:  time.Unix(int64(expires), 0),
 		Path:     path,
+		SameSite: sameSiteField,
 	}
-	http.SetCookie(*response, &cookie)
+	http.SetCookie(*response, &cookie) // TODO: we are passing the dereferenced of response, so isn't it making a copy of the response?
 }
 
 func setHeader(response *http.ResponseWriter, key string, value string) {
@@ -108,7 +116,7 @@ func getHeader(request *http.Request, key string) *string {
 }
 
 func getCookieValue(request *http.Request, key string) *string {
-
+	// TODO: why this comment?
 	/* // parse JSON cookies
 	    cookies = JSONCookies(cookies);
 
@@ -120,4 +128,11 @@ func getCookieValue(request *http.Request, key string) *string {
 		}
 	}
 	return nil
+}
+
+func setRelevantHeadersForOptionsAPI(response *http.ResponseWriter) {
+	setHeader(response, "Access-Control-Allow-Headers", antiCsrfHeaderKey)
+	setHeader(response, "Access-Control-Allow-Headers", frontendSDKNameHeaderKey)
+	setHeader(response, "Access-Control-Allow-Headers", frontendSDKVersionHeaderKey)
+	setHeader(response, "Access-Control-Allow-Credentials", "true")
 }

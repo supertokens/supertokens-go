@@ -16,17 +16,17 @@ func Config(hosts string) error {
 // CreateNewSession function used to create a new SuperTokens session
 func CreateNewSession(response *http.ResponseWriter,
 	userID string, payload ...map[string]interface{}) (Session, error) {
-	// TODO:
 
-	var session core.SessionInfo
-	var err error
-	if len(payload) == 0 {
-		session, err = core.CreateNewSession(userID, map[string]interface{}{}, map[string]interface{}{})
-	} else if len(payload) == 1 {
-		session, err = core.CreateNewSession(userID, payload[0], map[string]interface{}{})
-	} else {
-		session, err = core.CreateNewSession(userID, payload[0], payload[1])
+	var jwtPayload = map[string]interface{}{}
+	var sessionData = map[string]interface{}{}
+	if len(payload) == 1 {
+		jwtPayload = payload[0]
+	} else if len(payload) == 2 {
+		jwtPayload = payload[0]
+		sessionData = payload[1]
 	}
+
+	session, err := core.CreateNewSession(userID, jwtPayload, sessionData)
 
 	if err != nil {
 		return Session{}, err
@@ -42,8 +42,8 @@ func CreateNewSession(response *http.ResponseWriter,
 		accessToken.Token,
 		accessToken.Expiry,
 		accessToken.Domain,
-		accessToken.CookiePath,
 		accessToken.CookieSecure,
+		accessToken.CookiePath,
 		accessToken.SameSite,
 	)
 
@@ -52,8 +52,8 @@ func CreateNewSession(response *http.ResponseWriter,
 		refreshToken.Token,
 		refreshToken.Expiry,
 		refreshToken.Domain,
-		refreshToken.CookiePath,
 		refreshToken.CookieSecure,
+		refreshToken.CookiePath,
 		refreshToken.SameSite,
 	)
 
@@ -62,8 +62,8 @@ func CreateNewSession(response *http.ResponseWriter,
 		idRefreshToken.Token,
 		idRefreshToken.Expiry,
 		idRefreshToken.Domain,
-		idRefreshToken.CookiePath,
 		idRefreshToken.CookieSecure,
+		idRefreshToken.CookiePath,
 		idRefreshToken.SameSite,
 	)
 
@@ -84,12 +84,8 @@ func CreateNewSession(response *http.ResponseWriter,
 // GetSession function used to verify a session
 func GetSession(response *http.ResponseWriter, request *http.Request,
 	doAntiCsrfCheck bool) (Session, error) {
-	// TODO:
-
 	saveFrontendInfoFromRequest(request)
-
 	accessToken := getAccessTokenFromCookie(request)
-
 	if accessToken == nil {
 		// maybe the access token has expired.
 		return Session{}, errors.TryRefreshTokenError{
@@ -100,12 +96,13 @@ func GetSession(response *http.ResponseWriter, request *http.Request,
 	antiCsrfToken := getAntiCsrfTokenFromHeaders(request)
 	idRefreshToken := getIDRefreshTokenFromCookie(request)
 
-	session, err := core.GetSession(*accessToken, antiCsrfToken, doAntiCsrfCheck, idRefreshToken)
-	if err != nil {
-		if reflect.TypeOf(err) == reflect.TypeOf(errors.UnauthorisedError{}) {
-			handShakeInfo, err := core.GetHandshakeInfoInstance()
-			if err != nil {
-				return Session{}, err
+	session, getSessionError := core.GetSession(*accessToken, antiCsrfToken, doAntiCsrfCheck, idRefreshToken)
+
+	if getSessionError != nil {
+		if reflect.TypeOf(getSessionError) == reflect.TypeOf(errors.UnauthorisedError{}) {
+			handShakeInfo, handshakeInfoError := core.GetHandshakeInfoInstance()
+			if handshakeInfoError != nil {
+				return Session{}, handshakeInfoError
 			}
 			clearSessionFromCookie(response,
 				handShakeInfo.CookieDomain,
@@ -116,6 +113,7 @@ func GetSession(response *http.ResponseWriter, request *http.Request,
 				handShakeInfo.CookieSameSite,
 			)
 		}
+		return Session{}, getSessionError
 	}
 
 	if session.AccessToken != nil {
@@ -124,10 +122,11 @@ func GetSession(response *http.ResponseWriter, request *http.Request,
 			session.AccessToken.Token,
 			session.AccessToken.Expiry,
 			session.AccessToken.Domain,
-			session.AccessToken.CookiePath,
 			session.AccessToken.CookieSecure,
+			session.AccessToken.CookiePath,
 			session.AccessToken.SameSite,
 		)
+		accessToken = &session.AccessToken.Token
 	}
 
 	return Session{
@@ -141,18 +140,13 @@ func GetSession(response *http.ResponseWriter, request *http.Request,
 
 // RefreshSession function used to refresh a session
 func RefreshSession(response *http.ResponseWriter, request *http.Request) (Session, error) {
-	// TODO:
 	saveFrontendInfoFromRequest(request)
-
 	inputRefreshToken := getRefreshTokenFromCookie(request)
-
 	if inputRefreshToken == nil {
-
-		handShakeInfo, err := core.GetHandshakeInfoInstance()
-		if err != nil {
-			return Session{}, err
+		handShakeInfo, handshakeInfoError := core.GetHandshakeInfoInstance()
+		if handshakeInfoError != nil {
+			return Session{}, handshakeInfoError
 		}
-
 		clearSessionFromCookie(
 			response,
 			handShakeInfo.CookieDomain,
@@ -166,17 +160,16 @@ func RefreshSession(response *http.ResponseWriter, request *http.Request) (Sessi
 		}
 	}
 
-	session, err := core.RefreshSession(*inputRefreshToken)
+	session, refreshError := core.RefreshSession(*inputRefreshToken)
 
-	if err != nil {
+	if refreshError != nil {
 
-		if (reflect.TypeOf(err) == reflect.TypeOf(errors.UnauthorisedError{}) ||
-			reflect.TypeOf(err) == reflect.TypeOf(errors.TokenTheftDetectedError{})) {
-			handShakeInfo, err2 := core.GetHandshakeInfoInstance()
-			if err2 != nil {
-				return Session{}, err2
+		if (reflect.TypeOf(refreshError) == reflect.TypeOf(errors.UnauthorisedError{}) ||
+			reflect.TypeOf(refreshError) == reflect.TypeOf(errors.TokenTheftDetectedError{})) {
+			handShakeInfo, handshakeInfoError := core.GetHandshakeInfoInstance()
+			if handshakeInfoError != nil {
+				return Session{}, handshakeInfoError
 			}
-
 			clearSessionFromCookie(
 				response,
 				handShakeInfo.CookieDomain,
@@ -186,7 +179,7 @@ func RefreshSession(response *http.ResponseWriter, request *http.Request) (Sessi
 				handShakeInfo.IDRefreshTokenPath,
 				handShakeInfo.CookieSameSite)
 		}
-		return Session{}, err
+		return Session{}, refreshError
 	}
 
 	//attach cookies
@@ -199,8 +192,8 @@ func RefreshSession(response *http.ResponseWriter, request *http.Request) (Sessi
 		accessToken.Token,
 		accessToken.Expiry,
 		accessToken.Domain,
-		accessToken.CookiePath,
 		accessToken.CookieSecure,
+		accessToken.CookiePath,
 		accessToken.SameSite,
 	)
 
@@ -209,8 +202,8 @@ func RefreshSession(response *http.ResponseWriter, request *http.Request) (Sessi
 		refreshToken.Token,
 		refreshToken.Expiry,
 		refreshToken.Domain,
-		refreshToken.CookiePath,
 		refreshToken.CookieSecure,
+		refreshToken.CookiePath,
 		refreshToken.SameSite,
 	)
 
@@ -219,8 +212,8 @@ func RefreshSession(response *http.ResponseWriter, request *http.Request) (Sessi
 		idRefreshToken.Token,
 		idRefreshToken.Expiry,
 		idRefreshToken.Domain,
-		idRefreshToken.CookiePath,
 		idRefreshToken.CookieSecure,
+		idRefreshToken.CookiePath,
 		idRefreshToken.SameSite,
 	)
 
@@ -268,9 +261,8 @@ func UpdateSessionData(sessionHandle string, newSessionData map[string]interface
 }
 
 // SetRelevantHeadersForOptionsAPI function is used to set headers specific to SuperTokens for OPTIONS API
-func SetRelevantHeadersForOptionsAPI(response *http.ResponseWriter) error {
-	// TODO:
-	return nil
+func SetRelevantHeadersForOptionsAPI(response *http.ResponseWriter) {
+	setRelevantHeadersForOptionsAPI(response)
 }
 
 // GetJWTPayload function used to get jwt payload for the given handle
