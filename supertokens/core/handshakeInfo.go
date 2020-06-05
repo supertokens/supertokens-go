@@ -13,22 +13,37 @@ type handshakeInfo struct {
 	JwtSigningPublicKeyExpiryTime  uint64
 	CookieSameSite                 string
 	IDRefreshTokenPath             string
-	SessionExpiredStatusCode       int8
+	SessionExpiredStatusCode       int
 }
 
 var handshakeInfoInstantiated *handshakeInfo
 
 // GetHandshakeInfoInstance returns handshake info.
-func GetHandshakeInfoInstance() *handshakeInfo {
+func GetHandshakeInfoInstance() (*handshakeInfo, error) {
 	if handshakeInfoInstantiated == nil {
 		handshakeInfoLock.Lock()
 		if handshakeInfoInstantiated == nil {
-			// TODO: fetch from querier
-			handshakeInfoInstantiated = &handshakeInfo{}
+			response, err := getQuerierInstance().SendGetRequest("/handshake", map[string]string{})
+			if err != nil {
+				return nil, err
+			}
+			handshakeInfoInstantiated = &handshakeInfo{
+				JwtSigningPublicKey:            response["jwtSigningPublicKey"].(string),
+				CookieDomain:                   response["cookieDomain"].(string),
+				CookieSecure:                   response["cookieSecure"].(bool),
+				AccessTokenPath:                response["accessTokenPath"].(string),
+				RefreshTokenPath:               response["refreshTokenPath"].(string),
+				EnableAntiCsrf:                 response["enableAntiCsrf"].(bool),
+				AccessTokenBlacklistingEnabled: response["accessTokenBlacklistingEnabled"].(bool),
+				JwtSigningPublicKeyExpiryTime:  response["jwtSigningPublicKeyExpiryTime"].(uint64),
+				CookieSameSite:                 response["cookieSameSite"].(string),
+				IDRefreshTokenPath:             response["idRefreshTokenPath"].(string),
+				SessionExpiredStatusCode:       response["sessionExpiredStatusCode"].(int),
+			}
 		}
 		handshakeInfoLock.Unlock()
 	}
-	return handshakeInfoInstantiated
+	return handshakeInfoInstantiated, nil
 }
 
 var handshakeInfoLock sync.Mutex
