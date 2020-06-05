@@ -46,15 +46,27 @@ func CreateNewSession(userID string, jwtPayload map[string]interface{},
 }
 
 // GetSession function used to verify a session
-func GetSession(response *http.ResponseWriter, request *http.Request,
-	doAntiCsrfCheck bool) (SessionInfo, error) {
+func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool, idRefreshToken *string) (SessionInfo, error) {
 	// TODO:
 	return SessionInfo{}, nil
 }
 
 // RefreshSession function used to refresh a session
-func RefreshSession(response *http.ResponseWriter, request *http.Request) (SessionInfo, error) {
-	// TODO:
+func RefreshSession(refreshToken string) (SessionInfo, error) {
+	response, err := getQuerierInstance().SendPostRequest("/session/refresh",
+		map[string]interface{}{
+			"refreshToken": refreshToken,
+		})
+	if err != nil {
+		return SessionInfo{}, err
+	}
+	if response["status"] == "OK" {
+		return convertJSONResponseToSessionInfo(response), nil
+	} else if response["status"] == "UNAUTHORISED" {
+		// TODO:
+	} else {
+		// TODO:
+	}
 	return SessionInfo{}, nil
 }
 
