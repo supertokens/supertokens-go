@@ -63,7 +63,8 @@ func UpdateSessionData(sessionHandle string, newSessionData map[string]interface
 
 // SetRelevantHeadersForOptionsAPI function is used to set headers specific to SuperTokens for OPTIONS API
 func SetRelevantHeadersForOptionsAPI(response *http.ResponseWriter) error {
-	return core.SetRelevantHeadersForOptionsAPI(response)
+	// TODO:
+	return nil
 }
 
 // GetJWTPayload function used to get jwt payload for the given handle

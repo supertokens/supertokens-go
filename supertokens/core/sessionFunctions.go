@@ -1,8 +1,6 @@
 package core
 
 import (
-	"net/http"
-
 	"github.com/supertokens/supertokens-go/supertokens/errors"
 )
 
@@ -111,60 +109,139 @@ func RefreshSession(refreshToken string) (SessionInfo, error) {
 
 // RevokeAllSessionsForUser function used to revoke all sessions for a user
 func RevokeAllSessionsForUser(userID string) ([]string, error) {
-	// TODO:
-	return make([]string, 0), nil
+	response, err := getQuerierInstance().SendPostRequest("/session/remove",
+		map[string]interface{}{
+			"userId": userID,
+		})
+	if err != nil {
+		return nil, err
+	}
+	return response["sessionHandlesRevoked"].([]string), nil
 }
 
 // GetAllSessionHandlesForUser function used to get all sessions for a user
 func GetAllSessionHandlesForUser(userID string) ([]string, error) {
-	// TODO:
-	return make([]string, 0), nil
+	response, err := getQuerierInstance().SendGetRequest("/session/user",
+		map[string]string{
+			"userId": userID,
+		})
+	if err != nil {
+		return nil, err
+	}
+	return response["sessionHandles"].([]string), nil
 }
 
 // RevokeSession function used to revoke a specific session
 func RevokeSession(sessionHandle string) (bool, error) {
-	// TODO:
-	return false, nil
+	response, err := getQuerierInstance().SendPostRequest("/session/remove",
+		map[string]interface{}{
+			"sessionHandles": [1]string{sessionHandle},
+		})
+	if err != nil {
+		return false, err
+	}
+	return len(response["sessionHandlesRevoked"].([]string)) == 1, nil
 }
 
 // RevokeMultipleSessions function used to revoke a list of sessions
 func RevokeMultipleSessions(sessionHandles []string) ([]string, error) {
-	// TODO:
-	return make([]string, 0), nil
+	response, err := getQuerierInstance().SendPostRequest("/session/remove",
+		map[string]interface{}{
+			"sessionHandles": sessionHandles,
+		})
+	if err != nil {
+		return nil, err
+	}
+	return response["sessionHandlesRevoked"].([]string), nil
 }
 
 // GetSessionData function used to get session data for the given handle
 func GetSessionData(sessionHandle string) (map[string]interface{}, error) {
-	// TODO:
-	return map[string]interface{}{}, nil
+	response, err := getQuerierInstance().SendGetRequest("/session/data",
+		map[string]string{
+			"sessionHandle": sessionHandle,
+		})
+	if err != nil {
+		return nil, err
+	}
+	if response["status"] == "OK" {
+		return response["userDataInDatabase"].(map[string]interface{}), nil
+	} else {
+		return nil, errors.UnauthorisedError{
+			Msg: response["message"].(string),
+		}
+	}
 }
 
 // UpdateSessionData function used to update session data for the given handle
 func UpdateSessionData(sessionHandle string, newSessionData map[string]interface{}) error {
-	// TODO:
-	return nil
-}
-
-// SetRelevantHeadersForOptionsAPI function is used to set headers specific to SuperTokens for OPTIONS API
-func SetRelevantHeadersForOptionsAPI(response *http.ResponseWriter) error {
-	// TODO:
+	response, err := getQuerierInstance().SendPutRequest("/session/data",
+		map[string]interface{}{
+			"sessionHandle":      sessionHandle,
+			"userDataInDatabase": newSessionData,
+		})
+	if err != nil {
+		return err
+	}
+	if response["status"] == "UNAUTHORISED" {
+		return errors.UnauthorisedError{
+			Msg: response["message"].(string),
+		}
+	}
 	return nil
 }
 
 // GetJWTPayload function used to get jwt payload for the given handle
 func GetJWTPayload(sessionHandle string) (map[string]interface{}, error) {
-	// TODO:
-	return map[string]interface{}{}, nil
+	response, err := getQuerierInstance().SendGetRequest("/jwt/data",
+		map[string]string{
+			"sessionHandle": sessionHandle,
+		})
+	if err != nil {
+		return nil, err
+	}
+	if response["status"] == "OK" {
+		return response["userDataInJWT"].(map[string]interface{}), nil
+	} else {
+		return nil, errors.UnauthorisedError{
+			Msg: response["message"].(string),
+		}
+	}
 }
 
 // UpdateJWTPayload function used to update jwt payload for the given handle
 func UpdateJWTPayload(sessionHandle string, newJWTPayload map[string]interface{}) error {
-	// TODO:
+	response, err := getQuerierInstance().SendPutRequest("/jwt/data",
+		map[string]interface{}{
+			"sessionHandle": sessionHandle,
+			"userDataInJWT": newJWTPayload,
+		})
+	if err != nil {
+		return err
+	}
+	if response["status"] == "UNAUTHORISED" {
+		return errors.UnauthorisedError{
+			Msg: response["message"].(string),
+		}
+	}
 	return nil
 }
 
 // RegenerateSession function used to regenerate a session
 func RegenerateSession(accessToken string, newJWTPayload map[string]interface{}) (SessionInfo, error) {
-	// TODO:
-	return SessionInfo{}, nil
+	response, err := getQuerierInstance().SendPostRequest("/session/regenerate",
+		map[string]interface{}{
+			"accessToken":   accessToken,
+			"userDataInJWT": newJWTPayload,
+		})
+	if err != nil {
+		return SessionInfo{}, err
+	}
+	if response["status"] == "UNAUTHORISED" {
+		return SessionInfo{}, errors.UnauthorisedError{
+			Msg: response["message"].(string),
+		}
+	} else {
+		return convertJSONResponseToSessionInfo(response), nil
+	}
 }
