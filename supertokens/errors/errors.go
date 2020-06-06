@@ -1,5 +1,7 @@
 package errors
 
+import "reflect"
+
 // GeneralError used for non specific exceptions
 type GeneralError struct {
 	Msg         string
@@ -37,4 +39,28 @@ type UnauthorisedError struct {
 
 func (err UnauthorisedError) Error() string {
 	return err.Msg
+}
+
+// IsGeneralError returns true if error is a GeneralError
+func IsGeneralError(err error) bool {
+	// TODO: check if this is the correct way to check type.
+	return reflect.TypeOf(err) == reflect.TypeOf(GeneralError{})
+}
+
+// IsTokenTheftDetectedError returns true if error is a TokenTheftDetectedError
+func IsTokenTheftDetectedError(err error) bool {
+	// TODO: check if this is the correct way to check type.
+	return reflect.TypeOf(err) == reflect.TypeOf(TokenTheftDetectedError{})
+}
+
+// IsUnauthorisedError returns true if error is a UnauthorisedError
+func IsUnauthorisedError(err error) bool {
+	// TODO: check if this is the correct way to check type.
+	return reflect.TypeOf(err) == reflect.TypeOf(UnauthorisedError{})
+}
+
+// IsTryRefreshTokenError returns true if error is a TryRefreshTokenError
+func IsTryRefreshTokenError(err error) bool {
+	// TODO: check if this is the correct way to check type.
+	return reflect.TypeOf(err) == reflect.TypeOf(TryRefreshTokenError{})
 }

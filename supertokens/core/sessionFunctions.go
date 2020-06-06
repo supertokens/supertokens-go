@@ -60,7 +60,34 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool,
 			return SessionInfo{}, handShakeError
 		}
 		if handShakeInfo.JwtSigningPublicKeyExpiryTime > getCurrTimeInMS() {
-			// TODO:
+			accessTokenInfo, accessTokenError := getInfoFromAccessToken(accessToken,
+				handShakeInfo.JwtSigningPublicKey, handShakeInfo.EnableAntiCsrf && doAntiCsrfCheck)
+			if accessTokenError == nil {
+				if handShakeInfo.EnableAntiCsrf && doAntiCsrfCheck &&
+					(antiCsrfToken == nil || accessTokenInfo.antiCsrfToken == nil ||
+						*antiCsrfToken != *(accessTokenInfo.antiCsrfToken)) {
+					// we continue querying the core...
+				} else {
+					if !handShakeInfo.AccessTokenBlacklistingEnabled &&
+						accessTokenInfo.parentRefreshTokenHash1 == nil {
+						return SessionInfo{
+							Handle:         accessTokenInfo.sessionHandle,
+							UserID:         accessTokenInfo.userID,
+							UserDataInJWT:  accessTokenInfo.userData,
+							AccessToken:    nil,
+							RefreshToken:   nil,
+							IDRefreshToken: nil,
+							AntiCsrfToken:  nil,
+						}, nil
+					}
+					// we continue querying the core...
+				}
+			} else {
+				if !errors.IsTryRefreshTokenError(accessTokenError) {
+					return SessionInfo{}, accessTokenError
+				}
+				// we continue querying the core...
+			}
 		}
 	}
 

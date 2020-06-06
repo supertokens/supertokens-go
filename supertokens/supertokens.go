@@ -2,7 +2,6 @@ package supertokens
 
 import (
 	"net/http"
-	"reflect"
 
 	"github.com/supertokens/supertokens-go/supertokens/core"
 	"github.com/supertokens/supertokens-go/supertokens/errors"
@@ -99,7 +98,7 @@ func GetSession(response *http.ResponseWriter, request *http.Request,
 	session, getSessionError := core.GetSession(*accessToken, antiCsrfToken, doAntiCsrfCheck, idRefreshToken)
 
 	if getSessionError != nil {
-		if reflect.TypeOf(getSessionError) == reflect.TypeOf(errors.UnauthorisedError{}) {
+		if errors.IsUnauthorisedError(getSessionError) {
 			handShakeInfo, handshakeInfoError := core.GetHandshakeInfoInstance()
 			if handshakeInfoError != nil {
 				return Session{}, handshakeInfoError
@@ -164,8 +163,7 @@ func RefreshSession(response *http.ResponseWriter, request *http.Request) (Sessi
 
 	if refreshError != nil {
 
-		if (reflect.TypeOf(refreshError) == reflect.TypeOf(errors.UnauthorisedError{}) ||
-			reflect.TypeOf(refreshError) == reflect.TypeOf(errors.TokenTheftDetectedError{})) {
+		if errors.IsUnauthorisedError(refreshError) || errors.IsTokenTheftDetectedError(refreshError) {
 			handShakeInfo, handshakeInfoError := core.GetHandshakeInfoInstance()
 			if handshakeInfoError != nil {
 				return Session{}, handshakeInfoError
