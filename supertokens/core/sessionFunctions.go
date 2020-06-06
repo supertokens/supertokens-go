@@ -24,8 +24,8 @@ type SessionInfo struct {
 // TokenInfo carrier of cookie related info for a token
 type TokenInfo struct {
 	Token        string
-	Expiry       uint64
-	CreatedTime  uint64
+	Expiry       int64
+	CreatedTime  int64
 	CookiePath   string
 	CookieSecure bool
 	Domain       string
@@ -49,7 +49,20 @@ func CreateNewSession(userID string, jwtPayload map[string]interface{},
 
 // GetSession function used to verify a session
 func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool, idRefreshToken *string) (SessionInfo, error) {
-	// TODO: Try verifying it here
+	{
+		if idRefreshToken == nil {
+			return SessionInfo{}, errors.UnauthorisedError{
+				Msg: "idRefreshToken missing",
+			}
+		}
+		handShakeInfo, handShakeError := GetHandshakeInfoInstance()
+		if handShakeError != nil {
+			return SessionInfo{}, handShakeError
+		}
+		if handShakeInfo.JwtSigningPublicKeyExpiryTime > getCurrTimeInMS() {
+			// TODO:
+		}
+	}
 
 	body := map[string]interface{}{
 		"accessToken":     accessToken,
@@ -70,7 +83,7 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool,
 			}
 		}
 		handShakeInfo.UpdateJwtSigningPublicKeyInfo(
-			response["jwtSigningPublicKey"].(string), response["jwtSigningPublicKeyExpiryTime"].(uint64))
+			response["jwtSigningPublicKey"].(string), response["jwtSigningPublicKeyExpiryTime"].(int64))
 		return convertJSONResponseToSessionInfo(response), nil
 	} else if response["status"] == "UNAUTHORISED" {
 		return SessionInfo{}, errors.UnauthorisedError{

@@ -10,7 +10,7 @@ type handshakeInfo struct {
 	RefreshTokenPath               string
 	EnableAntiCsrf                 bool
 	AccessTokenBlacklistingEnabled bool
-	JwtSigningPublicKeyExpiryTime  uint64
+	JwtSigningPublicKeyExpiryTime  int64
 	CookieSameSite                 string
 	IDRefreshTokenPath             string
 	SessionExpiredStatusCode       int
@@ -35,7 +35,7 @@ func GetHandshakeInfoInstance() (*handshakeInfo, error) {
 				RefreshTokenPath:               response["refreshTokenPath"].(string),
 				EnableAntiCsrf:                 response["enableAntiCsrf"].(bool),
 				AccessTokenBlacklistingEnabled: response["accessTokenBlacklistingEnabled"].(bool),
-				JwtSigningPublicKeyExpiryTime:  response["jwtSigningPublicKeyExpiryTime"].(uint64),
+				JwtSigningPublicKeyExpiryTime:  response["jwtSigningPublicKeyExpiryTime"].(int64),
 				CookieSameSite:                 response["cookieSameSite"].(string),
 				IDRefreshTokenPath:             response["idRefreshTokenPath"].(string),
 				SessionExpiredStatusCode:       response["sessionExpiredStatusCode"].(int),
@@ -48,7 +48,7 @@ func GetHandshakeInfoInstance() (*handshakeInfo, error) {
 
 var handshakeInfoLock sync.Mutex
 
-func (info *handshakeInfo) UpdateJwtSigningPublicKeyInfo(newKey string, newExpiry uint64) {
+func (info *handshakeInfo) UpdateJwtSigningPublicKeyInfo(newKey string, newExpiry int64) {
 	handshakeInfoLock.Lock()
 	info.JwtSigningPublicKey = newKey
 	info.JwtSigningPublicKeyExpiryTime = newExpiry
