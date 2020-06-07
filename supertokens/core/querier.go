@@ -92,7 +92,7 @@ func (querierInstance *querier) getAPIVersion() (string, error) {
 	if querierInstance.apiVersion != nil {
 		return *(querierInstance.apiVersion), nil
 	}
-	_, err := querierInstance.sendRequestHelper("/apiversion", func(url string) (*http.Response, error) {
+	response, err := querierInstance.sendRequestHelper("/apiversion", func(url string) (*http.Response, error) {
 		return http.Get(url)
 	}, len(querierInstance.hosts))
 
@@ -100,7 +100,17 @@ func (querierInstance *querier) getAPIVersion() (string, error) {
 		return "", err
 	}
 
-	// TODO: do actual version comparison..
+	cdiSupportedByServer := response["versions"].([]string)
+
+	supportedVersion := getLargestVersionFromIntersection(cdiSupportedByServer, CdiVersion)
+
+	if supportedVersion == nil {
+		return "", errors.GeneralError{
+			Msg: "The running SuperTokens core version is not compatible with this Golang SDK. Please visit https://supertokens.io/docs/community/compatibility to find the right version",
+		}
+	}
+
+	querierInstance.apiVersion = supportedVersion
 
 	querierLock.Unlock()
 	return *(querierInstance.apiVersion), nil
@@ -108,7 +118,11 @@ func (querierInstance *querier) getAPIVersion() (string, error) {
 
 func (querierInstance *querier) SendPostRequest(path string, data map[string]interface{}) (map[string]interface{}, error) {
 	if path == "/session" || path == "/session/verify" || path == "/session/refresh" || path == "/handshake" {
-		// TODO: put driver info
+		data["frontendSDK"] = GetDeviceInfoInstance().GetFrontendSDKs()
+		data["drive"] = map[string]interface{}{
+			"name":    "node",
+			"version": VERSION,
+		}
 	}
 	return querierInstance.sendRequestHelper(path, func(url string) (*http.Response, error) {
 		jsonData, _ := json.Marshal(data)
