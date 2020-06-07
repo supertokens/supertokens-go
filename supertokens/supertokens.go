@@ -7,6 +7,11 @@ import (
 	"github.com/supertokens/supertokens-go/supertokens/errors"
 )
 
+type contextKey int
+
+// SessionContext string to get the session struct from context
+const SessionContext contextKey = iota
+
 // Config used to set locations of SuperTokens instances
 func Config(hosts string) error {
 	return core.Config(hosts)

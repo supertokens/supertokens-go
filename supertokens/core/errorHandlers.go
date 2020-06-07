@@ -6,7 +6,7 @@ import (
 )
 
 type errorHandlers struct {
-	OnTokenTheftDetectedErrorHandler func(string, string, http.ResponseWriter)
+	OnTokenTheftDetectedErrorHandler func(sessionHandle string, userID string, response http.ResponseWriter)
 	OnUnauthorisedErrorHandler       func(error, http.ResponseWriter)
 	OnTryRefreshTokenErrorHandler    func(error, http.ResponseWriter)
 	OnGeneralErrorHandler            func(error, http.ResponseWriter)
