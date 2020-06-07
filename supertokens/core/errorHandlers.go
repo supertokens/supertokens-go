@@ -12,20 +12,40 @@ type errorHandlers struct {
 	OnGeneralErrorHandler            func(error, http.ResponseWriter)
 }
 
-func defaultTokenTheftDetectedErrorHandler(sessionHandle string, userID string, response http.ResponseWriter) {
-	// TODO:
+func defaultTokenTheftDetectedErrorHandler(sessionHandle string, userID string, w http.ResponseWriter) {
+	handshakeInfo, handshakeInfoError := GetHandshakeInfoInstance()
+	if handshakeInfoError != nil {
+		GetErrorHandlersInstance().OnGeneralErrorHandler(handshakeInfoError, w)
+		return
+	}
+	w.WriteHeader(handshakeInfo.SessionExpiredStatusCode)
+	w.Write([]byte("token theft detected"))
+	_, _ = RevokeSession(sessionHandle)
 }
 
-func defaultUnauthorisedErrorHandler(err error, response http.ResponseWriter) {
-	// TODO:
+func defaultUnauthorisedErrorHandler(err error, w http.ResponseWriter) {
+	handshakeInfo, handshakeInfoError := GetHandshakeInfoInstance()
+	if handshakeInfoError != nil {
+		GetErrorHandlersInstance().OnGeneralErrorHandler(handshakeInfoError, w)
+		return
+	}
+	w.WriteHeader(handshakeInfo.SessionExpiredStatusCode)
+	w.Write([]byte("unauthorised: " + err.Error()))
 }
 
-func defaultTryRefreshTokenErrorHandler(err error, response http.ResponseWriter) {
-	// TODO:
+func defaultTryRefreshTokenErrorHandler(err error, w http.ResponseWriter) {
+	handshakeInfo, handshakeInfoError := GetHandshakeInfoInstance()
+	if handshakeInfoError != nil {
+		GetErrorHandlersInstance().OnGeneralErrorHandler(handshakeInfoError, w)
+		return
+	}
+	w.WriteHeader(handshakeInfo.SessionExpiredStatusCode)
+	w.Write([]byte("try refresh token: " + err.Error()))
 }
 
-func defaultGeneralErrorHandler(err error, response http.ResponseWriter) {
-	// TODO:
+func defaultGeneralErrorHandler(err error, w http.ResponseWriter) {
+	w.WriteHeader(500)
+	w.Write([]byte("Internal error: " + err.Error()))
 }
 
 var errorHandlerInstantiated *errorHandlers
