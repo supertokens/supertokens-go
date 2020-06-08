@@ -42,6 +42,9 @@ func main() {
 }
 
 func options(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "OPTIONS" {
+		return
+	}
 	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Header().Set("Access-Control-Allow-Headers", "content-type")
 	response.Header().Set("Access-Control-Allow-Methods", "*")
@@ -50,6 +53,11 @@ func options(response http.ResponseWriter, request *http.Request) {
 }
 
 func login(response http.ResponseWriter, request *http.Request) {
+
+	if request.Method != "POST" {
+		response.Write([]byte("incorrect Method, requires POST"))
+		return
+	}
 	var body map[string]interface{}
 	err := json.NewDecoder(request.Body).Decode(&body)
 	if err != nil {
@@ -70,10 +78,18 @@ func login(response http.ResponseWriter, request *http.Request) {
 }
 
 func testUserConfig(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "POST" {
+		response.Write([]byte("incorrect Method, requires POST"))
+		return
+	}
 	response.Write([]byte(""))
 
 }
 func multipleInterceptors(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "POST" {
+		response.Write([]byte("incorrect Method, requires POST"))
+		return
+	}
 	interceptorheader2 := request.Header.Get("interceptorheader2")
 	interceptorheader1 := request.Header.Get("interceptorheader1")
 
@@ -87,6 +103,10 @@ func multipleInterceptors(response http.ResponseWriter, request *http.Request) {
 }
 
 func defaultHandler(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "GET" {
+		response.Write([]byte("incorrect Method, requires GET"))
+		return
+	}
 	noOfTimesGetSessionCalledDuringTest++
 	value := request.Context().Value(supertokens.SessionContext)
 	session := value.(supertokens.Session)
@@ -97,6 +117,10 @@ func defaultHandler(response http.ResponseWriter, request *http.Request) {
 }
 
 func beforeeach(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "POST" {
+		response.Write([]byte("incorrect Method, requires GET"))
+		return
+	}
 	noOfTimesRefreshCalledDuringTest = 0
 	noOfTimesGetSessionCalledDuringTest = 0
 	core.ResetHandshakeInfo()
@@ -112,6 +136,11 @@ func testing(response http.ResponseWriter, request *http.Request) {
 }
 
 func logout(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "POST" {
+		response.Write([]byte("incorrect Method, requires POST"))
+		return
+	}
+
 	value := request.Context().Value(supertokens.SessionContext)
 	session := value.(supertokens.Session)
 	err := session.RevokeSession()
@@ -124,6 +153,10 @@ func logout(response http.ResponseWriter, request *http.Request) {
 }
 
 func revokeAll(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "POST" {
+		response.Write([]byte("incorrect Method, requires POST"))
+		return
+	}
 	value := request.Context().Value(supertokens.SessionContext)
 	session := value.(supertokens.Session)
 	userID := session.GetUserID()
@@ -132,6 +165,10 @@ func revokeAll(response http.ResponseWriter, request *http.Request) {
 }
 
 func refresh(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "POST" {
+		response.Write([]byte("incorrect Method, requires POST"))
+		return
+	}
 	noOfTimesRefreshCalledDuringTest++
 	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -139,25 +176,45 @@ func refresh(response http.ResponseWriter, request *http.Request) {
 }
 
 func refreshCalledTime(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "GET" {
+		response.Write([]byte("incorrect Method, requires GET"))
+		return
+	}
 	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Write([]byte(strconv.Itoa(noOfTimesRefreshCalledDuringTest)))
 }
 
 func getSessionCalledTime(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "GET" {
+		response.Write([]byte("incorrect Method, requires GET"))
+		return
+	}
 	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Write([]byte(strconv.Itoa(noOfTimesGetSessionCalledDuringTest)))
 }
 
 func getPackageVersion(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "GET" {
+		response.Write([]byte("incorrect Method, requires GET"))
+		return
+	}
 	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Write([]byte("4.1.3"))
 }
 
 func ping(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "GET" {
+		response.Write([]byte("incorrect Method, requires GET"))
+		return
+	}
 	response.Write([]byte(""))
 }
 
 func testHeader(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "GET" {
+		response.Write([]byte("incorrect Method, requires GET"))
+		return
+	}
 	testheader := request.Header.Get("st-custom-header")
 	success := testheader != ""
 	json.NewEncoder(response).Encode(map[string]interface{}{
@@ -166,16 +223,28 @@ func testHeader(response http.ResponseWriter, request *http.Request) {
 }
 
 func checkDeviceInfo(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "GET" {
+		response.Write([]byte("incorrect Method, requires GET"))
+		return
+	}
 	sdkName := request.Header.Get("supertokens-sdk-name")
 	sdkVersion := request.Header.Get("supertokens-sdk-version")
 	response.Write([]byte(strconv.FormatBool(sdkName == "website" && sdkVersion == "4.1.3")))
 }
 
 func checkAllowCredentials(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "POST" {
+		response.Write([]byte("incorrect Method, requires POST"))
+		return
+	}
 	response.Write([]byte(strconv.FormatBool(request.Header.Get("allow-credentials") != "")))
 }
 
 func testError(response http.ResponseWriter, request *http.Request) {
+	if request.Method != "GET" {
+		response.Write([]byte("incorrect Method, requires GET"))
+		return
+	}
 	response.WriteHeader(http.StatusInternalServerError)
 	response.Write([]byte("test error message"))
 }
