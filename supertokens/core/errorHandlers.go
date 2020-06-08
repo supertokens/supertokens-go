@@ -49,7 +49,7 @@ func defaultGeneralErrorHandler(err error, w http.ResponseWriter) {
 }
 
 var errorHandlerInstantiated *errorHandlers
-var errorHandlersOnce sync.Once
+var errorHandlersOnce *sync.Once = new(sync.Once)
 
 // GetErrorHandlersInstance returns all the error handlers.
 func GetErrorHandlersInstance() *errorHandlers {
@@ -62,4 +62,10 @@ func GetErrorHandlersInstance() *errorHandlers {
 		}
 	})
 	return errorHandlerInstantiated
+}
+
+// ResetError to be used for testing only
+func ResetError() {
+	errorHandlerInstantiated = nil
+	errorHandlersOnce = new(sync.Once)
 }

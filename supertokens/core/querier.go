@@ -27,6 +27,11 @@ type querier struct {
 var querierInstantiated *querier
 var querierLock sync.Mutex
 
+// ResetQuerier to be used for testing only
+func ResetQuerier() {
+	querierInstantiated = nil
+}
+
 // GetQuerierInstance function used to get querier struct
 func getQuerierInstance() *querier {
 	if querierInstantiated == nil {

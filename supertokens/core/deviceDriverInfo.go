@@ -12,7 +12,7 @@ type deviceInfo struct {
 }
 
 var deviceInfoInstantiated *deviceInfo
-var deviceInfoOnce sync.Once
+var deviceInfoOnce *sync.Once = new(sync.Once)
 var deviceInfoLock sync.Mutex
 
 // GetDeviceInfoInstance get device info struct - singleton
@@ -44,4 +44,10 @@ func (info *deviceInfo) AddToFrontendSDKs(name string, version string) {
 // GetFrontendSDKs get info about devices that have queried
 func (info *deviceInfo) GetFrontendSDKs() []device {
 	return info.frontendSDK
+}
+
+// ResetDeviceDriverInfo to be used for testing only
+func ResetDeviceDriverInfo() {
+	deviceInfoInstantiated = nil
+	deviceInfoOnce = new(sync.Once)
 }
