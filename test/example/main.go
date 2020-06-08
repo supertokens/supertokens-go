@@ -36,6 +36,7 @@ func main() {
 	supertokens.OnTryRefreshToken(customOnTryRefreshTokenError)
 	supertokens.OnUnauthorised(customOnUnauthorisedError)
 	supertokens.OnGeneralError(customOnGeneralError)
+	http.ListenAndServe(":8080", nil)
 
 }
 
