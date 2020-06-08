@@ -61,6 +61,7 @@ func login(response http.ResponseWriter, request *http.Request) {
 
 	if err != nil {
 		supertokens.HandleErrorAndRespond(err, response)
+		return
 	}
 	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -116,6 +117,7 @@ func logout(response http.ResponseWriter, request *http.Request) {
 	err := session.RevokeSession()
 	if err != nil {
 		supertokens.HandleErrorAndRespond(err, response)
+		return
 	}
 	response.Write([]byte("success"))
 
