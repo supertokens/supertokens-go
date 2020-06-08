@@ -57,5 +57,5 @@ func (info *handshakeInfo) UpdateJwtSigningPublicKeyInfo(newKey string, newExpir
 
 // ResetHandshakeInfo resets handshake info
 func ResetHandshakeInfo() {
-
+	//TODO:
 }
