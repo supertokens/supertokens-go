@@ -24,6 +24,7 @@ func main() {
 	http.HandleFunc("/testing", testing)
 	http.HandleFunc("/logout", supertokens.Middleware(logout))
 	http.HandleFunc("/revokeAll", supertokens.Middleware(revokeAll))
+	http.HandleFunc("/refresh", supertokens.Middleware(refresh))
 	http.HandleFunc("/refreshCalledTime", refreshCalledTime)
 	http.HandleFunc("/getSessionCalledTime", getSessionCalledTime)
 	http.HandleFunc("/getPackageVersion", getPackageVersion)
