@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -15,9 +16,26 @@ var noOfTimesRefreshCalledDuringTest int = 0
 func main() {
 	// TODO: create API according to https://github.com/supertokens/supertokens-javalin/blob/master/Example/src/main/java/example/Main.java
 	supertokens.Config("localhost:9000;")
-	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/login", login)
 	http.HandleFunc("/testUserConfig", testUserConfig)
 	http.HandleFunc("/multipleInterceptors", multipleInterceptors)
+	http.HandleFunc("/", supertokens.Middleware(defaultHandler))
+	http.HandleFunc("/beforeeach", beforeeach)
+	http.HandleFunc("/testing", testing)
+	http.HandleFunc("/logout", supertokens.Middleware(logout))
+	http.HandleFunc("/revokeAll", supertokens.Middleware(revokeAll))
+	http.HandleFunc("/refreshCalledTime", refreshCalledTime)
+	http.HandleFunc("/getSessionCalledTime", getSessionCalledTime)
+	http.HandleFunc("/getPackageVersion", getPackageVersion)
+	http.HandleFunc("/ping", ping)
+	http.HandleFunc("/testHeader", testHeader)
+	http.HandleFunc("/checkDeviceInfo", checkDeviceInfo)
+	http.HandleFunc("/checkAllowCredentials", checkDeviceInfo)
+	http.HandleFunc("/testError", testError)
+	http.HandleFunc("*", options)
+	supertokens.OnTryRefreshToken(customOnTryRefreshTokenError)
+	supertokens.OnUnauthorised(customOnUnauthorisedError)
+	supertokens.OnGeneralError(customOnGeneralError)
 
 }
 
@@ -29,11 +47,12 @@ func options(response http.ResponseWriter, request *http.Request) {
 	response.Write([]byte(""))
 }
 
-func loginHandler(response http.ResponseWriter, request *http.Request) {
+func login(response http.ResponseWriter, request *http.Request) {
 	var body map[string]interface{}
 	err := json.NewDecoder(request.Body).Decode(&body)
 	if err != nil {
-		//TODO: error when parsing body
+		response.Write([]byte("error when parsing body"))
+		return
 	}
 	userID := body["userId"].(string)
 	_, err = supertokens.CreateNewSession(response, userID)
@@ -155,4 +174,25 @@ func checkAllowCredentials(response http.ResponseWriter, request *http.Request) 
 func testError(response http.ResponseWriter, request *http.Request) {
 	response.WriteHeader(http.StatusInternalServerError)
 	response.Write([]byte("test error message"))
+}
+
+func customOnTryRefreshTokenError(err error, response http.ResponseWriter) {
+	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
+	response.Header().Set("Access-Control-Allow-Credentials", "true")
+	response.WriteHeader(440)
+	response.Write([]byte(""))
+
+}
+
+func customOnUnauthorisedError(err error, response http.ResponseWriter) {
+	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
+	response.Header().Set("Access-Control-Allow-Credentials", "true")
+	response.WriteHeader(440)
+	response.Write([]byte(""))
+}
+
+func customOnGeneralError(err error, response http.ResponseWriter) {
+	fmt.Println(err)
+	response.WriteHeader(http.StatusInternalServerError)
+	response.Write([]byte("Something went wrong"))
 }
