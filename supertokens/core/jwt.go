@@ -22,8 +22,7 @@ import (
 */
 const header = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsInZlcnNpb24iOiIyIn0="
 
-// VerifyJWTAndGetPayload verifies the given JWT with the given public key
-func VerifyJWTAndGetPayload(jwt string, jwtSigningPublicKey string) (map[string]interface{}, error) {
+func verifyJWTAndGetPayload(jwt string, jwtSigningPublicKey string) (map[string]interface{}, error) {
 	var splitted = strings.Split(jwt, ".")
 	if len(splitted) != 3 {
 		return nil, errors.GeneralError{

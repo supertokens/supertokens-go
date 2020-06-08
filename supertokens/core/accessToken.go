@@ -16,7 +16,7 @@ type accessTokenInfoStruct struct {
 }
 
 func getInfoFromAccessToken(token string, jwtSigningPublicKey string, doAntiCsrfCheck bool) (accessTokenInfoStruct, error) {
-	payload, verifyError := VerifyJWTAndGetPayload(token, jwtSigningPublicKey)
+	payload, verifyError := verifyJWTAndGetPayload(token, jwtSigningPublicKey)
 	if verifyError != nil {
 		return accessTokenInfoStruct{}, errors.TryRefreshTokenError{
 			Msg: verifyError.Error(),
