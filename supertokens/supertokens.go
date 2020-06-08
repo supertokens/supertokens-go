@@ -18,7 +18,7 @@ func Config(hosts string) error {
 }
 
 // CreateNewSession function used to create a new SuperTokens session
-func CreateNewSession(response *http.ResponseWriter,
+func CreateNewSession(response http.ResponseWriter,
 	userID string, payload ...map[string]interface{}) (Session, error) {
 
 	var jwtPayload = map[string]interface{}{}
@@ -86,7 +86,7 @@ func CreateNewSession(response *http.ResponseWriter,
 }
 
 // GetSession function used to verify a session
-func GetSession(response *http.ResponseWriter, request *http.Request,
+func GetSession(response http.ResponseWriter, request *http.Request,
 	doAntiCsrfCheck bool) (Session, error) {
 	saveFrontendInfoFromRequest(request)
 	accessToken := getAccessTokenFromCookie(request)
@@ -143,7 +143,7 @@ func GetSession(response *http.ResponseWriter, request *http.Request,
 }
 
 // RefreshSession function used to refresh a session
-func RefreshSession(response *http.ResponseWriter, request *http.Request) (Session, error) {
+func RefreshSession(response http.ResponseWriter, request *http.Request) (Session, error) {
 	saveFrontendInfoFromRequest(request)
 	inputRefreshToken := getRefreshTokenFromCookie(request)
 	if inputRefreshToken == nil {
@@ -264,7 +264,7 @@ func UpdateSessionData(sessionHandle string, newSessionData map[string]interface
 }
 
 // SetRelevantHeadersForOptionsAPI function is used to set headers specific to SuperTokens for OPTIONS API
-func SetRelevantHeadersForOptionsAPI(response *http.ResponseWriter) {
+func SetRelevantHeadersForOptionsAPI(response http.ResponseWriter) {
 	setRelevantHeadersForOptionsAPI(response)
 }
 

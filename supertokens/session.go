@@ -13,7 +13,7 @@ type Session struct {
 	userID        string
 	userDataInJWT map[string]interface{}
 	accessToken   string
-	response      *http.ResponseWriter
+	response      http.ResponseWriter
 }
 
 // RevokeSession function used to revoke a session for this session

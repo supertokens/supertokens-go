@@ -43,18 +43,15 @@ func (err UnauthorisedError) Error() string {
 
 // IsTokenTheftDetectedError returns true if error is a TokenTheftDetectedError
 func IsTokenTheftDetectedError(err error) bool {
-	// TODO: check if this is the correct way to check type.
 	return reflect.TypeOf(err) == reflect.TypeOf(TokenTheftDetectedError{})
 }
 
 // IsUnauthorisedError returns true if error is a UnauthorisedError
 func IsUnauthorisedError(err error) bool {
-	// TODO: check if this is the correct way to check type.
 	return reflect.TypeOf(err) == reflect.TypeOf(UnauthorisedError{})
 }
 
 // IsTryRefreshTokenError returns true if error is a TryRefreshTokenError
 func IsTryRefreshTokenError(err error) bool {
-	// TODO: check if this is the correct way to check type.
 	return reflect.TypeOf(err) == reflect.TypeOf(TryRefreshTokenError{})
 }

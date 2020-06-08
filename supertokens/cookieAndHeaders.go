@@ -19,17 +19,17 @@ const antiCsrfHeaderKey = "anti-csrf"
 const frontendSDKNameHeaderKey = "supertokens-sdk-name"
 const frontendSDKVersionHeaderKey = "supertokens-sdk-version"
 
-func attachAccessTokenToCookie(response *http.ResponseWriter, token string,
+func attachAccessTokenToCookie(response http.ResponseWriter, token string,
 	expiry int64, domain string, secure bool, path string, sameSite string) {
 	setCookie(response, accessTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
-func attachRefreshTokenToCookie(response *http.ResponseWriter, token string,
+func attachRefreshTokenToCookie(response http.ResponseWriter, token string,
 	expiry int64, domain string, secure bool, path string, sameSite string) {
 	setCookie(response, refreshTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
-func setIDRefreshTokenInHeaderAndCookie(response *http.ResponseWriter, token string,
+func setIDRefreshTokenInHeaderAndCookie(response http.ResponseWriter, token string,
 	expiry int64, domain string, secure bool, path string, sameSite string) {
 	setHeader(response, idRefreshTokenHeaderKey, token+";"+fmt.Sprint(expiry))
 	setHeader(response, "Access-Control-Expose-Headers", idRefreshTokenHeaderKey)
@@ -37,7 +37,7 @@ func setIDRefreshTokenInHeaderAndCookie(response *http.ResponseWriter, token str
 	setCookie(response, idRefreshTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
-func setAntiCsrfTokenInHeaders(response *http.ResponseWriter, antiCsrfToken string) {
+func setAntiCsrfTokenInHeaders(response http.ResponseWriter, antiCsrfToken string) {
 	setHeader(response, antiCsrfHeaderKey, antiCsrfToken)
 	setHeader(response, "Access-Control-Expose-Headers", antiCsrfHeaderKey)
 }
@@ -62,7 +62,7 @@ func getIDRefreshTokenFromCookie(request *http.Request) *string {
 	return getCookieValue(request, idRefreshTokenCookieKey)
 }
 
-func clearSessionFromCookie(response *http.ResponseWriter, domain string,
+func clearSessionFromCookie(response http.ResponseWriter, domain string,
 	secure bool, accessTokenPath string, refreshTokenPath string, idRefreshTokenPath string, sameSite string) {
 	setCookie(response, accessTokenCookieKey, "", domain, secure, true, 0, accessTokenPath, sameSite)
 	setCookie(response, refreshTokenCookieKey, "", domain, secure, true, 0, refreshTokenPath, sameSite)
@@ -75,7 +75,7 @@ func getRefreshTokenFromCookie(request *http.Request) *string {
 	return getCookieValue(request, refreshTokenCookieKey)
 }
 
-func setCookie(response *http.ResponseWriter, name string, value string,
+func setCookie(response http.ResponseWriter, name string, value string,
 	domain string, secure bool, httpOnly bool, expires int64, path string, sameSite string) {
 
 	var sameSiteField = http.SameSiteNoneMode
@@ -95,15 +95,15 @@ func setCookie(response *http.ResponseWriter, name string, value string,
 		Path:     path,
 		SameSite: sameSiteField,
 	}
-	http.SetCookie(*response, &cookie) // TODO: we are passing the dereferenced of response, so isn't it making a copy of the response?
+	http.SetCookie(response, &cookie)
 }
 
-func setHeader(response *http.ResponseWriter, key string, value string) {
-	existingValue := (*response).Header().Get(strings.ToLower(key))
+func setHeader(response http.ResponseWriter, key string, value string) {
+	existingValue := response.Header().Get(strings.ToLower(key))
 	if existingValue == "" {
-		(*response).Header().Set(key, value)
+		response.Header().Set(key, value)
 	} else {
-		(*response).Header().Set(key, existingValue+", "+value)
+		response.Header().Set(key, existingValue+", "+value)
 	}
 }
 
@@ -116,11 +116,6 @@ func getHeader(request *http.Request, key string) *string {
 }
 
 func getCookieValue(request *http.Request, key string) *string {
-	// TODO: why this comment?
-	/* // parse JSON cookies
-	    cookies = JSONCookies(cookies);
-
-		return (cookies as any)[key];*/
 	cookies := request.Cookies()
 	for _, value := range cookies {
 		if value.Name == key {
@@ -130,7 +125,7 @@ func getCookieValue(request *http.Request, key string) *string {
 	return nil
 }
 
-func setRelevantHeadersForOptionsAPI(response *http.ResponseWriter) {
+func setRelevantHeadersForOptionsAPI(response http.ResponseWriter) {
 	setHeader(response, "Access-Control-Allow-Headers", antiCsrfHeaderKey)
 	setHeader(response, "Access-Control-Allow-Headers", frontendSDKNameHeaderKey)
 	setHeader(response, "Access-Control-Allow-Headers", frontendSDKVersionHeaderKey)
