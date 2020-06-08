@@ -25,7 +25,7 @@ func Middleware(theirHandler http.Handler, doAntiCsrfCheck ...bool) http.Handler
 			(handshakeInfo.RefreshTokenPath+"/") == path ||
 			handshakeInfo.RefreshTokenPath == (path+"/")) &&
 			r.Method == "POST" {
-			session, sessionError := RefreshSession(&w, r)
+			session, sessionError := RefreshSession(w, r)
 			if sessionError != nil {
 				HandleErrorAndRespond(sessionError, w)
 				return
@@ -37,7 +37,7 @@ func Middleware(theirHandler http.Handler, doAntiCsrfCheck ...bool) http.Handler
 			if len(doAntiCsrfCheck) != 0 {
 				actualDoAntiCsrfCheck = doAntiCsrfCheck[0]
 			}
-			session, sessionError := GetSession(&w, r, actualDoAntiCsrfCheck)
+			session, sessionError := GetSession(w, r, actualDoAntiCsrfCheck)
 			if sessionError != nil {
 				HandleErrorAndRespond(sessionError, w)
 				return
