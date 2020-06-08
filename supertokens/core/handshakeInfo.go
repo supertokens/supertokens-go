@@ -54,3 +54,8 @@ func (info *handshakeInfo) UpdateJwtSigningPublicKeyInfo(newKey string, newExpir
 	info.JwtSigningPublicKeyExpiryTime = newExpiry
 	handshakeInfoLock.Unlock()
 }
+
+// ResetHandshakeInfo resets handshake info
+func ResetHandshakeInfo() {
+
+}
