@@ -42,7 +42,7 @@ func Middleware(theirHandler http.HandlerFunc, extraParams ...interface{}) http.
 			theirHandler.ServeHTTP(w, r.WithContext(ctx))
 		} else {
 			var actualDoAntiCsrfCheck = r.Method != "GET"
-			if len(extraParams) != 0 {
+			if len(extraParams) != 0 && extraParams[0] != nil {
 				actualDoAntiCsrfCheck = extraParams[0].(bool)
 			}
 			session, sessionError := GetSession(w, r, actualDoAntiCsrfCheck)
