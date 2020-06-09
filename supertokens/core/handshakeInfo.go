@@ -22,8 +22,9 @@ var handshakeInfoInstantiated *handshakeInfo
 func GetHandshakeInfoInstance() (*handshakeInfo, error) {
 	if handshakeInfoInstantiated == nil {
 		handshakeInfoLock.Lock()
+		defer handshakeInfoLock.Unlock()
 		if handshakeInfoInstantiated == nil {
-			response, err := getQuerierInstance().SendGetRequest("/handshake", map[string]string{})
+			response, err := getQuerierInstance().SendPostRequest("/handshake", map[string]interface{}{})
 			if err != nil {
 				return nil, err
 			}
@@ -35,13 +36,12 @@ func GetHandshakeInfoInstance() (*handshakeInfo, error) {
 				RefreshTokenPath:               response["refreshTokenPath"].(string),
 				EnableAntiCsrf:                 response["enableAntiCsrf"].(bool),
 				AccessTokenBlacklistingEnabled: response["accessTokenBlacklistingEnabled"].(bool),
-				JwtSigningPublicKeyExpiryTime:  response["jwtSigningPublicKeyExpiryTime"].(int64),
+				JwtSigningPublicKeyExpiryTime:  int64(response["jwtSigningPublicKeyExpiryTime"].(float64)),
 				CookieSameSite:                 response["cookieSameSite"].(string),
 				IDRefreshTokenPath:             response["idRefreshTokenPath"].(string),
-				SessionExpiredStatusCode:       response["sessionExpiredStatusCode"].(int),
+				SessionExpiredStatusCode:       int(response["sessionExpiredStatusCode"].(float64)),
 			}
 		}
-		handshakeInfoLock.Unlock()
 	}
 	return handshakeInfoInstantiated, nil
 }
@@ -50,9 +50,9 @@ var handshakeInfoLock sync.Mutex
 
 func (info *handshakeInfo) UpdateJwtSigningPublicKeyInfo(newKey string, newExpiry int64) {
 	handshakeInfoLock.Lock()
+	defer handshakeInfoLock.Unlock()
 	info.JwtSigningPublicKey = newKey
 	info.JwtSigningPublicKeyExpiryTime = newExpiry
-	handshakeInfoLock.Unlock()
 }
 
 // ResetHandshakeInfo to be used for testing only

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -19,6 +18,7 @@ func main() {
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/testUserConfig", testUserConfig)
 	http.HandleFunc("/multipleInterceptors", multipleInterceptors)
+	// TODO: try also with http.HandleFunc
 	http.HandleFunc("/", supertokens.Middleware(defaultHandler))
 	http.HandleFunc("/beforeeach", beforeeach)
 	http.HandleFunc("/testing", testing)
@@ -312,7 +312,6 @@ func customOnUnauthorizedError(err error, response http.ResponseWriter) {
 }
 
 func customOnGeneralError(err error, response http.ResponseWriter) {
-	fmt.Println(err)
 	response.WriteHeader(http.StatusInternalServerError)
 	response.Write([]byte("Something went wrong"))
 }

@@ -110,7 +110,7 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool,
 			}
 		}
 		handShakeInfo.UpdateJwtSigningPublicKeyInfo(
-			response["jwtSigningPublicKey"].(string), response["jwtSigningPublicKeyExpiryTime"].(int64))
+			response["jwtSigningPublicKey"].(string), int64(response["jwtSigningPublicKeyExpiryTime"].(float64)))
 		return convertJSONResponseToSessionInfo(response), nil
 	} else if response["status"] == "Unauthorized" {
 		return SessionInfo{}, errors.UnauthorizedError{
@@ -156,7 +156,8 @@ func RevokeAllSessionsForUser(userID string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return response["sessionHandlesRevoked"].([]string), nil
+	return convertInterfaceArrayToStringArray(
+		response["sessionHandlesRevoked"].([]interface{})), nil
 }
 
 // GetAllSessionHandlesForUser function used to get all sessions for a user
@@ -168,7 +169,8 @@ func GetAllSessionHandlesForUser(userID string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return response["sessionHandles"].([]string), nil
+	return convertInterfaceArrayToStringArray(
+		response["sessionHandles"].([]interface{})), nil
 }
 
 // RevokeSession function used to revoke a specific session
@@ -180,7 +182,7 @@ func RevokeSession(sessionHandle string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return len(response["sessionHandlesRevoked"].([]string)) == 1, nil
+	return len(response["sessionHandlesRevoked"].([]interface{})) == 1, nil
 }
 
 // RevokeMultipleSessions function used to revoke a list of sessions
@@ -192,7 +194,8 @@ func RevokeMultipleSessions(sessionHandles []string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return response["sessionHandlesRevoked"].([]string), nil
+	return convertInterfaceArrayToStringArray(
+		response["sessionHandlesRevoked"].([]interface{})), nil
 }
 
 // GetSessionData function used to get session data for the given handle

@@ -36,6 +36,7 @@ func ResetQuerier() {
 func getQuerierInstance() *querier {
 	if querierInstantiated == nil {
 		querierLock.Lock()
+		defer querierLock.Unlock()
 		if querierInstantiated == nil {
 			querierInstantiated = &querier{
 				hosts: []hosts{
@@ -48,7 +49,6 @@ func getQuerierInstance() *querier {
 				apiVersion:     nil,
 			}
 		}
-		querierLock.Unlock()
 	}
 	return querierInstantiated
 }
@@ -57,6 +57,7 @@ func getQuerierInstance() *querier {
 func InitQuerier(hostsStr string) error {
 	if querierInstantiated == nil {
 		querierLock.Lock()
+		defer querierLock.Unlock()
 		if querierInstantiated == nil {
 
 			// convert "hostname1:port1;hostname2:port2" to proper data type
@@ -87,7 +88,6 @@ func InitQuerier(hostsStr string) error {
 				apiVersion:     nil,
 			}
 		}
-		querierLock.Unlock()
 	}
 	return nil
 }
@@ -97,6 +97,7 @@ func (querierInstance *querier) getAPIVersion() (string, error) {
 		return *(querierInstance.apiVersion), nil
 	}
 	querierLock.Lock()
+	defer querierLock.Unlock()
 	if querierInstance.apiVersion != nil {
 		return *(querierInstance.apiVersion), nil
 	}
@@ -108,7 +109,11 @@ func (querierInstance *querier) getAPIVersion() (string, error) {
 		return "", err
 	}
 
-	cdiSupportedByServer := response["versions"].([]string)
+	cdiSupportedByServerInterface := response["versions"].([]interface{})
+	cdiSupportedByServer := []string{}
+	for i := 0; i < len(cdiSupportedByServerInterface); i++ {
+		cdiSupportedByServer = append(cdiSupportedByServer, cdiSupportedByServerInterface[i].(string))
+	}
 
 	supportedVersion := getLargestVersionFromIntersection(cdiSupportedByServer, CdiVersion)
 
@@ -120,7 +125,6 @@ func (querierInstance *querier) getAPIVersion() (string, error) {
 
 	querierInstance.apiVersion = supportedVersion
 
-	querierLock.Unlock()
 	return *(querierInstance.apiVersion), nil
 }
 
@@ -192,7 +196,6 @@ func (querierInstance *querier) SendGetRequest(path string, params map[string]st
 		if apiVersionError != nil {
 			return nil, apiVersionError
 		}
-
 		req.Header.Set("cdi-version", apiVerion)
 
 		return client.Do(req)

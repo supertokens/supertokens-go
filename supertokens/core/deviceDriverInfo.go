@@ -28,6 +28,7 @@ func GetDeviceInfoInstance() *deviceInfo {
 // AddToFrontendSDKs add a device's info to array
 func (info *deviceInfo) AddToFrontendSDKs(name string, version string) {
 	deviceInfoLock.Lock()
+	defer deviceInfoLock.Unlock()
 	for i := 0; i < len(info.frontendSDK); i++ {
 		curr := info.frontendSDK[i]
 		if curr.name == name && curr.version == version {
@@ -38,7 +39,6 @@ func (info *deviceInfo) AddToFrontendSDKs(name string, version string) {
 		name:    name,
 		version: version,
 	})
-	deviceInfoLock.Unlock()
 }
 
 // GetFrontendSDKs get info about devices that have queried
