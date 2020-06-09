@@ -1,99 +1,49 @@
+package main
+
 import (
-    "github.com/supertokens/supertokens-go/sessions/gin/supertokens"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/supertokens/supertokens-go/supertokens"
 )
 
-r := gin.Default()
-
-r.POST("/login", loginHandler)
-
-r.POST("/auth/refresh", supertokens.Middleware(),refreshHandler)
-
-r.POST("/auth/logout", supertokens.Middleware(),logoutHandler)
-
-r.GET("/user/info", supertokens.Middleware(true),getUserInfoHandler)
-
-r.PUT("/user/info", supertokens.Middleware(),putUserInfoHandler)
-
-r.Run(":8000")
-
-supertokens.Config("localhost:8000;...")
-
-
-supertokens.OnTokenTheftDetected( func( sessionHandle string, userId string, c *gin.Context){
-
-})
-
-supertokens.OnUnauthorized( func( err error, c *gin.Context){
-
-})
-
-supertokens.OnTryRefreshToken( func( err error, c *gin.Context){
-
-})
-
-supertokens.OnGeneralError( func( err error, c *gin.Context){
-
-})
-
-
-func loginHandler(c *gin.Context){
-
-    userId := "User1"
-
-    jwtPayload :=  map[string]interface{}{
-                        "key" : "value"
-    }
-    sessionData := map[string]interface{}{
-        "awesomeThings": [...]string{"info","moreInfo"}
-
-    }
-
-    _, err := supertokens.CreateNewSession(c, userId,jwtPayload, sessionData)
-
-    if err != nil {
-        return supertokens.HandleErrorAndRespond(err)
-    }
-
-    c.JSON(200, gin.H{
-		"message": "success",
-	})
+func main() {
+	r := gin.Default()
+	r.Handle("GET", "/info", customSupertokensMiddleware(), infoHandler)
+	r.Handle("POST", "/session", newSession)
+	r.Run(":8080")
 }
 
-func refreshHandler(c *gin.Context){
-    c.JSON(200, gin.H{
-		"message": "success",
-	})
+func customSupertokensMiddleware(condition ...bool) func(*gin.Context) {
+	return func(c *gin.Context) {
+		var params = []interface{}{}
+		if len(condition) == 1 {
+			params = append(params, condition[0])
+		} else {
+			params = append(params, nil)
+		}
+		params = append(params, func(err error, w http.ResponseWriter) {
+			c.Abort()
+			supertokens.HandleErrorAndRespond(err, w)
+		})
+		handler := supertokens.Middleware(func(w http.ResponseWriter, r *http.Request) {
+			c.Set(supertokens.GinContext,
+				r.Context().Value(supertokens.SessionContext).(supertokens.Session))
+			c.Next()
+		}, params...)
+		handler(c.Writer, c.Request)
+	}
 }
 
-func logoutHandler (c *gin.Context){
-    session :=  c.Value(supertokens.sessionContext)
-    err := session.RevokeSession()
-    if err != nil {
-        return supertokens.HandleErrorAndRespond(err)
-    }
-
-    c.JSON(200, gin.H{
-		"success": "true",
-	})
+func newSession(c *gin.Context) {
+	_, err := supertokens.CreateNewSession(c.Writer, "user1")
+	if err != nil {
+		supertokens.HandleErrorAndRespond(err, c.Writer)
+	}
+	c.JSON(http.StatusOK, gin.H{"msg": "done"})
 }
 
-func getUserInfoHandler (c *gin.Context){
-    session := c.Value(supertokens.sessionContext)
-    userId := session.UserID()
-
-    c.JSON(200, gin.H{
-		"message": userId
-	})
-}
-
-func putUserInfoHandler(c *gin.Context){
-
-    newUserInfo,_:= ioutil.ReadAll(c.request.Body)
-    
-    //update user data
-    userId := session.UserID()
-
-    c.JSON(200, gin.H{
-		"success": true
-	})
+func infoHandler(c *gin.Context) {
+	session := c.MustGet(supertokens.GinContext).(supertokens.Session)
+	c.JSON(http.StatusOK, gin.H{"data": session.GetUserID()})
 }
