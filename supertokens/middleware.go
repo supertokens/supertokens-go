@@ -32,9 +32,9 @@ func Middleware(theirHandler http.HandlerFunc, extraParams ...interface{}) http.
 			session, sessionError := RefreshSession(w, r)
 			if sessionError != nil {
 				if len(extraParams) != 2 {
-					HandleErrorAndRespond(handshakeInfoError, w)
+					HandleErrorAndRespond(sessionError, w)
 				} else {
-					extraParams[1].(func(err error, w http.ResponseWriter))(handshakeInfoError, w)
+					extraParams[1].(func(err error, w http.ResponseWriter))(sessionError, w)
 				}
 				return
 			}
@@ -48,9 +48,9 @@ func Middleware(theirHandler http.HandlerFunc, extraParams ...interface{}) http.
 			session, sessionError := GetSession(w, r, actualDoAntiCsrfCheck)
 			if sessionError != nil {
 				if len(extraParams) != 2 {
-					HandleErrorAndRespond(handshakeInfoError, w)
+					HandleErrorAndRespond(sessionError, w)
 				} else {
-					extraParams[1].(func(err error, w http.ResponseWriter))(handshakeInfoError, w)
+					extraParams[1].(func(err error, w http.ResponseWriter))(sessionError, w)
 				}
 				return
 			}
