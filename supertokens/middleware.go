@@ -9,7 +9,7 @@ import (
 )
 
 // Middleware for verifying and refreshing session
-func Middleware(theirHandler http.Handler, doAntiCsrfCheck ...bool) http.Handler {
+func Middleware(theirHandler http.HandlerFunc, doAntiCsrfCheck ...bool) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "OPTIONS" || r.Method == "TRACE" {
 			theirHandler.ServeHTTP(w, r)
