@@ -103,7 +103,7 @@ func GetSession(response http.ResponseWriter, request *http.Request,
 	session, getSessionError := core.GetSession(*accessToken, antiCsrfToken, doAntiCsrfCheck, idRefreshToken)
 
 	if getSessionError != nil {
-		if errors.IsUnauthorisedError(getSessionError) {
+		if errors.IsUnauthorizedError(getSessionError) {
 			handShakeInfo, handshakeInfoError := core.GetHandshakeInfoInstance()
 			if handshakeInfoError != nil {
 				return Session{}, handshakeInfoError
@@ -159,7 +159,7 @@ func RefreshSession(response http.ResponseWriter, request *http.Request) (Sessio
 			handShakeInfo.RefreshTokenPath,
 			handShakeInfo.IDRefreshTokenPath,
 			handShakeInfo.CookieSameSite)
-		return Session{}, errors.UnauthorisedError{
+		return Session{}, errors.UnauthorizedError{
 			Msg: "Missing auth tokens in cookies. Have you set the correct refresh API path in your frontend and SuperTokens config?",
 		}
 	}
@@ -168,7 +168,7 @@ func RefreshSession(response http.ResponseWriter, request *http.Request) (Sessio
 
 	if refreshError != nil {
 
-		if errors.IsUnauthorisedError(refreshError) || errors.IsTokenTheftDetectedError(refreshError) {
+		if errors.IsUnauthorizedError(refreshError) || errors.IsTokenTheftDetectedError(refreshError) {
 			handShakeInfo, handshakeInfoError := core.GetHandshakeInfoInstance()
 			if handshakeInfoError != nil {
 				return Session{}, handshakeInfoError
@@ -283,9 +283,9 @@ func OnTokenTheftDetected(handler func(string, string, http.ResponseWriter)) {
 	core.GetErrorHandlersInstance().OnTokenTheftDetectedErrorHandler = handler
 }
 
-// OnUnauthorised function to override default behaviour of handling unauthorised error
-func OnUnauthorised(handler func(error, http.ResponseWriter)) {
-	core.GetErrorHandlersInstance().OnUnauthorisedErrorHandler = handler
+// OnUnauthorized function to override default behaviour of handling Unauthorized error
+func OnUnauthorized(handler func(error, http.ResponseWriter)) {
+	core.GetErrorHandlersInstance().OnUnauthorizedErrorHandler = handler
 }
 
 // OnTryRefreshToken function to override default behaviour of handling try refresh token errors

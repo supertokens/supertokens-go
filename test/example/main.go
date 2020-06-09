@@ -34,7 +34,7 @@ func main() {
 	http.HandleFunc("/checkAllowCredentials", checkDeviceInfo)
 	http.HandleFunc("/testError", testError)
 	supertokens.OnTryRefreshToken(customOnTryRefreshTokenError)
-	supertokens.OnUnauthorised(customOnUnauthorisedError)
+	supertokens.OnUnauthorized(customOnUnauthorizedError)
 	supertokens.OnGeneralError(customOnGeneralError)
 	http.ListenAndServe(":8080", nil)
 
@@ -52,6 +52,7 @@ func login(response http.ResponseWriter, request *http.Request) {
 
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
@@ -79,6 +80,7 @@ func login(response http.ResponseWriter, request *http.Request) {
 func testUserConfig(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
@@ -89,6 +91,7 @@ func testUserConfig(response http.ResponseWriter, request *http.Request) {
 func multipleInterceptors(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
@@ -108,6 +111,7 @@ func multipleInterceptors(response http.ResponseWriter, request *http.Request) {
 func defaultHandler(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
@@ -124,6 +128,7 @@ func defaultHandler(response http.ResponseWriter, request *http.Request) {
 func beforeeach(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
@@ -137,6 +142,7 @@ func beforeeach(response http.ResponseWriter, request *http.Request) {
 func testing(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	}
 	value := request.Header.Get("testing")
 	if value != "" {
@@ -148,6 +154,7 @@ func testing(response http.ResponseWriter, request *http.Request) {
 func logout(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
@@ -167,6 +174,7 @@ func logout(response http.ResponseWriter, request *http.Request) {
 func revokeAll(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
@@ -181,6 +189,7 @@ func revokeAll(response http.ResponseWriter, request *http.Request) {
 func refresh(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
@@ -194,6 +203,7 @@ func refresh(response http.ResponseWriter, request *http.Request) {
 func refreshCalledTime(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
@@ -205,6 +215,7 @@ func refreshCalledTime(response http.ResponseWriter, request *http.Request) {
 func getSessionCalledTime(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
@@ -216,6 +227,7 @@ func getSessionCalledTime(response http.ResponseWriter, request *http.Request) {
 func getPackageVersion(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
@@ -227,6 +239,7 @@ func getPackageVersion(response http.ResponseWriter, request *http.Request) {
 func ping(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
@@ -237,6 +250,7 @@ func ping(response http.ResponseWriter, request *http.Request) {
 func testHeader(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
@@ -251,6 +265,7 @@ func testHeader(response http.ResponseWriter, request *http.Request) {
 func checkDeviceInfo(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
@@ -263,6 +278,7 @@ func checkDeviceInfo(response http.ResponseWriter, request *http.Request) {
 func checkAllowCredentials(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
@@ -273,6 +289,7 @@ func checkAllowCredentials(response http.ResponseWriter, request *http.Request) 
 func testError(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
+		return
 	} else if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
@@ -289,7 +306,7 @@ func customOnTryRefreshTokenError(err error, response http.ResponseWriter) {
 
 }
 
-func customOnUnauthorisedError(err error, response http.ResponseWriter) {
+func customOnUnauthorizedError(err error, response http.ResponseWriter) {
 	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.WriteHeader(440)

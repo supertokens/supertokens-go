@@ -51,8 +51,8 @@ func Middleware(theirHandler http.HandlerFunc, doAntiCsrfCheck ...bool) http.Han
 // HandleErrorAndRespond if error handlers are provided, then uses those, else does default error handling depending on the type of error
 func HandleErrorAndRespond(err error, w http.ResponseWriter) {
 	errorHandlers := core.GetErrorHandlersInstance()
-	if errors.IsUnauthorisedError(err) {
-		errorHandlers.OnUnauthorisedErrorHandler(err, w)
+	if errors.IsUnauthorizedError(err) {
+		errorHandlers.OnUnauthorizedErrorHandler(err, w)
 	} else if errors.IsTryRefreshTokenError(err) {
 		errorHandlers.OnTryRefreshTokenErrorHandler(err, w)
 	} else if errors.IsTokenTheftDetectedError(err) {

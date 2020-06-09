@@ -15,7 +15,7 @@ supertokens.OnTokenTheftDetected( func( sessionHandle string, userId string, res
 
 })
 
-supertokens.OnUnauthorised( func( err error, response http.ResponseWriter, request *http.Request){
+supertokens.OnUnauthorized( func( err error, response http.ResponseWriter, request *http.Request){
 
 })
 

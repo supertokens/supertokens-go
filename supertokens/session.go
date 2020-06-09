@@ -43,7 +43,7 @@ func (session *Session) RevokeSession() error {
 func (session *Session) GetSessionData() (map[string]interface{}, error) {
 	data, err := GetSessionData(session.sessionHandle)
 	if err != nil {
-		if errors.IsUnauthorisedError(err) {
+		if errors.IsUnauthorizedError(err) {
 			handShakeInfo, handShakeInfoErr := core.GetHandshakeInfoInstance()
 			if handShakeInfoErr != nil {
 				return nil, handShakeInfoErr
@@ -66,7 +66,7 @@ func (session *Session) GetSessionData() (map[string]interface{}, error) {
 func (session *Session) UpdateSessionData(newSessionData map[string]interface{}) error {
 	err := UpdateSessionData(session.sessionHandle, newSessionData)
 	if err != nil {
-		if errors.IsUnauthorisedError(err) {
+		if errors.IsUnauthorizedError(err) {
 			handShakeInfo, handShakeInfoErr := core.GetHandshakeInfoInstance()
 			if handShakeInfoErr != nil {
 				return handShakeInfoErr
@@ -109,7 +109,7 @@ func (session *Session) GetAccessToken() string {
 func (session *Session) UpdateJWTPayload(newJWTPayload map[string]interface{}) error {
 	sessionInfo, err := core.RegenerateSession(session.accessToken, newJWTPayload)
 	if err != nil {
-		if errors.IsUnauthorisedError(err) {
+		if errors.IsUnauthorizedError(err) {
 			handShakeInfo, handShakeInfoErr := core.GetHandshakeInfoInstance()
 			if handShakeInfoErr != nil {
 				return handShakeInfoErr

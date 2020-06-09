@@ -23,7 +23,7 @@ supertokens.OnTokenTheftDetected( func( sessionHandle string, userId string, c *
 
 })
 
-supertokens.OnUnauthorised( func( err error, c *gin.Context){
+supertokens.OnUnauthorized( func( err error, c *gin.Context){
 
 })
 

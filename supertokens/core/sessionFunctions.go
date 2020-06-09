@@ -51,7 +51,7 @@ func CreateNewSession(userID string, jwtPayload map[string]interface{},
 func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool, idRefreshToken *string) (SessionInfo, error) {
 	{
 		if idRefreshToken == nil {
-			return SessionInfo{}, errors.UnauthorisedError{
+			return SessionInfo{}, errors.UnauthorizedError{
 				Msg: "idRefreshToken missing",
 			}
 		}
@@ -112,8 +112,8 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool,
 		handShakeInfo.UpdateJwtSigningPublicKeyInfo(
 			response["jwtSigningPublicKey"].(string), response["jwtSigningPublicKeyExpiryTime"].(int64))
 		return convertJSONResponseToSessionInfo(response), nil
-	} else if response["status"] == "UNAUTHORISED" {
-		return SessionInfo{}, errors.UnauthorisedError{
+	} else if response["status"] == "Unauthorized" {
+		return SessionInfo{}, errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
 	} else {
@@ -134,8 +134,8 @@ func RefreshSession(refreshToken string) (SessionInfo, error) {
 	}
 	if response["status"] == "OK" {
 		return convertJSONResponseToSessionInfo(response), nil
-	} else if response["status"] == "UNAUTHORISED" {
-		return SessionInfo{}, errors.UnauthorisedError{
+	} else if response["status"] == "Unauthorized" {
+		return SessionInfo{}, errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
 	} else {
@@ -207,7 +207,7 @@ func GetSessionData(sessionHandle string) (map[string]interface{}, error) {
 	if response["status"] == "OK" {
 		return response["userDataInDatabase"].(map[string]interface{}), nil
 	} else {
-		return nil, errors.UnauthorisedError{
+		return nil, errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
 	}
@@ -223,8 +223,8 @@ func UpdateSessionData(sessionHandle string, newSessionData map[string]interface
 	if err != nil {
 		return err
 	}
-	if response["status"] == "UNAUTHORISED" {
-		return errors.UnauthorisedError{
+	if response["status"] == "Unauthorized" {
+		return errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
 	}
@@ -243,7 +243,7 @@ func GetJWTPayload(sessionHandle string) (map[string]interface{}, error) {
 	if response["status"] == "OK" {
 		return response["userDataInJWT"].(map[string]interface{}), nil
 	} else {
-		return nil, errors.UnauthorisedError{
+		return nil, errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
 	}
@@ -259,8 +259,8 @@ func UpdateJWTPayload(sessionHandle string, newJWTPayload map[string]interface{}
 	if err != nil {
 		return err
 	}
-	if response["status"] == "UNAUTHORISED" {
-		return errors.UnauthorisedError{
+	if response["status"] == "Unauthorized" {
+		return errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
 	}
@@ -277,8 +277,8 @@ func RegenerateSession(accessToken string, newJWTPayload map[string]interface{})
 	if err != nil {
 		return SessionInfo{}, err
 	}
-	if response["status"] == "UNAUTHORISED" {
-		return SessionInfo{}, errors.UnauthorisedError{
+	if response["status"] == "Unauthorized" {
+		return SessionInfo{}, errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
 	} else {

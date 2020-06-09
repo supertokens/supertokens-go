@@ -32,12 +32,12 @@ func (err TokenTheftDetectedError) Error() string {
 	return err.Msg
 }
 
-// UnauthorisedError used for when the user has been logged out
-type UnauthorisedError struct {
+// UnauthorizedError used for when the user has been logged out
+type UnauthorizedError struct {
 	Msg string
 }
 
-func (err UnauthorisedError) Error() string {
+func (err UnauthorizedError) Error() string {
 	return err.Msg
 }
 
@@ -46,9 +46,9 @@ func IsTokenTheftDetectedError(err error) bool {
 	return reflect.TypeOf(err) == reflect.TypeOf(TokenTheftDetectedError{})
 }
 
-// IsUnauthorisedError returns true if error is a UnauthorisedError
-func IsUnauthorisedError(err error) bool {
-	return reflect.TypeOf(err) == reflect.TypeOf(UnauthorisedError{})
+// IsUnauthorizedError returns true if error is a UnauthorizedError
+func IsUnauthorizedError(err error) bool {
+	return reflect.TypeOf(err) == reflect.TypeOf(UnauthorizedError{})
 }
 
 // IsTryRefreshTokenError returns true if error is a TryRefreshTokenError

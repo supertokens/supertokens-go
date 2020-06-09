@@ -7,7 +7,7 @@ import (
 
 type errorHandlers struct {
 	OnTokenTheftDetectedErrorHandler func(sessionHandle string, userID string, response http.ResponseWriter)
-	OnUnauthorisedErrorHandler       func(error, http.ResponseWriter)
+	OnUnauthorizedErrorHandler       func(error, http.ResponseWriter)
 	OnTryRefreshTokenErrorHandler    func(error, http.ResponseWriter)
 	OnGeneralErrorHandler            func(error, http.ResponseWriter)
 }
@@ -23,14 +23,14 @@ func defaultTokenTheftDetectedErrorHandler(sessionHandle string, userID string, 
 	_, _ = RevokeSession(sessionHandle)
 }
 
-func defaultUnauthorisedErrorHandler(err error, w http.ResponseWriter) {
+func defaultUnauthorizedErrorHandler(err error, w http.ResponseWriter) {
 	handshakeInfo, handshakeInfoError := GetHandshakeInfoInstance()
 	if handshakeInfoError != nil {
 		GetErrorHandlersInstance().OnGeneralErrorHandler(handshakeInfoError, w)
 		return
 	}
 	w.WriteHeader(handshakeInfo.SessionExpiredStatusCode)
-	w.Write([]byte("unauthorised: " + err.Error()))
+	w.Write([]byte("Unauthorized: " + err.Error()))
 }
 
 func defaultTryRefreshTokenErrorHandler(err error, w http.ResponseWriter) {
@@ -56,7 +56,7 @@ func GetErrorHandlersInstance() *errorHandlers {
 	errorHandlersOnce.Do(func() {
 		errorHandlerInstantiated = &errorHandlers{
 			OnTokenTheftDetectedErrorHandler: defaultTokenTheftDetectedErrorHandler,
-			OnUnauthorisedErrorHandler:       defaultUnauthorisedErrorHandler,
+			OnUnauthorizedErrorHandler:       defaultUnauthorizedErrorHandler,
 			OnTryRefreshTokenErrorHandler:    defaultTryRefreshTokenErrorHandler,
 			OnGeneralErrorHandler:            defaultGeneralErrorHandler,
 		}
