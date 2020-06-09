@@ -34,6 +34,7 @@ func main() {
 	http.HandleFunc("/testError", testError)
 	http.HandleFunc("/index.html", index)
 	http.HandleFunc("/fail", fail)
+	http.HandleFunc("/update-jwt", supertokens.Middleware(updateJwt))
 	supertokens.OnTryRefreshToken(customOnTryRefreshTokenError)
 	supertokens.OnUnauthorized(customOnUnauthorizedError)
 	supertokens.OnGeneralError(customOnGeneralError)
@@ -135,12 +136,40 @@ func defaultHandler(response http.ResponseWriter, request *http.Request) {
 	response.Write([]byte(session.GetUserID()))
 }
 
+func updateJwt(response http.ResponseWriter, request *http.Request) {
+	if request.Method == "OPTIONS" {
+		options(response, request)
+		return
+	} else if request.Method == "GET" {
+		response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
+		response.Header().Set("Access-Control-Allow-Credentials", "true")
+		session := request.Context().Value(supertokens.SessionContext).(supertokens.Session)
+		json.NewEncoder(response).Encode(session.GetJWTPayload)
+		return
+	} else if request.Method == "POST" {
+		var body map[string]interface{}
+		err := json.NewDecoder(request.Body).Decode(&body)
+		if err != nil {
+			response.Write([]byte("error when parsing the body"))
+			return
+		}
+		session := request.Context().Value(supertokens.SessionContext).(supertokens.Session)
+		session.UpdateJWTPayload(body)
+		response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
+		response.Header().Set("Access-Control-Allow-Credentials", "true")
+		json.NewEncoder(response).Encode(session.GetJWTPayload)
+	} else {
+		response.Write([]byte("incorrect Method, requires POST or GET"))
+	}
+
+}
+
 func beforeeach(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
 		return
 	} else if request.Method != "POST" {
-		response.Write([]byte("incorrect Method, requires GET"))
+		response.Write([]byte("incorrect Method, requires POST"))
 		return
 	}
 	noOfTimesRefreshCalledDuringTest = 0
