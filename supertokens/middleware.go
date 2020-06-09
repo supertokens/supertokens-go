@@ -8,8 +8,8 @@ import (
 	"github.com/supertokens/supertokens-go/supertokens/errors"
 )
 
-// Middleware for verifying and refreshing session
-func Middleware(theirHandler http.HandlerFunc, doAntiCsrfCheck ...bool) http.HandlerFunc {
+// Middleware for verifying and refreshing session. ExtraParams are: bool, func(error, http.ResponseWriter)
+func Middleware(theirHandler http.HandlerFunc, extraParams ...interface{}) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "OPTIONS" || r.Method == "TRACE" {
 			theirHandler.ServeHTTP(w, r)
@@ -18,7 +18,11 @@ func Middleware(theirHandler http.HandlerFunc, doAntiCsrfCheck ...bool) http.Han
 		var path = r.URL.Path
 		handshakeInfo, handshakeInfoError := core.GetHandshakeInfoInstance()
 		if handshakeInfoError != nil {
-			HandleErrorAndRespond(handshakeInfoError, w)
+			if len(extraParams) != 2 {
+				HandleErrorAndRespond(handshakeInfoError, w)
+			} else {
+				extraParams[1].(func(err error, w http.ResponseWriter))(handshakeInfoError, w)
+			}
 			return
 		}
 		if (handshakeInfo.RefreshTokenPath == path ||
@@ -27,19 +31,27 @@ func Middleware(theirHandler http.HandlerFunc, doAntiCsrfCheck ...bool) http.Han
 			r.Method == "POST" {
 			session, sessionError := RefreshSession(w, r)
 			if sessionError != nil {
-				HandleErrorAndRespond(sessionError, w)
+				if len(extraParams) != 2 {
+					HandleErrorAndRespond(handshakeInfoError, w)
+				} else {
+					extraParams[1].(func(err error, w http.ResponseWriter))(handshakeInfoError, w)
+				}
 				return
 			}
 			ctx := context.WithValue(r.Context(), SessionContext, session)
 			theirHandler.ServeHTTP(w, r.WithContext(ctx))
 		} else {
 			var actualDoAntiCsrfCheck = r.Method != "GET"
-			if len(doAntiCsrfCheck) != 0 {
-				actualDoAntiCsrfCheck = doAntiCsrfCheck[0]
+			if len(extraParams) != 0 {
+				actualDoAntiCsrfCheck = extraParams[0].(bool)
 			}
 			session, sessionError := GetSession(w, r, actualDoAntiCsrfCheck)
 			if sessionError != nil {
-				HandleErrorAndRespond(sessionError, w)
+				if len(extraParams) != 2 {
+					HandleErrorAndRespond(handshakeInfoError, w)
+				} else {
+					extraParams[1].(func(err error, w http.ResponseWriter))(handshakeInfoError, w)
+				}
 				return
 			}
 			ctx := context.WithValue(r.Context(), SessionContext, session)
