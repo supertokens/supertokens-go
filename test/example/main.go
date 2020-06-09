@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -14,7 +15,6 @@ var noOfTimesGetSessionCalledDuringTest int = 0
 var noOfTimesRefreshCalledDuringTest int = 0
 
 func main() {
-	// TODO: create API according to https://github.com/supertokens/supertokens-javalin/blob/master/Example/src/main/java/example/Main.java
 	supertokens.Config("localhost:9000;")
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/testUserConfig", testUserConfig)
@@ -27,17 +27,28 @@ func main() {
 	http.HandleFunc("/refresh", supertokens.Middleware(refresh))
 	http.HandleFunc("/refreshCalledTime", refreshCalledTime)
 	http.HandleFunc("/getSessionCalledTime", getSessionCalledTime)
-	http.HandleFunc("/getPackageVersion", getPackageVersion)
 	http.HandleFunc("/ping", ping)
 	http.HandleFunc("/testHeader", testHeader)
 	http.HandleFunc("/checkDeviceInfo", checkDeviceInfo)
-	http.HandleFunc("/checkAllowCredentials", checkDeviceInfo)
+	http.HandleFunc("/checkAllowCredentials", checkAllowCredentials)
 	http.HandleFunc("/testError", testError)
+	http.HandleFunc("/index.html", index)
+	http.HandleFunc("/fail", fail)
 	supertokens.OnTryRefreshToken(customOnTryRefreshTokenError)
 	supertokens.OnUnauthorized(customOnUnauthorizedError)
 	supertokens.OnGeneralError(customOnGeneralError)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe("0.0.0.0:8080", nil)
+}
 
+func fail(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(404)
+	w.Write([]byte(""))
+}
+
+func index(w http.ResponseWriter, r *http.Request) {
+	dat, _ := ioutil.ReadFile("./static/index.html")
+	w.Header().Set("Content-Type", "text/html")
+	w.Write(dat)
 }
 
 func options(response http.ResponseWriter, request *http.Request) {
@@ -119,10 +130,9 @@ func defaultHandler(response http.ResponseWriter, request *http.Request) {
 	noOfTimesGetSessionCalledDuringTest++
 	value := request.Context().Value(supertokens.SessionContext)
 	session := value.(supertokens.Session)
-	session.GetUserID()
 	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Header().Set("Access-Control-Allow-Credentials", "true")
-	response.Write([]byte("success"))
+	response.Write([]byte(session.GetUserID()))
 }
 
 func beforeeach(response http.ResponseWriter, request *http.Request) {
@@ -224,18 +234,6 @@ func getSessionCalledTime(response http.ResponseWriter, request *http.Request) {
 	response.Write([]byte(strconv.Itoa(noOfTimesGetSessionCalledDuringTest)))
 }
 
-func getPackageVersion(response http.ResponseWriter, request *http.Request) {
-	if request.Method == "OPTIONS" {
-		options(response, request)
-		return
-	} else if request.Method != "GET" {
-		response.Write([]byte("incorrect Method, requires GET"))
-		return
-	}
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Write([]byte("4.1.3"))
-}
-
 func ping(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
@@ -272,7 +270,7 @@ func checkDeviceInfo(response http.ResponseWriter, request *http.Request) {
 	}
 	sdkName := request.Header.Get("supertokens-sdk-name")
 	sdkVersion := request.Header.Get("supertokens-sdk-version")
-	response.Write([]byte(strconv.FormatBool(sdkName == "website" && sdkVersion == "4.1.3")))
+	response.Write([]byte(strconv.FormatBool(sdkName == "website" && sdkVersion != "")))
 }
 
 func checkAllowCredentials(response http.ResponseWriter, request *http.Request) {

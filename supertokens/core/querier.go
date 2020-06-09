@@ -64,6 +64,9 @@ func InitQuerier(hostsStr string) error {
 			var splitted = strings.Split(hostsStr, ";")
 			for i := 0; i < len(splitted); i++ {
 				var curr = splitted[i]
+				if curr == "" {
+					continue
+				}
 				var hostname = strings.Split(curr, ":")[0]
 				var port, err = strconv.Atoi(strings.Split(curr, ":")[1])
 				if err != nil {
