@@ -139,13 +139,11 @@ func defaultHandler(response http.ResponseWriter, request *http.Request) {
 func updateJwt(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "OPTIONS" {
 		options(response, request)
-		return
 	} else if request.Method == "GET" {
 		response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 		response.Header().Set("Access-Control-Allow-Credentials", "true")
 		session := request.Context().Value(supertokens.SessionContext).(supertokens.Session)
-		json.NewEncoder(response).Encode(session.GetJWTPayload)
-		return
+		json.NewEncoder(response).Encode(session.GetJWTPayload())
 	} else if request.Method == "POST" {
 		var body map[string]interface{}
 		err := json.NewDecoder(request.Body).Decode(&body)
@@ -157,11 +155,10 @@ func updateJwt(response http.ResponseWriter, request *http.Request) {
 		session.UpdateJWTPayload(body)
 		response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 		response.Header().Set("Access-Control-Allow-Credentials", "true")
-		json.NewEncoder(response).Encode(session.GetJWTPayload)
+		json.NewEncoder(response).Encode(session.GetJWTPayload())
 	} else {
 		response.Write([]byte("incorrect Method, requires POST or GET"))
 	}
-
 }
 
 func beforeeach(response http.ResponseWriter, request *http.Request) {
@@ -206,6 +203,8 @@ func logout(response http.ResponseWriter, request *http.Request) {
 		supertokens.HandleErrorAndRespond(err, response)
 		return
 	}
+	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
+	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.Write([]byte("success"))
 
 }
