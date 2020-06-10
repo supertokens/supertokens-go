@@ -25,7 +25,7 @@ func Middleware(condition ...bool) func(*gin.Context) {
 		handler := supertokens.Middleware(func(w http.ResponseWriter, r *http.Request) {
 			session := r.Context().Value(supertokens.SessionContext)
 			if session != nil {
-				c.Set(supertokens.GinContext, session.(supertokens.Session))
+				c.Set(sessionContext, session.(supertokens.Session))
 			}
 			c.Next()
 		}, params...)

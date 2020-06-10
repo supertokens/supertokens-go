@@ -128,8 +128,7 @@ func defaultHandler(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 	noOfTimesGetSessionCalledDuringTest++
-	value := request.Context().Value(supertokens.SessionContext)
-	session := value.(supertokens.Session)
+	session := supertokens.GetSessionFromRequest(request)
 	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.Write([]byte(session.GetUserID()))
@@ -141,7 +140,7 @@ func updateJwt(response http.ResponseWriter, request *http.Request) {
 	} else if request.Method == "GET" {
 		response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 		response.Header().Set("Access-Control-Allow-Credentials", "true")
-		session := request.Context().Value(supertokens.SessionContext).(supertokens.Session)
+		session := supertokens.GetSessionFromRequest(request)
 		json.NewEncoder(response).Encode(session.GetJWTPayload())
 	} else if request.Method == "POST" {
 		var body map[string]interface{}
@@ -150,7 +149,7 @@ func updateJwt(response http.ResponseWriter, request *http.Request) {
 			response.Write([]byte("error when parsing the body"))
 			return
 		}
-		session := request.Context().Value(supertokens.SessionContext).(supertokens.Session)
+		session := supertokens.GetSessionFromRequest(request)
 		session.UpdateJWTPayload(body)
 		response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 		response.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -195,8 +194,7 @@ func logout(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	value := request.Context().Value(supertokens.SessionContext)
-	session := value.(supertokens.Session)
+	session := supertokens.GetSessionFromRequest(request)
 	err := session.RevokeSession()
 	if err != nil {
 		supertokens.HandleErrorAndRespond(err, response)
@@ -216,8 +214,7 @@ func revokeAll(response http.ResponseWriter, request *http.Request) {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
 	}
-	value := request.Context().Value(supertokens.SessionContext)
-	session := value.(supertokens.Session)
+	session := supertokens.GetSessionFromRequest(request)
 	userID := session.GetUserID()
 	supertokens.RevokeAllSessionsForUser(userID)
 	response.Write([]byte("success"))

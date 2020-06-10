@@ -8,7 +8,7 @@ import (
 )
 
 // SessionContext string to get session struct from context if using Gin
-const SessionContext string = "supertokens_session_key"
+const sessionContext string = "supertokens_session_key"
 
 // Config used to set locations of SuperTokens instances
 func Config(hosts string) error {
@@ -94,4 +94,9 @@ func OnTryRefreshToken(handler func(error, http.ResponseWriter)) {
 // OnGeneralError function to override default behaviour of handling general errors
 func OnGeneralError(handler func(error, http.ResponseWriter)) {
 	supertokens.OnGeneralError(handler)
+}
+
+// GetSessionFromRequest returns the verified session object if present, otherwise it panics
+func GetSessionFromRequest(c *gin.Context) supertokens.Session {
+	return c.MustGet(sessionContext).(supertokens.Session)
 }

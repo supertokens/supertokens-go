@@ -9,8 +9,7 @@ import (
 
 type contextKey int
 
-// SessionContext string to get the session struct from context
-const SessionContext contextKey = iota
+const sessionContext contextKey = iota
 
 // Config used to set locations of SuperTokens instances
 func Config(hosts string) error {
@@ -296,4 +295,9 @@ func OnTryRefreshToken(handler func(error, http.ResponseWriter)) {
 // OnGeneralError function to override default behaviour of handling general errors
 func OnGeneralError(handler func(error, http.ResponseWriter)) {
 	core.GetErrorHandlersInstance().OnGeneralErrorHandler = handler
+}
+
+// GetSessionFromRequest returns the verified session object if present, otherwise it panics
+func GetSessionFromRequest(r *http.Request) Session {
+	return r.Context().Value(sessionContext).(Session)
 }

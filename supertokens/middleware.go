@@ -38,7 +38,7 @@ func Middleware(theirHandler http.HandlerFunc, extraParams ...interface{}) http.
 				}
 				return
 			}
-			ctx := context.WithValue(r.Context(), SessionContext, session)
+			ctx := context.WithValue(r.Context(), sessionContext, session)
 			theirHandler.ServeHTTP(w, r.WithContext(ctx))
 		} else {
 			var actualDoAntiCsrfCheck = r.Method != "GET"
@@ -54,7 +54,7 @@ func Middleware(theirHandler http.HandlerFunc, extraParams ...interface{}) http.
 				}
 				return
 			}
-			ctx := context.WithValue(r.Context(), SessionContext, session)
+			ctx := context.WithValue(r.Context(), sessionContext, session)
 			theirHandler.ServeHTTP(w, r.WithContext(ctx))
 		}
 	})
