@@ -35,6 +35,8 @@ github.com/supertokens/supertokens-go v0.0.0-20200610075929-3d54cfbd7a72 h1:2XJ5
 github.com/supertokens/supertokens-go v0.0.0-20200610075929-3d54cfbd7a72/go.mod h1:WH0FKQHJpuCN5YrOd9OIQ3BbPM2DRh+3li03xqH0lWk=
 github.com/supertokens/supertokens-go v0.0.0-20200610084030-12ee66e2c4f1 h1:zfejTHwB8I26BM0fV66c60Pv44lFlDfR92h65uMCmYA=
 github.com/supertokens/supertokens-go v0.0.0-20200610084030-12ee66e2c4f1/go.mod h1:WH0FKQHJpuCN5YrOd9OIQ3BbPM2DRh+3li03xqH0lWk=
+github.com/supertokens/supertokens-go v0.0.0-20200610090149-2ba5dcf959c6 h1:F5cbz6fLzy9VS5NFdT1Hsp/XGBlDpLL6Q9APY+de9BQ=
+github.com/supertokens/supertokens-go v0.0.0-20200610090149-2ba5dcf959c6/go.mod h1:JiH9JqjMR70z8q/tczTVnOZv4VPf+J0wE8MmnuoN3+Q=
 github.com/ugorji/go v1.1.7 h1:/68gy2h+1mWMrwZFeD1kQialdSzAb432dtpeJ42ovdo=
 github.com/ugorji/go v1.1.7/go.mod h1:kZn38zHttfInRq0xu/PH0az30d+z6vm202qpg1oXVMw=
 github.com/ugorji/go/codec v1.1.7 h1:2SvQaVZ1ouYrrKKwoSk2pzd4A9evlKJb9oTL+OaLUSs=

@@ -96,7 +96,13 @@ func OnGeneralError(handler func(error, http.ResponseWriter)) {
 	supertokens.OnGeneralError(handler)
 }
 
-// GetSessionFromRequest returns the verified session object if present, otherwise it panics
-func GetSessionFromRequest(c *gin.Context) supertokens.Session {
-	return c.MustGet(sessionContext).(supertokens.Session)
+// GetSessionFromRequest returns the verified session object if present, otherwise returns nil
+func GetSessionFromRequest(c *gin.Context) *supertokens.Session {
+	value, exists := c.Get(sessionContext)
+	if exists {
+		temp := value.(supertokens.Session)
+		return &temp
+	} else {
+		return nil
+	}
 }

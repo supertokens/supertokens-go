@@ -297,11 +297,12 @@ func OnGeneralError(handler func(error, http.ResponseWriter)) {
 	core.GetErrorHandlersInstance().OnGeneralErrorHandler = handler
 }
 
-// GetSessionFromRequest returns the verified session object if present, otherwise it panics
-func GetSessionFromRequest(r *http.Request) Session {
+// GetSessionFromRequest returns the verified session object if present, otherwise returns nil
+func GetSessionFromRequest(r *http.Request) *Session {
 	value := r.Context().Value(sessionContext)
 	if value == nil {
-		panic("Session is missing from request. Please only call this after the supertokens.Middleware() function")
+		return nil
 	}
-	return value.(Session)
+	temp := value.(Session)
+	return &temp
 }
