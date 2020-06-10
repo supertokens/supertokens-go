@@ -22,11 +22,15 @@ func CreateNewSession(response http.ResponseWriter,
 
 	var jwtPayload = map[string]interface{}{}
 	var sessionData = map[string]interface{}{}
-	if len(payload) == 1 {
+	if len(payload) == 1 && payload[0] != nil {
 		jwtPayload = payload[0]
 	} else if len(payload) == 2 {
-		jwtPayload = payload[0]
-		sessionData = payload[1]
+		if payload[0] != nil {
+			jwtPayload = payload[0]
+		}
+		if payload[1] != nil {
+			sessionData = payload[1]
+		}
 	}
 
 	session, err := core.CreateNewSession(userID, jwtPayload, sessionData)
