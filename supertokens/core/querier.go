@@ -3,6 +3,7 @@ package core
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -26,10 +27,12 @@ type querier struct {
 
 var querierInstantiated *querier
 var querierLock sync.Mutex
+var hostsAliveForTesting = []string{}
 
 // ResetQuerier to be used for testing only
 func ResetQuerier() {
 	querierInstantiated = nil
+	hostsAliveForTesting = []string{}
 }
 
 // GetQuerierInstance function used to get querier struct
@@ -126,6 +129,9 @@ func (querierInstance *querier) getAPIVersion() (string, error) {
 	querierInstance.apiVersion = supportedVersion
 
 	return *(querierInstance.apiVersion), nil
+}
+func (querierInstance *querier) GetHostsAliveForTesting() []string {
+	return hostsAliveForTesting
 }
 
 func (querierInstance *querier) SendPostRequest(path string, data map[string]interface{}) (map[string]interface{}, error) {
@@ -234,21 +240,28 @@ func (querierInstance *querier) sendRequestHelper(path string, httpRequest httpR
 		}
 	}
 	var currentHost = querierInstance.hosts[querierInstance.lastTriedIndex]
+	hostPortString := currentHost.hostname + ":" + strconv.Itoa(currentHost.port)
 	querierInstance.lastTriedIndex = (querierInstance.lastTriedIndex + 1) % len(querierInstance.hosts)
-	var resp, err = httpRequest("http://" + currentHost.hostname + ":" + strconv.Itoa(currentHost.port) + path)
+	var resp, err = httpRequest("http://" + hostPortString + path)
 
-	if err != nil && resp == nil {
+	if err != nil {
+		if strings.Contains(err.Error(), "connection refused") {
+			return querierInstance.sendRequestHelper(path, httpRequest, numberOfTries-1)
+		}
+		if resp != nil {
+			resp.Body.Close()
+		}
 		return nil, errors.GeneralError{
 			Msg:         "Error while querying SuperTokens core",
 			ActualError: err,
 		}
 	}
 
-	defer resp.Body.Close()
-
-	if err != nil {
-		return querierInstance.sendRequestHelper(path, httpRequest, numberOfTries-1)
+	if flag.Lookup("test.v") != nil && !containsHost(hostsAliveForTesting, hostPortString) {
+		hostsAliveForTesting = append(hostsAliveForTesting, hostPortString)
 	}
+
+	defer resp.Body.Close()
 
 	if resp.StatusCode >= 400 {
 		return nil, errors.GeneralError{

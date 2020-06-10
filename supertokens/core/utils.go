@@ -128,3 +128,15 @@ func convertInterfaceArrayToStringArray(arr []interface{}) []string {
 	}
 	return result
 }
+
+func containsHost(hostsAlive []string, host string) bool {
+	if len(hostsAlive) == 0 {
+		return false
+	}
+	for _, value := range hostsAlive {
+		if value == host {
+			return true
+		}
+	}
+	return false
+}
