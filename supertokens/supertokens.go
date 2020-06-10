@@ -12,9 +12,6 @@ type contextKey int
 // SessionContext string to get the session struct from context
 const SessionContext contextKey = iota
 
-// GinContext string to get session struct from context if using Gin
-const GinContext string = "supertokens_session_key"
-
 // Config used to set locations of SuperTokens instances
 func Config(hosts string) error {
 	return core.Config(hosts)

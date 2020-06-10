@@ -7,32 +7,9 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/supertokens/supertokens-go/supertokens"
 	"github.com/supertokens/supertokens-go/supertokens/core"
+	"github.com/supertokens/supertokens-go/supertokens/gin/supertokens"
 )
-
-func supertokensMiddleware(condition ...bool) func(*gin.Context) {
-	return func(c *gin.Context) {
-		var params = []interface{}{}
-		if len(condition) == 1 {
-			params = append(params, condition[0])
-		} else {
-			params = append(params, nil)
-		}
-		params = append(params, func(err error, w http.ResponseWriter) {
-			c.Abort()
-			supertokens.HandleErrorAndRespond(err, w)
-		})
-		handler := supertokens.Middleware(func(w http.ResponseWriter, r *http.Request) {
-			session := r.Context().Value(supertokens.SessionContext)
-			if session != nil {
-				c.Set(supertokens.GinContext, session.(supertokens.Session))
-			}
-			c.Next()
-		}, params...)
-		handler(c.Writer, c.Request)
-	}
-}
 
 var noOfTimesGetSessionCalledDuringTest int = 0
 var noOfTimesRefreshCalledDuringTest int = 0
