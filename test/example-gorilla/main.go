@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/mux"
+
 	"github.com/supertokens/supertokens-go/supertokens"
 	"github.com/supertokens/supertokens-go/supertokens/core"
 )
@@ -15,29 +17,30 @@ var noOfTimesRefreshCalledDuringTest int = 0
 
 func main() {
 	supertokens.Config("localhost:9000;")
-	http.HandleFunc("/login", login)
-	http.HandleFunc("/testUserConfig", testUserConfig)
-	http.HandleFunc("/multipleInterceptors", multipleInterceptors)
-	http.HandleFunc("/", supertokens.Middleware(defaultHandler))
-	http.HandleFunc("/beforeeach", beforeeach)
-	http.HandleFunc("/testing", testing)
-	http.HandleFunc("/logout", supertokens.Middleware(logout))
-	http.HandleFunc("/revokeAll", supertokens.Middleware(revokeAll))
-	http.HandleFunc("/refresh", supertokens.Middleware(refresh))
-	http.HandleFunc("/refreshCalledTime", refreshCalledTime)
-	http.HandleFunc("/getSessionCalledTime", getSessionCalledTime)
-	http.HandleFunc("/ping", ping)
-	http.HandleFunc("/testHeader", testHeader)
-	http.HandleFunc("/checkDeviceInfo", checkDeviceInfo)
-	http.HandleFunc("/checkAllowCredentials", checkAllowCredentials)
-	http.HandleFunc("/testError", testError)
-	http.HandleFunc("/index.html", index)
-	http.HandleFunc("/fail", fail)
-	http.HandleFunc("/update-jwt", supertokens.Middleware(updateJwt))
+	r := mux.NewRouter()
+	r.HandleFunc("/login", login)
+	r.HandleFunc("/testUserConfig", testUserConfig)
+	r.HandleFunc("/multipleInterceptors", multipleInterceptors)
+	r.HandleFunc("/", supertokens.Middleware(defaultHandler))
+	r.HandleFunc("/beforeeach", beforeeach)
+	r.HandleFunc("/testing", testing)
+	r.HandleFunc("/logout", supertokens.Middleware(logout))
+	r.HandleFunc("/revokeAll", supertokens.Middleware(revokeAll))
+	r.HandleFunc("/refresh", supertokens.Middleware(refresh))
+	r.HandleFunc("/refreshCalledTime", refreshCalledTime)
+	r.HandleFunc("/getSessionCalledTime", getSessionCalledTime)
+	r.HandleFunc("/ping", ping)
+	r.HandleFunc("/testHeader", testHeader)
+	r.HandleFunc("/checkDeviceInfo", checkDeviceInfo)
+	r.HandleFunc("/checkAllowCredentials", checkAllowCredentials)
+	r.HandleFunc("/testError", testError)
+	r.HandleFunc("/index.html", index)
+	r.HandleFunc("/fail", fail)
+	r.HandleFunc("/update-jwt", supertokens.Middleware(updateJwt))
 	supertokens.OnTryRefreshToken(customOnTryRefreshTokenError)
 	supertokens.OnUnauthorized(customOnUnauthorizedError)
 	supertokens.OnGeneralError(customOnGeneralError)
-	http.ListenAndServe("0.0.0.0:8080", nil)
+	http.ListenAndServe("0.0.0.0:8080", r)
 }
 
 func fail(w http.ResponseWriter, r *http.Request) {
