@@ -1,5 +1,12 @@
-When making a change to the supertokens dir:
+When making a change to the supertokens/:
 - After changes, commit & push them. Get the last <commit hash> from git log
 - go to gin folder and run "go get github.com/supertokens/supertokens-go/supertokens@<commit hash>"
 - go to test/example-gorilla folder and run "go get github.com/supertokens/supertokens-go/supertokens@<commit hash>"
 - git add --all && git commit && git push
+
+When making changes to gin/
+- Just regular add, commit, push
+
+When making changes to both
+- First make changes to supertokens dir (see above)
+- Then make changes to gin/

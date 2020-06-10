@@ -100,9 +100,8 @@ func OnGeneralError(handler func(error, http.ResponseWriter)) {
 func GetSessionFromRequest(c *gin.Context) *supertokens.Session {
 	value, exists := c.Get(sessionContext)
 	if exists {
-		temp := value.(supertokens.Session)
-		return &temp
-	} else {
-		return nil
+		temp := value.(*supertokens.Session)
+		return temp
 	}
+	return nil
 }

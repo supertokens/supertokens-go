@@ -5,8 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/supertokens/supertokens-go/supertokens"
-	"github.com/supertokens/supertokens-go/supertokens/core"
-	"github.com/supertokens/supertokens-go/supertokens/errors"
 )
 
 // Middleware for verifying and refreshing session.
@@ -35,15 +33,5 @@ func Middleware(condition ...bool) func(*gin.Context) {
 
 // HandleErrorAndRespond if error handlers are provided, then uses those, else does default error handling depending on the type of error
 func HandleErrorAndRespond(err error, c *gin.Context) {
-	errorHandlers := core.GetErrorHandlersInstance()
-	if errors.IsUnauthorizedError(err) {
-		errorHandlers.OnUnauthorizedErrorHandler(err, c.Writer)
-	} else if errors.IsTryRefreshTokenError(err) {
-		errorHandlers.OnTryRefreshTokenErrorHandler(err, c.Writer)
-	} else if errors.IsTokenTheftDetectedError(err) {
-		actualError := err.(errors.TokenTheftDetectedError)
-		errorHandlers.OnTokenTheftDetectedErrorHandler(actualError.SessionHandle, actualError.UserID, c.Writer)
-	} else {
-		errorHandlers.OnGeneralErrorHandler(err, c.Writer)
-	}
+	supertokens.HandleErrorAndRespond(err, c.Writer)
 }
