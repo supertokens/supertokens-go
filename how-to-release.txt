@@ -1,0 +1,5 @@
+When making a change to the supertokens dir:
+- After changes, commit & push them. Get the last <commit hash> from git log
+- go to gin folder and run "go get github.com/supertokens/supertokens-go/supertokens@<commit hash>"
+- go to test/example-gorilla folder and run "go get github.com/supertokens/supertokens-go/supertokens@<commit hash>"
+- git add --all && git commit && git push

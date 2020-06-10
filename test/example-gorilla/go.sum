@@ -22,6 +22,8 @@ github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81P
 github.com/supertokens/supertokens-go v0.0.0-20200319141133-1d010a73d3cc h1:Zi/rNm+kFJOoyF1rsocCZKCwAGpkyxD8uc4/qp4SI3c=
 github.com/supertokens/supertokens-go v0.0.0-20200610071952-83ae7e4c0e0b h1:xjhjFLd8VkxztsHka22kGy93WJ5nGA3LqtssPq0zqkg=
 github.com/supertokens/supertokens-go v0.0.0-20200610071952-83ae7e4c0e0b/go.mod h1:7Oc5m5hTp9v4Ko9xDFrjedGrcDuILxEaEEpS84TSDM4=
+github.com/supertokens/supertokens-go v0.0.0-20200610090736-2abfa63f35e3 h1:nZGdeReq6JyL+y8Jqr5J17MhUMIKtL3Sh+AsMS1MVtA=
+github.com/supertokens/supertokens-go v0.0.0-20200610090736-2abfa63f35e3/go.mod h1:JiH9JqjMR70z8q/tczTVnOZv4VPf+J0wE8MmnuoN3+Q=
 github.com/ugorji/go v1.1.7/go.mod h1:kZn38zHttfInRq0xu/PH0az30d+z6vm202qpg1oXVMw=
 github.com/ugorji/go/codec v1.1.7/go.mod h1:Ax+UKWsSmolVDwsd+7N3ZtXu+yMGCf907BLYF3GoBXY=
 golang.org/x/sys v0.0.0-20200116001909-b77594299b42/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
