@@ -33,7 +33,7 @@ func ResetQuerier() {
 }
 
 // GetQuerierInstance function used to get querier struct
-func getQuerierInstance() *querier {
+func GetQuerierInstance() *querier {
 	if querierInstantiated == nil {
 		querierLock.Lock()
 		defer querierLock.Unlock()
