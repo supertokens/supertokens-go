@@ -32,7 +32,7 @@ func GetProcessStateInstance() *processState {
 }
 
 func (p *processState) GetLastEventByName(state int) *int {
-	if flag.Lookup("test.v") != nil {
+	if flag.Lookup("test.v") == nil {
 		return nil
 	}
 	processStateLock.Lock()
@@ -47,7 +47,7 @@ func (p *processState) GetLastEventByName(state int) *int {
 }
 
 func (p *processState) AddState(state int) {
-	if flag.Lookup("test.v") != nil {
+	if flag.Lookup("test.v") == nil {
 		return
 	}
 	processStateLock.Lock()
