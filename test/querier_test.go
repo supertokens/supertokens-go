@@ -1,7 +1,6 @@
 package testing
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -78,7 +77,6 @@ func TestThreeCoresOneDeadRoundRobin(t *testing.T) {
 	}
 	hostAlive := q.GetHostsAliveForTesting()
 	if len(hostAlive) != 2 {
-		fmt.Println(hostAlive)
 		t.Error("failed")
 	}
 
