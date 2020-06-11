@@ -100,7 +100,7 @@ func killAllST() {
 	core.ResetError()
 	core.ResetHandshakeInfo()
 	core.ResetQuerier()
-	// TODO: process state reset
+	core.ResetProcessState()
 }
 
 func startST(host string, port string) string {

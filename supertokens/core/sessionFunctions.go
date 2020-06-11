@@ -86,6 +86,8 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool)
 		}
 	}
 
+	GetProcessStateInstance().AddState(CallingServiceInVerify)
+
 	body := map[string]interface{}{
 		"accessToken":     accessToken,
 		"doAntiCsrfCheck": doAntiCsrfCheck,

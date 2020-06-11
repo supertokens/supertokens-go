@@ -21,7 +21,7 @@ func TestTokenTheftDetection(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = core.GetSession(response2.AccessToken.Token, response2.AntiCsrfToken, true, &response2.IDRefreshToken.Token)
+	_, err = core.GetSession(response2.AccessToken.Token, response2.AntiCsrfToken, true)
 	if err != nil {
 		t.Error(err)
 	}
