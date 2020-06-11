@@ -92,6 +92,26 @@ func CreateNewSession(response http.ResponseWriter,
 func GetSession(response http.ResponseWriter, request *http.Request,
 	doAntiCsrfCheck bool) (Session, error) {
 	saveFrontendInfoFromRequest(request)
+
+	idRefreshToken := getIDRefreshTokenFromCookie(request)
+	if idRefreshToken == nil {
+		handShakeInfo, handshakeInfoError := core.GetHandshakeInfoInstance()
+		if handshakeInfoError != nil {
+			return Session{}, handshakeInfoError
+		}
+		clearSessionFromCookie(response,
+			handShakeInfo.CookieDomain,
+			handShakeInfo.CookieSecure,
+			handShakeInfo.AccessTokenPath,
+			handShakeInfo.RefreshTokenPath,
+			handShakeInfo.IDRefreshTokenPath,
+			handShakeInfo.CookieSameSite,
+		)
+		return Session{}, errors.UnauthorizedError{
+			Msg: "idRefreshToken missing",
+		}
+	}
+
 	accessToken := getAccessTokenFromCookie(request)
 	if accessToken == nil {
 		// maybe the access token has expired.
@@ -101,9 +121,8 @@ func GetSession(response http.ResponseWriter, request *http.Request,
 	}
 
 	antiCsrfToken := getAntiCsrfTokenFromHeaders(request)
-	idRefreshToken := getIDRefreshTokenFromCookie(request)
 
-	session, getSessionError := core.GetSession(*accessToken, antiCsrfToken, doAntiCsrfCheck, idRefreshToken)
+	session, getSessionError := core.GetSession(*accessToken, antiCsrfToken, doAntiCsrfCheck)
 
 	if getSessionError != nil {
 		if errors.IsUnauthorizedError(getSessionError) {
