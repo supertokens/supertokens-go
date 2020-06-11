@@ -24,7 +24,7 @@ func TestCoreNotAvailable(t *testing.T) {
 	beforeEach()
 	supertokens.Config("localhost:8080;localhost:8081")
 	q := core.GetQuerierInstance()
-	_, err := q.SendGetRequest("/", map[string]string{})
+	_, err := q.SendGetRequest("", "/", map[string]string{})
 	if err == nil && err.Error() != "Error while querying SuperTokens core" {
 		t.Error("failed")
 	}
@@ -37,12 +37,12 @@ func TestThreeCoresAndRoundRobin(t *testing.T) {
 	startST("localhost", "8082")
 	supertokens.Config("localhost:8080;localhost:8081;localhost:8082")
 	q := core.GetQuerierInstance()
-	response, _ := q.SendGetRequest("/hello", map[string]string{})
+	response, _ := q.SendGetRequest("", "/hello", map[string]string{})
 	if response == nil || response["result"].(string) != "Hello\n" {
 		t.Error("failed")
 		return
 	}
-	response, _ = q.SendDeleteRequest("/hello", map[string]interface{}{})
+	response, _ = q.SendDeleteRequest("", "/hello", map[string]interface{}{})
 	if response == nil || response["result"].(string) != "Hello\n" {
 		t.Error("failed")
 		return
@@ -65,12 +65,12 @@ func TestThreeCoresOneDeadRoundRobin(t *testing.T) {
 	startST("localhost", "8082")
 	supertokens.Config("localhost:8080;localhost:8081;localhost:8082")
 	q := core.GetQuerierInstance()
-	response, _ := q.SendGetRequest("/hello", map[string]string{})
+	response, _ := q.SendGetRequest("", "/hello", map[string]string{})
 	if response == nil || response["result"].(string) != "Hello\n" {
 		t.Error("failed")
 		return
 	}
-	response, _ = q.SendDeleteRequest("/hello", map[string]interface{}{})
+	response, _ = q.SendDeleteRequest("", "/hello", map[string]interface{}{})
 	if response == nil || response["result"].(string) != "Hello\n" {
 		t.Error("failed")
 		return
@@ -80,7 +80,7 @@ func TestThreeCoresOneDeadRoundRobin(t *testing.T) {
 		t.Error("failed")
 	}
 
-	response, _ = q.SendGetRequest("/hello", map[string]string{})
+	response, _ = q.SendGetRequest("", "/hello", map[string]string{})
 	if response == nil || response["result"].(string) != "Hello\n" {
 		t.Error("failed")
 		return

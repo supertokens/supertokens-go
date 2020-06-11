@@ -134,17 +134,16 @@ func (querierInstance *querier) GetHostsAliveForTesting() []string {
 	return hostsAliveForTesting
 }
 
-func (querierInstance *querier) SendPostRequest(path string, data map[string]interface{}) (map[string]interface{}, error) {
+func (querierInstance *querier) SendPostRequest(requestID string, path string, data map[string]interface{}) (map[string]interface{}, error) {
 	if path == "/session" || path == "/session/verify" || path == "/session/refresh" || path == "/handshake" {
 		data["frontendSDK"] = GetDeviceInfoInstance().GetFrontendSDKs()
 		data["drive"] = map[string]interface{}{
-			"name":    "node",
+			"name":    "go",
 			"version": VERSION,
 		}
 	}
 	return querierInstance.sendRequestHelper(path, func(url string) (*http.Response, error) {
 		jsonData, _ := json.Marshal(data)
-		client := &http.Client{}
 		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 		if err != nil {
 			return nil, err
@@ -158,14 +157,22 @@ func (querierInstance *querier) SendPostRequest(path string, data map[string]int
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("cdi-version", apiVerion)
 
+		client := getHTTPClient(requestID)
 		return client.Do(req)
 	}, len(querierInstance.hosts))
 }
 
-func (querierInstance *querier) SendDeleteRequest(path string, data map[string]interface{}) (map[string]interface{}, error) {
+func getHTTPClient(requestID string) MockedHTTPClient {
+	mock := GetMockedHTTPClient(requestID)
+	if mock == nil {
+		return &http.Client{}
+	}
+	return mock
+}
+
+func (querierInstance *querier) SendDeleteRequest(requestID string, path string, data map[string]interface{}) (map[string]interface{}, error) {
 	return querierInstance.sendRequestHelper(path, func(url string) (*http.Response, error) {
 		jsonData, _ := json.Marshal(data)
-		client := &http.Client{}
 		req, err := http.NewRequest("DELETE", url, bytes.NewBuffer(jsonData))
 		if err != nil {
 			return nil, err
@@ -179,13 +186,13 @@ func (querierInstance *querier) SendDeleteRequest(path string, data map[string]i
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("cdi-version", apiVerion)
 
+		client := getHTTPClient(requestID)
 		return client.Do(req)
 	}, len(querierInstance.hosts))
 }
 
-func (querierInstance *querier) SendGetRequest(path string, params map[string]string) (map[string]interface{}, error) {
+func (querierInstance *querier) SendGetRequest(requestID string, path string, params map[string]string) (map[string]interface{}, error) {
 	return querierInstance.sendRequestHelper(path, func(url string) (*http.Response, error) {
-		client := &http.Client{}
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
 			return nil, err
@@ -204,14 +211,14 @@ func (querierInstance *querier) SendGetRequest(path string, params map[string]st
 		}
 		req.Header.Set("cdi-version", apiVerion)
 
+		client := getHTTPClient(requestID)
 		return client.Do(req)
 	}, len(querierInstance.hosts))
 }
 
-func (querierInstance *querier) SendPutRequest(path string, data map[string]interface{}) (map[string]interface{}, error) {
+func (querierInstance *querier) SendPutRequest(requestID string, path string, data map[string]interface{}) (map[string]interface{}, error) {
 	return querierInstance.sendRequestHelper(path, func(url string) (*http.Response, error) {
 		jsonData, _ := json.Marshal(data)
-		client := &http.Client{}
 		req, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonData))
 		if err != nil {
 			return nil, err
@@ -225,6 +232,7 @@ func (querierInstance *querier) SendPutRequest(path string, data map[string]inte
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("cdi-version", apiVerion)
 
+		client := getHTTPClient(requestID)
 		return client.Do(req)
 	}, len(querierInstance.hosts))
 }

@@ -35,7 +35,7 @@ type TokenInfo struct {
 // CreateNewSession function used to create a new SuperTokens session
 func CreateNewSession(userID string, jwtPayload map[string]interface{},
 	sessionData map[string]interface{}) (SessionInfo, error) {
-	response, err := GetQuerierInstance().SendPostRequest("/session",
+	response, err := GetQuerierInstance().SendPostRequest("newsession", "/session",
 		map[string]interface{}{
 			"userId":             userID,
 			"userDataInJWT":      jwtPayload,
@@ -95,7 +95,7 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool)
 	if antiCsrfToken != nil {
 		body["antiCsrfToken"] = *antiCsrfToken
 	}
-	response, err := GetQuerierInstance().SendPostRequest("/session/verify", body)
+	response, err := GetQuerierInstance().SendPostRequest("verify", "/session/verify", body)
 	if err != nil {
 		return SessionInfo{}, err
 	}
@@ -122,7 +122,7 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool)
 
 // RefreshSession function used to refresh a session
 func RefreshSession(refreshToken string) (SessionInfo, error) {
-	response, err := GetQuerierInstance().SendPostRequest("/session/refresh",
+	response, err := GetQuerierInstance().SendPostRequest("refresh", "/session/refresh",
 		map[string]interface{}{
 			"refreshToken": refreshToken,
 		})
@@ -146,7 +146,7 @@ func RefreshSession(refreshToken string) (SessionInfo, error) {
 
 // RevokeAllSessionsForUser function used to revoke all sessions for a user
 func RevokeAllSessionsForUser(userID string) ([]string, error) {
-	response, err := GetQuerierInstance().SendPostRequest("/session/remove",
+	response, err := GetQuerierInstance().SendPostRequest("revokeall", "/session/remove",
 		map[string]interface{}{
 			"userId": userID,
 		})
@@ -159,7 +159,7 @@ func RevokeAllSessionsForUser(userID string) ([]string, error) {
 
 // GetAllSessionHandlesForUser function used to get all sessions for a user
 func GetAllSessionHandlesForUser(userID string) ([]string, error) {
-	response, err := GetQuerierInstance().SendGetRequest("/session/user",
+	response, err := GetQuerierInstance().SendGetRequest("getall", "/session/user",
 		map[string]string{
 			"userId": userID,
 		})
@@ -172,7 +172,7 @@ func GetAllSessionHandlesForUser(userID string) ([]string, error) {
 
 // RevokeSession function used to revoke a specific session
 func RevokeSession(sessionHandle string) (bool, error) {
-	response, err := GetQuerierInstance().SendPostRequest("/session/remove",
+	response, err := GetQuerierInstance().SendPostRequest("revoke", "/session/remove",
 		map[string]interface{}{
 			"sessionHandles": [1]string{sessionHandle},
 		})
@@ -184,7 +184,7 @@ func RevokeSession(sessionHandle string) (bool, error) {
 
 // RevokeMultipleSessions function used to revoke a list of sessions
 func RevokeMultipleSessions(sessionHandles []string) ([]string, error) {
-	response, err := GetQuerierInstance().SendPostRequest("/session/remove",
+	response, err := GetQuerierInstance().SendPostRequest("revokemultiple", "/session/remove",
 		map[string]interface{}{
 			"sessionHandles": sessionHandles,
 		})
@@ -197,7 +197,7 @@ func RevokeMultipleSessions(sessionHandles []string) ([]string, error) {
 
 // GetSessionData function used to get session data for the given handle
 func GetSessionData(sessionHandle string) (map[string]interface{}, error) {
-	response, err := GetQuerierInstance().SendGetRequest("/session/data",
+	response, err := GetQuerierInstance().SendGetRequest("getsessiondata", "/session/data",
 		map[string]string{
 			"sessionHandle": sessionHandle,
 		})
@@ -206,16 +206,15 @@ func GetSessionData(sessionHandle string) (map[string]interface{}, error) {
 	}
 	if response["status"] == "OK" {
 		return response["userDataInDatabase"].(map[string]interface{}), nil
-	} else {
-		return nil, errors.UnauthorizedError{
-			Msg: response["message"].(string),
-		}
+	}
+	return nil, errors.UnauthorizedError{
+		Msg: response["message"].(string),
 	}
 }
 
 // UpdateSessionData function used to update session data for the given handle
 func UpdateSessionData(sessionHandle string, newSessionData map[string]interface{}) error {
-	response, err := GetQuerierInstance().SendPutRequest("/session/data",
+	response, err := GetQuerierInstance().SendPutRequest("updatesessiondata", "/session/data",
 		map[string]interface{}{
 			"sessionHandle":      sessionHandle,
 			"userDataInDatabase": newSessionData,
@@ -233,7 +232,7 @@ func UpdateSessionData(sessionHandle string, newSessionData map[string]interface
 
 // GetJWTPayload function used to get jwt payload for the given handle
 func GetJWTPayload(sessionHandle string) (map[string]interface{}, error) {
-	response, err := GetQuerierInstance().SendGetRequest("/jwt/data",
+	response, err := GetQuerierInstance().SendGetRequest("getjwtpayload", "/jwt/data",
 		map[string]string{
 			"sessionHandle": sessionHandle,
 		})
@@ -242,16 +241,15 @@ func GetJWTPayload(sessionHandle string) (map[string]interface{}, error) {
 	}
 	if response["status"] == "OK" {
 		return response["userDataInJWT"].(map[string]interface{}), nil
-	} else {
-		return nil, errors.UnauthorizedError{
-			Msg: response["message"].(string),
-		}
+	}
+	return nil, errors.UnauthorizedError{
+		Msg: response["message"].(string),
 	}
 }
 
 // UpdateJWTPayload function used to update jwt payload for the given handle
 func UpdateJWTPayload(sessionHandle string, newJWTPayload map[string]interface{}) error {
-	response, err := GetQuerierInstance().SendPutRequest("/jwt/data",
+	response, err := GetQuerierInstance().SendPutRequest("updatejwtpayload", "/jwt/data",
 		map[string]interface{}{
 			"sessionHandle": sessionHandle,
 			"userDataInJWT": newJWTPayload,
@@ -269,7 +267,7 @@ func UpdateJWTPayload(sessionHandle string, newJWTPayload map[string]interface{}
 
 // RegenerateSession function used to regenerate a session
 func RegenerateSession(accessToken string, newJWTPayload map[string]interface{}) (SessionInfo, error) {
-	response, err := GetQuerierInstance().SendPostRequest("/session/regenerate",
+	response, err := GetQuerierInstance().SendPostRequest("regenerate", "/session/regenerate",
 		map[string]interface{}{
 			"accessToken":   accessToken,
 			"userDataInJWT": newJWTPayload,
@@ -281,7 +279,6 @@ func RegenerateSession(accessToken string, newJWTPayload map[string]interface{})
 		return SessionInfo{}, errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
-	} else {
-		return convertJSONResponseToSessionInfo(response), nil
 	}
+	return convertJSONResponseToSessionInfo(response), nil
 }

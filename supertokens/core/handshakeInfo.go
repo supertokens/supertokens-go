@@ -24,7 +24,7 @@ func GetHandshakeInfoInstance() (*handshakeInfo, error) {
 		handshakeInfoLock.Lock()
 		defer handshakeInfoLock.Unlock()
 		if handshakeInfoInstantiated == nil {
-			response, err := GetQuerierInstance().SendPostRequest("/handshake", map[string]interface{}{})
+			response, err := GetQuerierInstance().SendPostRequest("handshake", "/handshake", map[string]interface{}{})
 			if err != nil {
 				return nil, err
 			}

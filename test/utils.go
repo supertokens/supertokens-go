@@ -101,6 +101,7 @@ func killAllST() {
 	core.ResetHandshakeInfo()
 	core.ResetQuerier()
 	core.ResetProcessState()
+	core.ResetHTTPMocking()
 }
 
 func startST(host string, port string) string {
