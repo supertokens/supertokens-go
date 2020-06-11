@@ -17,18 +17,36 @@ func Config(hosts string) error {
 
 // CreateNewSession function used to create a new SuperTokens session
 func CreateNewSession(c *gin.Context, userID string,
-	payload ...map[string]interface{}) (supertokens.Session, error) {
-	return supertokens.CreateNewSession(c.Writer, userID, payload...)
+	payload ...map[string]interface{}) (Session, error) {
+	actualSession, err := supertokens.CreateNewSession(c.Writer, userID, payload...)
+	if err != nil {
+		return Session{}, err
+	}
+	return Session{
+		actualSession: &actualSession,
+	}, nil
 }
 
 // GetSession function used to verify a session
-func GetSession(c *gin.Context, doAntiCsrfCheck bool) (supertokens.Session, error) {
-	return supertokens.GetSession(c.Writer, c.Request, doAntiCsrfCheck)
+func GetSession(c *gin.Context, doAntiCsrfCheck bool) (Session, error) {
+	actualSession, err := supertokens.GetSession(c.Writer, c.Request, doAntiCsrfCheck)
+	if err != nil {
+		return Session{}, err
+	}
+	return Session{
+		actualSession: &actualSession,
+	}, nil
 }
 
 // RefreshSession function used to refresh a session
-func RefreshSession(c *gin.Context) (supertokens.Session, error) {
-	return supertokens.RefreshSession(c.Writer, c.Request)
+func RefreshSession(c *gin.Context) (Session, error) {
+	actualSession, err := supertokens.RefreshSession(c.Writer, c.Request)
+	if err != nil {
+		return Session{}, err
+	}
+	return Session{
+		actualSession: &actualSession,
+	}, nil
 }
 
 // RevokeAllSessionsForUser function used to revoke all sessions for a user
@@ -97,10 +115,10 @@ func OnGeneralError(handler func(error, http.ResponseWriter)) {
 }
 
 // GetSessionFromRequest returns the verified session object if present, otherwise returns nil
-func GetSessionFromRequest(c *gin.Context) *supertokens.Session {
+func GetSessionFromRequest(c *gin.Context) *Session {
 	value, exists := c.Get(sessionContext)
 	if exists {
-		temp := value.(*supertokens.Session)
+		temp := value.(*Session)
 		return temp
 	}
 	return nil

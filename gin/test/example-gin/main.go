@@ -139,7 +139,7 @@ func defaultHandler(c *gin.Context) {
 		return
 	}
 	noOfTimesGetSessionCalledDuringTest++
-	session := supertokens.GetSessionFromRequest(c)
+	var session *supertokens.Session = supertokens.GetSessionFromRequest(c)
 	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.Write([]byte(session.GetUserID()))
