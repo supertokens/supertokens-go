@@ -2,6 +2,7 @@ package testing
 
 import (
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"time"
@@ -162,6 +163,10 @@ func containsHost(hostsAlive []string, host string) bool {
 		}
 	}
 	return false
+}
+
+func extractInfoFromResponse(response *http.Response) map[string]string {
+	return map[string]string{}
 }
 
 func beforeEach() {
