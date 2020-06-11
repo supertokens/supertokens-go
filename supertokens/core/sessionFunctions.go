@@ -48,13 +48,8 @@ func CreateNewSession(userID string, jwtPayload map[string]interface{},
 }
 
 // GetSession function used to verify a session
-func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool, idRefreshToken *string) (SessionInfo, error) {
+func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool) (SessionInfo, error) {
 	{
-		if idRefreshToken == nil {
-			return SessionInfo{}, errors.UnauthorizedError{
-				Msg: "idRefreshToken missing",
-			}
-		}
 		handShakeInfo, handShakeError := GetHandshakeInfoInstance()
 		if handShakeError != nil {
 			return SessionInfo{}, handShakeError

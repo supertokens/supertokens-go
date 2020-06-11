@@ -3,6 +3,7 @@ package supertokens
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -87,7 +88,7 @@ func setCookie(response http.ResponseWriter, name string, value string,
 
 	cookie := http.Cookie{
 		Name:     name,
-		Value:    value,
+		Value:    url.QueryEscape(value),
 		Domain:   domain,
 		Secure:   secure,
 		HttpOnly: httpOnly,
@@ -119,7 +120,11 @@ func getCookieValue(request *http.Request, key string) *string {
 	cookies := request.Cookies()
 	for _, value := range cookies {
 		if value.Name == key {
-			return &value.Value
+			val, err := url.QueryUnescape(value.Value)
+			if err != nil {
+				return nil
+			}
+			return &val
 		}
 	}
 	return nil
