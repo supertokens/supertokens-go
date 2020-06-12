@@ -132,6 +132,8 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool)
 				return SessionInfo{}, handShakeError
 			}
 		}
+		fmt.Println("RAW RESPONSE")
+		fmt.Println(response["jwtSigningPublicKeyExpiryTime"])
 		handShakeInfo.UpdateJwtSigningPublicKeyInfo(
 			response["jwtSigningPublicKey"].(string), int64(response["jwtSigningPublicKeyExpiryTime"].(float64)))
 		return convertJSONResponseToSessionInfo(response), nil
