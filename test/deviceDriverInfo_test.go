@@ -74,6 +74,6 @@ func TestDeviceDriveInfoWithoutFrontendSDK(t *testing.T) {
 	}
 }
 
-func TestFrontendSDK(t *testing.T) {
+// func TestFrontendSDK(t *testing.T) {
 
-}
+// }
