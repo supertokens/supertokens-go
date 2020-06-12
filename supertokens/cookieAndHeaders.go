@@ -37,17 +37,17 @@ const frontendSDKNameHeaderKey = "supertokens-sdk-name"
 const frontendSDKVersionHeaderKey = "supertokens-sdk-version"
 
 func attachAccessTokenToCookie(response http.ResponseWriter, token string,
-	expiry int64, domain string, secure bool, path string, sameSite string) {
+	expiry uint64, domain string, secure bool, path string, sameSite string) {
 	setCookie(response, accessTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
 func attachRefreshTokenToCookie(response http.ResponseWriter, token string,
-	expiry int64, domain string, secure bool, path string, sameSite string) {
+	expiry uint64, domain string, secure bool, path string, sameSite string) {
 	setCookie(response, refreshTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
 func setIDRefreshTokenInHeaderAndCookie(response http.ResponseWriter, token string,
-	expiry int64, domain string, secure bool, path string, sameSite string) {
+	expiry uint64, domain string, secure bool, path string, sameSite string) {
 	setHeader(response, idRefreshTokenHeaderKey, token+";"+fmt.Sprint(expiry))
 	setHeader(response, "Access-Control-Expose-Headers", idRefreshTokenHeaderKey)
 
@@ -93,7 +93,7 @@ func getRefreshTokenFromCookie(request *http.Request) *string {
 }
 
 func setCookie(response http.ResponseWriter, name string, value string,
-	domain string, secure bool, httpOnly bool, expires int64, path string, sameSite string) {
+	domain string, secure bool, httpOnly bool, expires uint64, path string, sameSite string) {
 
 	var sameSiteField = http.SameSiteNoneMode
 	if sameSite == "lax" {

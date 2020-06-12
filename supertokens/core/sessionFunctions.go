@@ -17,8 +17,6 @@
 package core
 
 import (
-	"fmt"
-
 	"github.com/supertokens/supertokens-go/supertokens/errors"
 )
 
@@ -42,8 +40,8 @@ type SessionInfo struct {
 // TokenInfo carrier of cookie related info for a token
 type TokenInfo struct {
 	Token        string
-	Expiry       int64
-	CreatedTime  int64
+	Expiry       uint64
+	CreatedTime  uint64
 	CookiePath   string
 	CookieSecure bool
 	Domain       string
@@ -72,18 +70,13 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool)
 		if handShakeError != nil {
 			return SessionInfo{}, handShakeError
 		}
-		fmt.Println("VALUES BEING COMPARED")
-		fmt.Println(handShakeInfo.JwtSigningPublicKeyExpiryTime)
-		fmt.Println(getCurrTimeInMS())
 		if handShakeInfo.JwtSigningPublicKeyExpiryTime > getCurrTimeInMS() {
-			fmt.Println("CASE 0!!!!!!!!!!!")
 			accessTokenInfo, accessTokenError := getInfoFromAccessToken(accessToken,
 				handShakeInfo.JwtSigningPublicKey, handShakeInfo.EnableAntiCsrf && doAntiCsrfCheck)
 			if accessTokenError == nil {
 				if handShakeInfo.EnableAntiCsrf && doAntiCsrfCheck &&
 					(antiCsrfToken == nil || accessTokenInfo.antiCsrfToken == nil ||
 						*antiCsrfToken != *(accessTokenInfo.antiCsrfToken)) {
-					fmt.Println("CASE 1!!!!!!!!!!!")
 					// we continue querying the core...
 				} else {
 					if !handShakeInfo.AccessTokenBlacklistingEnabled &&
@@ -98,20 +91,17 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool)
 							AntiCsrfToken:  nil,
 						}, nil
 					}
-					fmt.Println("CASE 2!!!!!!!!!!!")
 					// we continue querying the core...
 				}
 			} else {
 				if !errors.IsTryRefreshTokenError(accessTokenError) {
 					return SessionInfo{}, accessTokenError
 				}
-				fmt.Println("CASE 3!!!!!!!!!!!")
 				// we continue querying the core...
 			}
 		}
 	}
 
-	fmt.Println("CASE 4!!!!!!!!!!!")
 	GetProcessStateInstance().AddState(CallingServiceInVerify)
 
 	body := map[string]interface{}{
@@ -132,12 +122,10 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool)
 				return SessionInfo{}, handShakeError
 			}
 		}
-		fmt.Println("RAW RESPONSE")
-		fmt.Println(response["jwtSigningPublicKeyExpiryTime"])
 		handShakeInfo.UpdateJwtSigningPublicKeyInfo(
-			response["jwtSigningPublicKey"].(string), int64(response["jwtSigningPublicKeyExpiryTime"].(float64)))
+			response["jwtSigningPublicKey"].(string), uint64(response["jwtSigningPublicKeyExpiryTime"].(float64)))
 		return convertJSONResponseToSessionInfo(response), nil
-	} else if response["status"] == "Unauthorized" {
+	} else if response["status"] == "UNAUTHORISED" {
 		return SessionInfo{}, errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
@@ -159,7 +147,7 @@ func RefreshSession(refreshToken string) (SessionInfo, error) {
 	}
 	if response["status"] == "OK" {
 		return convertJSONResponseToSessionInfo(response), nil
-	} else if response["status"] == "Unauthorized" {
+	} else if response["status"] == "UNAUTHORISED" {
 		return SessionInfo{}, errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}

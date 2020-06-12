@@ -17,7 +17,6 @@
 package core
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -29,7 +28,7 @@ type handshakeInfo struct {
 	RefreshTokenPath               string
 	EnableAntiCsrf                 bool
 	AccessTokenBlacklistingEnabled bool
-	JwtSigningPublicKeyExpiryTime  int64
+	JwtSigningPublicKeyExpiryTime  uint64
 	CookieSameSite                 string
 	IDRefreshTokenPath             string
 	SessionExpiredStatusCode       int
@@ -55,7 +54,7 @@ func GetHandshakeInfoInstance() (*handshakeInfo, error) {
 				RefreshTokenPath:               response["refreshTokenPath"].(string),
 				EnableAntiCsrf:                 response["enableAntiCsrf"].(bool),
 				AccessTokenBlacklistingEnabled: response["accessTokenBlacklistingEnabled"].(bool),
-				JwtSigningPublicKeyExpiryTime:  int64(response["jwtSigningPublicKeyExpiryTime"].(float64)),
+				JwtSigningPublicKeyExpiryTime:  uint64(response["jwtSigningPublicKeyExpiryTime"].(float64)),
 				CookieSameSite:                 response["cookieSameSite"].(string),
 				IDRefreshTokenPath:             response["idRefreshTokenPath"].(string),
 				SessionExpiredStatusCode:       int(response["sessionExpiredStatusCode"].(float64)),
@@ -67,14 +66,10 @@ func GetHandshakeInfoInstance() (*handshakeInfo, error) {
 
 var handshakeInfoLock sync.Mutex
 
-func (info *handshakeInfo) UpdateJwtSigningPublicKeyInfo(newKey string, newExpiry int64) {
+func (info *handshakeInfo) UpdateJwtSigningPublicKeyInfo(newKey string, newExpiry uint64) {
 	handshakeInfoLock.Lock()
 	defer handshakeInfoLock.Unlock()
 	info.JwtSigningPublicKey = newKey
-	fmt.Println("UPDATING SIGNING EXPIRY KEY!!")
-	fmt.Println(info.JwtSigningPublicKeyExpiryTime)
-	fmt.Println(newExpiry)
-	fmt.Println("DONE UPDATING SIGNING EXPIRY KEY!!")
 	info.JwtSigningPublicKeyExpiryTime = newExpiry
 }
 
