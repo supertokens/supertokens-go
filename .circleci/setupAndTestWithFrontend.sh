@@ -83,8 +83,8 @@ cd ../../../supertokens-website/test/server
 npm i -d
 npm i git+https://github.com:supertokens/supertokens-node.git#$3
 cd ../../
-npm i -d
-NODE_PORT=8081 INSTALL_PATH=../com-root npm test
+# npm i -d
+# NODE_PORT=8081 INSTALL_PATH=../com-root npm test
 if [[ $? -ne 0 ]]
 then
     echo "test failed... exiting!"
@@ -92,7 +92,7 @@ then
 fi
 kill -15 $pid
 
-cd ../../../project/test/example-gorilla/
+cd ../project/test/example-gorilla/
 go get ./...
 go run main.go &
 pid=$!
@@ -105,7 +105,7 @@ then
 fi
 kill -15 $pid
 
-cd ../../../project/gin/test/example-gin/
+cd ../project/gin/test/example-gin/
 go get ./...
 go run main.go &
 pid=$!
