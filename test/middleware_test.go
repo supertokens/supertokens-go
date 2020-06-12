@@ -32,7 +32,7 @@ func TestMiddleware(t *testing.T) {
 	startST("localhost", "8080")
 	supertokens.Config("localhost:8080")
 	mux := http.NewServeMux()
-	mux.HandleFunc("/create", func(response http.ResponseWriter, requeset *http.Request) {
+	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
 		supertokens.CreateNewSession(response, "testing-userID")
 	})
 
@@ -219,6 +219,7 @@ func TestMiddleware(t *testing.T) {
 		if err != nil {
 			t.Error("error when parsing body")
 		}
+		res.Body.Close()
 
 		if jsonResponse4["message"] != "token theft detected" {
 			t.Error("incorrect response body")
