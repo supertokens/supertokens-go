@@ -90,7 +90,7 @@ then
     echo "test failed... exiting!"
     exit 1
 fi
-kill -15 $pid
+pkill -KILL go && pkill -KILL main
 
 cd ../project/test/example-gorilla/
 go get ./...
