@@ -16,7 +16,10 @@
 
 package core
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
 
 type handshakeInfo struct {
 	JwtSigningPublicKey            string
@@ -68,6 +71,10 @@ func (info *handshakeInfo) UpdateJwtSigningPublicKeyInfo(newKey string, newExpir
 	handshakeInfoLock.Lock()
 	defer handshakeInfoLock.Unlock()
 	info.JwtSigningPublicKey = newKey
+	fmt.Println("UPDATING SIGNING EXPIRY KEY!!")
+	fmt.Println(info.JwtSigningPublicKeyExpiryTime)
+	fmt.Println(newExpiry)
+	fmt.Println("DONE UPDATING SIGNING EXPIRY KEY!!")
 	info.JwtSigningPublicKeyExpiryTime = newExpiry
 }
 

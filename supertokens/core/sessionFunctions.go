@@ -72,7 +72,9 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool)
 		if handShakeError != nil {
 			return SessionInfo{}, handShakeError
 		}
-		fmt.Println("CASE -1!!!!!!!!!!!")
+		fmt.Println("VALUES BEING COMPARED")
+		fmt.Println(handShakeInfo.JwtSigningPublicKeyExpiryTime)
+		fmt.Println(getCurrTimeInMS())
 		if handShakeInfo.JwtSigningPublicKeyExpiryTime > getCurrTimeInMS() {
 			fmt.Println("CASE 0!!!!!!!!!!!")
 			accessTokenInfo, accessTokenError := getInfoFromAccessToken(accessToken,
