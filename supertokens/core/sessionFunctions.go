@@ -238,7 +238,7 @@ func UpdateSessionData(sessionHandle string, newSessionData map[string]interface
 	if err != nil {
 		return err
 	}
-	if response["status"] == "Unauthorized" {
+	if response["status"] == "UNAUTHORISED" {
 		return errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
