@@ -94,7 +94,7 @@ kill -15 $pid
 
 cd ../project/test/example-gorilla/
 go get ./...
-go run main.go
+# go run main.go
 pid=$!
 cd ../../../supertokens-website/
 NODE_PORT=8081 INSTALL_PATH=../com-root npm test
