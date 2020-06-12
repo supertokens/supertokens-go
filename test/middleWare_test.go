@@ -1,107 +1,113 @@
 package testing
 
-// func TestMiddleware(t *testing.T) {
-// 	beforeEach()
-// 	startST("localhost", "8080")
-// 	supertokens.Config("localhost:8080")
-// 	mux := http.NewServeMux()
-// 	mux.HandleFunc("/create", func(response http.ResponseWriter, requeset *http.Request) {
-// 		supertokens.CreateNewSession(response, "testing-userID")
-// 	})
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 
-// 	mux.HandleFunc("/user/id", supertokens.Middleware(func(response http.ResponseWriter, request *http.Request) {
-// 		session := supertokens.GetSessionFromRequest(request)
+	"github.com/supertokens/supertokens-go/supertokens"
+)
 
-// 		if session != nil {
-// 			// json.NewEncoder(response).Encode(map[string]interface{}{
-// 			// 	"message": session.GetUserID,
-// 			// })
-// 			response.Write([]byte(""))
-// 			return
-// 		}
-// 		response.Write([]byte(""))
-// 	}))
+func TestMiddleware(t *testing.T) {
+	beforeEach()
+	startST("localhost", "8080")
+	supertokens.Config("localhost:8080")
+	mux := http.NewServeMux()
+	mux.HandleFunc("/create", func(response http.ResponseWriter, requeset *http.Request) {
+		supertokens.CreateNewSession(response, "testing-userID")
+	})
 
-// 	mux.HandleFunc("/user/handle", supertokens.Middleware(func(response http.ResponseWriter, request *http.Request) {
-// 		session := supertokens.GetSessionFromRequest(request)
-// 		if session != nil {
-// 			json.NewEncoder(response).Encode(map[string]interface{}{
-// 				"message": session.GetHandle,
-// 			})
-// 			return
-// 		}
-// 		response.Write([]byte(""))
-// 	}))
+	mux.HandleFunc("/user/id", supertokens.Middleware(func(response http.ResponseWriter, request *http.Request) {
+		session := supertokens.GetSessionFromRequest(request)
 
-// 	mux.HandleFunc("/refresh", supertokens.Middleware(func(response http.ResponseWriter, request *http.Request) {
+		if session != nil {
+			response.Write([]byte(session.GetUserID()))
+			return
+		}
+		response.Write([]byte(""))
+	}))
 
-// 		json.NewEncoder(response).Encode(map[string]interface{}{
-// 			"message": true,
-// 		})
+	mux.HandleFunc("/user/handle", supertokens.Middleware(func(response http.ResponseWriter, request *http.Request) {
+		session := supertokens.GetSessionFromRequest(request)
+		if session != nil {
+			json.NewEncoder(response).Encode(map[string]interface{}{
+				"message": session.GetHandle,
+			})
+			return
+		}
+		response.Write([]byte(""))
+	}))
 
-// 	}))
+	mux.HandleFunc("/refresh", supertokens.Middleware(func(response http.ResponseWriter, request *http.Request) {
 
-// 	mux.HandleFunc("/logout", supertokens.Middleware(func(response http.ResponseWriter, request *http.Request) {
-// 		session := supertokens.GetSessionFromRequest(request)
-// 		if session != nil {
-// 			err := session.RevokeSession()
-// 			if err != nil {
-// 				response.Write([]byte(""))
-// 				return
-// 			}
-// 			json.NewEncoder(response).Encode(map[string]interface{}{
-// 				"message": true,
-// 			})
-// 			return
-// 		}
-// 		response.Write([]byte(""))
-// 	}))
-// 	supertokens.OnTryRefreshToken(func(err error, response http.ResponseWriter) {
-// 		response.WriteHeader(401)
-// 		json.NewEncoder(response).Encode(map[string]interface{}{
-// 			"message": " try refresh token",
-// 		})
-// 	})
-// 	supertokens.OnTokenTheftDetected(func(val1 string, val2 string, response http.ResponseWriter) {
-// 		response.WriteHeader(401)
-// 		json.NewEncoder(response).Encode(map[string]interface{}{
-// 			"message": " token theft detected",
-// 		})
-// 	})
-// 	supertokens.OnGeneralError(func(err error, response http.ResponseWriter) {
-// 		response.WriteHeader(401)
-// 		json.NewEncoder(response).Encode(map[string]interface{}{
-// 			"message": " general error",
-// 		})
-// 	})
+		json.NewEncoder(response).Encode(map[string]interface{}{
+			"message": true,
+		})
 
-// 	ts := httptest.NewServer(mux)
-// 	defer ts.Close()
+	}))
 
-// 	client := &http.Client{}
-// 	req, _ := http.NewRequest("POST", ts.URL+"/create", nil)
-// 	res, _ := client.Do(req)
+	mux.HandleFunc("/logout", supertokens.Middleware(func(response http.ResponseWriter, request *http.Request) {
+		session := supertokens.GetSessionFromRequest(request)
+		if session != nil {
+			err := session.RevokeSession()
+			if err != nil {
+				response.Write([]byte(""))
+				return
+			}
+			json.NewEncoder(response).Encode(map[string]interface{}{
+				"message": true,
+			})
+			return
+		}
+		response.Write([]byte(""))
+	}))
+	supertokens.OnTryRefreshToken(func(err error, response http.ResponseWriter) {
+		response.WriteHeader(401)
+		json.NewEncoder(response).Encode(map[string]interface{}{
+			"message": " try refresh token",
+		})
+	})
+	supertokens.OnTokenTheftDetected(func(val1 string, val2 string, response http.ResponseWriter) {
+		response.WriteHeader(401)
+		json.NewEncoder(response).Encode(map[string]interface{}{
+			"message": " token theft detected",
+		})
+	})
+	supertokens.OnGeneralError(func(err error, response http.ResponseWriter) {
+		response.WriteHeader(401)
+		json.NewEncoder(response).Encode(map[string]interface{}{
+			"message": " general error",
+		})
+	})
 
-// 	response := extractInfoFromResponseHeader(res)
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
 
-// 	req, _ = http.NewRequest("POST", ts.URL+"/user/id", nil)
-// 	req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
-// 	req.Header.Add("anti-csrf", response["antiCsrf"])
-// 	res, _ = client.Do(req)
+	client := &http.Client{}
+	req, _ := http.NewRequest("POST", ts.URL+"/create", nil)
+	res, _ := client.Do(req)
 
-// 	body, err := ioutil.ReadAll(res.Body)
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-// 	res.Body.Close()
-// 	// var responseBody map[string]string
-// 	// json.Unmarshal(body, &responseBody)
-// 	fmt.Println(string(body))
-// 	// if responseBody["message"] != "testing-userID" {
-// 	// 	t.Error("incorrect response body")
-// 	// }
+	response := extractInfoFromResponseHeader(res)
 
-// }
+	req, _ = http.NewRequest("POST", ts.URL+"/user/id", nil)
+	req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+	req.Header.Add("anti-csrf", response["antiCsrf"])
+	res, _ = client.Do(req)
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		t.Error(err)
+	}
+	res.Body.Close()
+	fmt.Println(string(body))
+	if string(body) != "testing-userID" {
+		t.Error("incorrect response body")
+	}
+
+}
 
 /* {
     Map<String, String> headers = new HashMap<>();
