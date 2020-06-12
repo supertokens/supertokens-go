@@ -1,53 +1,45 @@
 package testing
 
-import (
-	"net/http"
-	"net/http/httptest"
-	"testing"
+// func TestSessionVerifyWithAntiCsrf(t *testing.T) {
+// 	beforeEach()
+// 	startST("localhost", "8080")
+// 	supertokens.Config("localhost:8080")
+// 	mux := http.NewServeMux()
+// 	mux.HandleFunc("/create", func(response http.ResponseWriter, requeset *http.Request) {
+// 		supertokens.CreateNewSession(response, "id1")
 
-	"github.com/supertokens/supertokens-go/supertokens"
-)
+// 	})
+// 	mux.HandleFunc("/session/verify", func(response http.ResponseWriter, requeset *http.Request) {
+// 		supertokens.GetSession(response, requeset, true)
 
-func TestSessionVerifyWithAntiCsrf(t *testing.T) {
-	beforeEach()
-	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
-	mux := http.NewServeMux()
-	mux.HandleFunc("/create", func(response http.ResponseWriter, requeset *http.Request) {
-		supertokens.CreateNewSession(response, "id1")
+// 	})
+// 	mux.HandleFunc("/session/verifyAntiCsrfFalse", func(response http.ResponseWriter, requeset *http.Request) {
+// 		supertokens.GetSession(response, requeset, false)
 
-	})
-	mux.HandleFunc("/session/verify", func(response http.ResponseWriter, requeset *http.Request) {
-		supertokens.GetSession(response, requeset, true)
+// 	})
+// 	ts := httptest.NewServer(mux)
+// 	defer ts.Close()
 
-	})
-	mux.HandleFunc("/session/verifyAntiCsrfFalse", func(response http.ResponseWriter, requeset *http.Request) {
-		supertokens.GetSession(response, requeset, false)
+// 	client := &http.Client{}
+// 	req, _ := http.NewRequest("POST", ts.URL+"/create", nil)
+// 	res, _ := client.Do(req)
+// 	response := extractInfoFromResponseHeader(res)
 
-	})
-	ts := httptest.NewServer(mux)
-	defer ts.Close()
+// 	req, _ = http.NewRequest("POST", ts.URL+"/session/verify", nil)
+// 	req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+// 	req.Header.Add("anti-csrf", response["antiCsrf"])
+// 	res, _ = client.Do(req)
 
-	client := &http.Client{}
-	req, _ := http.NewRequest("POST", ts.URL+"/create", nil)
-	res, _ := client.Do(req)
-	response := extractInfoFromResponse(res)
+// 	if res.StatusCode != 200 {
+// 		t.Error("response status code was not 200")
+// 	}
 
-	req, _ = http.NewRequest("POST", ts.URL+"/session/verify", nil)
-	req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
-	req.Header.Add("anti-csrf", response["antiCsrf"])
-	res, _ = client.Do(req)
+// 	req, _ = http.NewRequest("POST", ts.URL+"/session/verifyAntiCsrfFalse", nil)
+// 	req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+// 	req.Header.Add("anti-csrf", response["antiCsrf"])
+// 	res, _ = client.Do(req)
 
-	if res.StatusCode != 200 {
-		t.Error("response status code was not 200")
-	}
-
-	req, _ = http.NewRequest("POST", ts.URL+"/session/verifyAntiCsrfFalse", nil)
-	req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
-	req.Header.Add("anti-csrf", response["antiCsrf"])
-	res, _ = client.Do(req)
-
-	if res.StatusCode != 200 {
-		t.Error("response status code was not 200")
-	}
-}
+// 	if res.StatusCode != 200 {
+// 		t.Error("response status code was not 200")
+// 	}
+// }

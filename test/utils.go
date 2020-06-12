@@ -165,8 +165,36 @@ func containsHost(hostsAlive []string, host string) bool {
 	return false
 }
 
-func extractInfoFromResponse(response *http.Response) map[string]string {
-	return map[string]string{}
+func extractInfoFromResponseHeader(res *http.Response) map[string]string {
+
+	headerInfo := extractInfoFromCookies(res.Cookies())
+	if res.Header.Get("Anti-Csrf") != "" {
+		headerInfo["antiCsrf"] = res.Header.Get("Anti-Csrf")
+	}
+	if res.Header.Get("Id-Refresh-Token") != "" {
+		headerInfo["idRefreshTokenFromHeader"] = res.Header.Get("Id-Refresh-Token")
+	}
+
+	return headerInfo
+}
+
+func extractInfoFromCookies(cookies []*http.Cookie) map[string]string {
+	var response = map[string]string{}
+
+	for _, cookie := range cookies {
+		if cookie.Name == "sAccessToken" {
+			response["accessToken"] = cookie.Value
+			response["accessTokenExpiry"] = cookie.RawExpires
+		} else if cookie.Name == "sRefreshToken" {
+			response["refreshToken"] = cookie.Value
+			response["refreshTokenExpiry"] = cookie.RawExpires
+
+		} else {
+			response["idRefreshTokenFromCookie"] = cookie.Value
+			response["idRefreshTokenExpiry"] = cookie.RawExpires
+		}
+	}
+	return response
 }
 
 func beforeEach() {
