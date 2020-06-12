@@ -17,6 +17,8 @@
 package core
 
 import (
+	"fmt"
+
 	"github.com/supertokens/supertokens-go/supertokens/errors"
 )
 
@@ -77,6 +79,7 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool)
 				if handShakeInfo.EnableAntiCsrf && doAntiCsrfCheck &&
 					(antiCsrfToken == nil || accessTokenInfo.antiCsrfToken == nil ||
 						*antiCsrfToken != *(accessTokenInfo.antiCsrfToken)) {
+					fmt.Println("CASE 1!!!!!!!!!!!")
 					// we continue querying the core...
 				} else {
 					if !handShakeInfo.AccessTokenBlacklistingEnabled &&
@@ -91,17 +94,20 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool)
 							AntiCsrfToken:  nil,
 						}, nil
 					}
+					fmt.Println("CASE 2!!!!!!!!!!!")
 					// we continue querying the core...
 				}
 			} else {
 				if !errors.IsTryRefreshTokenError(accessTokenError) {
 					return SessionInfo{}, accessTokenError
 				}
+				fmt.Println("CASE 3!!!!!!!!!!!")
 				// we continue querying the core...
 			}
 		}
 	}
 
+	fmt.Println("CASE 4!!!!!!!!!!!")
 	GetProcessStateInstance().AddState(CallingServiceInVerify)
 
 	body := map[string]interface{}{
