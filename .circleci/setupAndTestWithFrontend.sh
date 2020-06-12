@@ -90,9 +90,9 @@ then
     echo "test failed... exiting!"
     exit 1
 fi
-kill -15 $pid
+pkill -KILL go && pkill -KILL main
 
-cd ../../../project/test/example-gorilla/
+cd ../project/test/example-gorilla/
 go get ./...
 go run main.go &
 pid=$!
@@ -103,9 +103,9 @@ then
     echo "test failed... exiting!"
     exit 1
 fi
-kill -15 $pid
+pkill -KILL go && pkill -KILL main
 
-cd ../../../project/gin/test/example-gin/
+cd ../project/gin/test/example-gin/
 go get ./...
 go run main.go &
 pid=$!
@@ -116,7 +116,7 @@ then
     echo "test failed... exiting!"
     exit 1
 fi
-kill -15 $pid
+pkill -KILL go && pkill -KILL main
 
 rm -rf ./test/server/node_modules/supertokens-node
 git checkout HEAD -- ./test/server/package.json
