@@ -1,4 +1,4 @@
 module github.com/supertokens/supertokens-go
 
-go 1.14
+go 1.13
 

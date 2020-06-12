@@ -1,29 +1,21 @@
 version: 2
 jobs:
-  publish:
-    docker:
-      - image: circleci/golang:1.12
-    steps:
-      - checkout
   test:
     docker:
       - image: rishabhpoddar/supertokens_go_driver_testing
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "b3:da:ef:15:52:aa:a3:69:c3:6b:14:0c:be:23:b7:c7"
+            - "b6:ef:23:21:21:df:53:19:2f:22:83:97:1e:9c:20:77"
       - checkout
+      - run: go version
+      - run: go get ./...
+      - run: (cd .circleci/ && ./doTests.sh)
 
 workflows:
   version: 2
   tagged-build:
     jobs:
-      - publish:
-          filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*/
-            branches:
-              ignore: /.*/
       - test:
           filters:
             tags:

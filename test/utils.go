@@ -141,8 +141,8 @@ func startST(host string, port string) string {
 	panic("could not start ST process")
 }
 
-func getCurrTimeInMS() int64 {
-	return time.Now().UnixNano() / 1000000
+func getCurrTimeInMS() uint64 {
+	return uint64(time.Now().UnixNano() / 1000000)
 }
 
 func itemExists(arr []string, item string) bool {

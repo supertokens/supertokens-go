@@ -43,8 +43,8 @@ func convertJSONResponseToSessionInfo(response map[string]interface{}) SessionIn
 	if accessTokenJSON != nil {
 		accessToken = &TokenInfo{
 			Token:        accessTokenJSON["token"].(string),
-			Expiry:       int64(accessTokenJSON["expiry"].(float64)),
-			CreatedTime:  int64(accessTokenJSON["createdTime"].(float64)),
+			Expiry:       uint64(accessTokenJSON["expiry"].(float64)),
+			CreatedTime:  uint64(accessTokenJSON["createdTime"].(float64)),
 			CookiePath:   accessTokenJSON["cookiePath"].(string),
 			CookieSecure: accessTokenJSON["cookieSecure"].(bool),
 			Domain:       accessTokenJSON["domain"].(string),
@@ -55,8 +55,8 @@ func convertJSONResponseToSessionInfo(response map[string]interface{}) SessionIn
 	if refreshTokenJSON != nil {
 		refreshToken = &TokenInfo{
 			Token:        refreshTokenJSON["token"].(string),
-			Expiry:       int64(refreshTokenJSON["expiry"].(float64)),
-			CreatedTime:  int64(refreshTokenJSON["createdTime"].(float64)),
+			Expiry:       uint64(refreshTokenJSON["expiry"].(float64)),
+			CreatedTime:  uint64(refreshTokenJSON["createdTime"].(float64)),
 			CookiePath:   refreshTokenJSON["cookiePath"].(string),
 			CookieSecure: refreshTokenJSON["cookieSecure"].(bool),
 			Domain:       refreshTokenJSON["domain"].(string),
@@ -67,8 +67,8 @@ func convertJSONResponseToSessionInfo(response map[string]interface{}) SessionIn
 	if idRefreshTokenJSON != nil {
 		idRefreshToken = &TokenInfo{
 			Token:        idRefreshTokenJSON["token"].(string),
-			Expiry:       int64(idRefreshTokenJSON["expiry"].(float64)),
-			CreatedTime:  int64(idRefreshTokenJSON["createdTime"].(float64)),
+			Expiry:       uint64(idRefreshTokenJSON["expiry"].(float64)),
+			CreatedTime:  uint64(idRefreshTokenJSON["createdTime"].(float64)),
 			CookiePath:   idRefreshTokenJSON["cookiePath"].(string),
 			CookieSecure: idRefreshTokenJSON["cookieSecure"].(bool),
 			Domain:       idRefreshTokenJSON["domain"].(string),
@@ -92,8 +92,8 @@ func convertJSONResponseToSessionInfo(response map[string]interface{}) SessionIn
 	}
 }
 
-func getCurrTimeInMS() int64 {
-	return time.Now().UnixNano() / 1000000
+func getCurrTimeInMS() uint64 {
+	return uint64(time.Now().UnixNano() / 1000000)
 }
 
 func getLargestVersionFromIntersection(v1 []string, v2 []string) *string {

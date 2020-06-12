@@ -28,7 +28,7 @@ func TestJWTInputOutput(t *testing.T) {
 		return
 	}
 	if payload["antiCsrfToken"] != "776f306c-331e-486a-ad6d-f6398e7c4311" ||
-		int64(payload["expiryTime"].(float64)) != 1591515813918 ||
+		uint64(payload["expiryTime"].(float64)) != 1591515813918 ||
 		payload["sessionHandle"] != "cfffed4c-90bb-43b1-9dfe-15bc2fbc03c2" ||
 		payload["userId"] != "" {
 		t.Error("returned payload is invalid")

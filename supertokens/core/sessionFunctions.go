@@ -40,8 +40,8 @@ type SessionInfo struct {
 // TokenInfo carrier of cookie related info for a token
 type TokenInfo struct {
 	Token        string
-	Expiry       int64
-	CreatedTime  int64
+	Expiry       uint64
+	CreatedTime  uint64
 	CookiePath   string
 	CookieSecure bool
 	Domain       string
@@ -123,9 +123,9 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool)
 			}
 		}
 		handShakeInfo.UpdateJwtSigningPublicKeyInfo(
-			response["jwtSigningPublicKey"].(string), int64(response["jwtSigningPublicKeyExpiryTime"].(float64)))
+			response["jwtSigningPublicKey"].(string), uint64(response["jwtSigningPublicKeyExpiryTime"].(float64)))
 		return convertJSONResponseToSessionInfo(response), nil
-	} else if response["status"] == "Unauthorized" {
+	} else if response["status"] == "UNAUTHORISED" {
 		return SessionInfo{}, errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
@@ -147,7 +147,7 @@ func RefreshSession(refreshToken string) (SessionInfo, error) {
 	}
 	if response["status"] == "OK" {
 		return convertJSONResponseToSessionInfo(response), nil
-	} else if response["status"] == "Unauthorized" {
+	} else if response["status"] == "UNAUTHORISED" {
 		return SessionInfo{}, errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}

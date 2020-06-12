@@ -27,8 +27,8 @@ type accessTokenInfoStruct struct {
 	parentRefreshTokenHash1 *string
 	userData                map[string]interface{}
 	antiCsrfToken           *string
-	expiryTime              int64
-	timeCreated             int64
+	expiryTime              uint64
+	timeCreated             uint64
 }
 
 func getInfoFromAccessToken(token string, jwtSigningPublicKey string, doAntiCsrfCheck bool) (accessTokenInfoStruct, error) {
@@ -75,15 +75,15 @@ func getInfoFromAccessToken(token string, jwtSigningPublicKey string, doAntiCsrf
 		antiCsrfToken = &temp
 	}
 
-	var expiryTime *int64 = nil
+	var expiryTime *uint64 = nil
 	if payload["expiryTime"] != nil {
-		temp := int64(payload["expiryTime"].(float64))
+		temp := uint64(payload["expiryTime"].(float64))
 		expiryTime = &temp
 	}
 
-	var timeCreated *int64 = nil
+	var timeCreated *uint64 = nil
 	if payload["timeCreated"] != nil {
-		temp := int64(payload["timeCreated"].(float64))
+		temp := uint64(payload["timeCreated"].(float64))
 		timeCreated = &temp
 	}
 
