@@ -302,9 +302,12 @@ func TestManipulationOfSessionData(t *testing.T) {
 		t.Error("incorrect value")
 	}
 
-	core.UpdateSessionData(response.Handle, map[string]interface{}{
+	err = core.UpdateSessionData(response.Handle, map[string]interface{}{
 		"key": "value2",
 	})
+	if err != nil {
+		t.Error(err)
+	}
 
 	data, err = core.GetSessionData(response.Handle)
 	if err != nil {
@@ -324,6 +327,58 @@ func TestManipulationOfSessionData(t *testing.T) {
 	} else {
 		t.Error("should not have come here")
 	}
+}
+
+func TestManipulationOfJWTPayload(t *testing.T) {
+	beforeEach()
+	startST("localhost", "8080")
+	supertokens.Config("localhost:8080")
+
+	response, err := core.CreateNewSession("someUniqueUserId", map[string]interface{}{}, map[string]interface{}{})
+	if err != nil {
+		t.Error(err)
+	}
+	err = core.UpdateJWTPayload(response.Handle, map[string]interface{}{
+		"key": "value",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	data, err := core.GetJWTPayload(response.Handle)
+	if err != nil {
+		t.Error(err)
+	}
+	if data["key"] != "value" {
+		t.Error("incorrect value")
+	}
+
+	err = core.UpdateJWTPayload(response.Handle, map[string]interface{}{
+		"key": "value2",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	data, err = core.GetJWTPayload(response.Handle)
+	if err != nil {
+		t.Error(err)
+	}
+	if data["key"] != "value2" {
+		t.Error("incorrect value")
+	}
+
+	err = core.UpdateJWTPayload("random", map[string]interface{}{
+		"key": "value2",
+	})
+	if err != nil {
+		if !errors.IsUnauthorizedError(err) {
+			t.Error(err)
+		}
+	} else {
+		t.Error("should not have come here")
+	}
+
 }
 
 func TestNoAntiCSRFRequiredIfDisabledFromCore(t *testing.T) {
