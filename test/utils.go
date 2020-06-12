@@ -196,6 +196,9 @@ func extractInfoFromResponseHeader(res *http.Response) map[string]string {
 
 func extractInfoFromCookies(cookies []*http.Cookie) map[string]string {
 	var response = map[string]string{}
+	if len(cookies) == 0 {
+		return response
+	}
 
 	for _, cookie := range cookies {
 		if cookie.Name == "sAccessToken" {
