@@ -43,7 +43,6 @@ func TestMiddleware(t *testing.T) {
 			json.NewEncoder(response).Encode(map[string]interface{}{
 				"message": session.GetUserID(),
 			})
-			return
 		}
 	}))
 
@@ -53,7 +52,6 @@ func TestMiddleware(t *testing.T) {
 			json.NewEncoder(response).Encode(map[string]interface{}{
 				"message": session.GetHandle(),
 			})
-			return
 		}
 	}))
 
@@ -70,13 +68,11 @@ func TestMiddleware(t *testing.T) {
 		if session != nil {
 			err := session.RevokeSession()
 			if err != nil {
-				response.Write([]byte(""))
 				return
 			}
 			json.NewEncoder(response).Encode(map[string]interface{}{
 				"message": true,
 			})
-			return
 		}
 	}))
 	supertokens.OnTryRefreshToken(func(err error, response http.ResponseWriter) {
@@ -106,63 +102,70 @@ func TestMiddleware(t *testing.T) {
 	res, _ := client.Do(req)
 
 	response := extractInfoFromResponseHeader(res)
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/user/id", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
 
-	req, _ = http.NewRequest("POST", ts.URL+"/user/id", nil)
-	req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
-	req.Header.Add("anti-csrf", response["antiCsrf"])
-	res, _ = client.Do(req)
-
-	var jsonResponse map[string]interface{}
-	err := json.NewDecoder(res.Body).Decode(&jsonResponse)
-	if err != nil {
-		t.Error("error when parsing json body")
-	}
-	res.Body.Close()
-	if jsonResponse["message"] != "testing-userID" {
-		t.Error("incorrect response body")
-	}
-
-	req, _ = http.NewRequest("POST", ts.URL+"/user/handle", nil)
-	req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
-	req.Header.Add("anti-csrf", response["antiCsrf"])
-	res, _ = client.Do(req)
-
-	if res.StatusCode != 200 {
-		t.Error("response has non 200 status code ")
+		var jsonResponse map[string]interface{}
+		err := json.NewDecoder(res.Body).Decode(&jsonResponse)
+		if err != nil {
+			t.Error("error when parsing json body")
+		}
+		res.Body.Close()
+		if jsonResponse["message"] != "testing-userID" {
+			t.Error("incorrect response body")
+		}
 	}
 
-	req, _ = http.NewRequest("POST", ts.URL+"/user/handle", nil)
-	req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
-	res, _ = client.Do(req)
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/user/handle", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
 
-	if res.StatusCode != 401 {
-		t.Error("response does not have 401 status code ")
-	}
-	var jsonResponse2 map[string]interface{}
-	err = json.NewDecoder(res.Body).Decode(&jsonResponse2)
-	res.Body.Close()
-	if err != nil {
-		t.Error("error when parsing json body")
-	}
-	if jsonResponse2["message"] != "try refresh token" {
-		t.Error("incorrect response body")
+		if res.StatusCode != 200 {
+			t.Error("response has non 200 status code ")
+		}
 	}
 
-	req, _ = http.NewRequest("POST", ts.URL+"/user/handle", nil)
-	req.Header.Add("Cookie", "sAccessToken="+response["accessToken"])
-	req.Header.Add("anti-csrf", response["antiCsrf"])
-	res, _ = client.Do(req)
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/user/handle", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		res, _ = client.Do(req)
 
-	if res.StatusCode != 440 {
-		t.Error("incorrect status code")
+		if res.StatusCode != 401 {
+			t.Error("response does not have 401 status code ")
+		}
+		var jsonResponse2 map[string]interface{}
+		err := json.NewDecoder(res.Body).Decode(&jsonResponse2)
+		res.Body.Close()
+		if err != nil {
+			t.Error("error when parsing json body")
+		}
+		if jsonResponse2["message"] != "try refresh token" {
+			t.Error("incorrect response body")
+		}
 	}
-	body, err := ioutil.ReadAll(res.Body)
-	res.Body.Close()
-	if err != nil {
-		t.Error("error when parsing body")
-	}
-	if !strings.Contains(string(body), "Unauthorized") {
-		t.Error("incorrect response")
+
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/user/handle", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
+
+		if res.StatusCode != 440 {
+			t.Error("incorrect status code")
+		}
+		body, err := ioutil.ReadAll(res.Body)
+		res.Body.Close()
+		if err != nil {
+			t.Error("error when parsing body")
+		}
+		if !strings.Contains(string(body), "Unauthorized") {
+			t.Error("incorrect response")
+		}
 	}
 
 	req, _ = http.NewRequest("POST", ts.URL+"/refresh", nil)
@@ -170,86 +173,93 @@ func TestMiddleware(t *testing.T) {
 	res, _ = client.Do(req)
 
 	response2 := extractInfoFromResponseHeader(res)
+	var response3 map[string]string
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/user/id", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response2["accessToken"]+";sIdRefreshToken="+response2["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response2["antiCsrf"])
+		res, _ = client.Do(req)
 
-	req, _ = http.NewRequest("POST", ts.URL+"/user/id", nil)
-	req.Header.Add("Cookie", "sAccessToken="+response2["accessToken"]+";sIdRefreshToken="+response2["idRefreshTokenFromCookie"])
-	req.Header.Add("anti-csrf", response2["antiCsrf"])
-	res, _ = client.Do(req)
+		var jsonResponse3 map[string]interface{}
+		err := json.NewDecoder(res.Body).Decode(&jsonResponse3)
+		if err != nil {
+			t.Error("error when parsing body")
+		}
+		res.Body.Close()
 
-	var jsonResponse3 map[string]interface{}
-	err = json.NewDecoder(res.Body).Decode(&jsonResponse3)
-	if err != nil {
-		t.Error("error when parsing body")
+		if jsonResponse3["message"] != "testing-userID" {
+			t.Error("incorrect json response")
+		}
+
+		response3 = extractInfoFromResponseHeader(res)
 	}
-	res.Body.Close()
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/user/handle", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response3["accessToken"]+";sIdRefreshToken="+response2["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response2["antiCsrf"])
+		res, _ = client.Do(req)
 
-	if jsonResponse3["message"] != "testing-userID" {
-		t.Error("incorrect json response")
-	}
+		if res.StatusCode != 200 {
+			t.Error("non 200 status code")
 
-	response3 := extractInfoFromResponseHeader(res)
-
-	req, _ = http.NewRequest("POST", ts.URL+"/user/handle", nil)
-	req.Header.Add("Cookie", "sAccessToken="+response3["accessToken"]+";sIdRefreshToken="+response2["idRefreshTokenFromCookie"])
-	req.Header.Add("anti-csrf", response2["antiCsrf"])
-	res, _ = client.Do(req)
-
-	if res.StatusCode != 200 {
-		t.Error("non 200 status code")
-
-	}
-
-	req, _ = http.NewRequest("POST", ts.URL+"/refresh", nil)
-	req.Header.Add("Cookie", "sRefreshToken="+response["refreshToken"])
-	res, _ = client.Do(req)
-
-	if res.StatusCode != 403 {
-		t.Error("incorrect status code")
+		}
 	}
 
-	var jsonResponse4 map[string]interface{}
-	err = json.NewDecoder(res.Body).Decode(&jsonResponse4)
-	if err != nil {
-		t.Error("error when parsing body")
-	}
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/refresh", nil)
+		req.Header.Add("Cookie", "sRefreshToken="+response["refreshToken"])
+		res, _ = client.Do(req)
 
-	if jsonResponse4["message"] != "token theft detected" {
-		t.Error("incorrect response body")
-	}
+		if res.StatusCode != 403 {
+			t.Error("incorrect status code")
+		}
 
-	req, _ = http.NewRequest("POST", ts.URL+"/logout", nil)
-	req.Header.Add("Cookie", "sAccessToken="+response3["accessToken"]+";sIdRefreshToken="+response2["idRefreshTokenFromCookie"])
-	req.Header.Add("anti-csrf", response2["antiCsrf"])
-	res, _ = client.Do(req)
+		var jsonResponse4 map[string]interface{}
+		err := json.NewDecoder(res.Body).Decode(&jsonResponse4)
+		if err != nil {
+			t.Error("error when parsing body")
+		}
 
-	if res.StatusCode != 200 {
-		t.Error("non 200 response code")
+		if jsonResponse4["message"] != "token theft detected" {
+			t.Error("incorrect response body")
+		}
 	}
+	var response4 map[string]string
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/logout", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response3["accessToken"]+";sIdRefreshToken="+response2["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response2["antiCsrf"])
+		res, _ = client.Do(req)
 
-	response4 := extractInfoFromResponseHeader(res)
-	if response4["antiCsrf"] != "" {
-		t.Error("antiCsrf is not empty")
-	}
-	if response4["accessToken"] != "" {
-		t.Error("accessToken is not empty")
-	}
-	if response4["refreshToken"] != "" {
-		t.Error("refreshToken is not empty")
-	}
-	if response4["idRefreshTokenFromHeader"] != "remove" {
-		t.Error("incorrect value")
-	}
-	if response4["idRefreshTokenFromCookie"] != "" {
-		t.Error("idRefreshTokenFromCookie is not empty")
-	}
-	if response4["accessTokenExpiry"] != "Thu, 01 Jan 1970 00:00:00 GMT" {
-		t.Error("incorrect value")
-	}
-	if response4["idRefreshTokenExpiry"] != "Thu, 01 Jan 1970 00:00:00 GMT" {
-		t.Error("incorrect value")
-	}
-	if response4["refreshTokenExpiry"] != "Thu, 01 Jan 1970 00:00:00 GMT" {
-		t.Error("incorrect value")
+		if res.StatusCode != 200 {
+			t.Error("non 200 response code")
+		}
+
+		response4 = extractInfoFromResponseHeader(res)
+		if response4["antiCsrf"] != "" {
+			t.Error("antiCsrf is not empty")
+		}
+		if response4["accessToken"] != "" {
+			t.Error("accessToken is not empty")
+		}
+		if response4["refreshToken"] != "" {
+			t.Error("refreshToken is not empty")
+		}
+		if response4["idRefreshTokenFromHeader"] != "remove" {
+			t.Error("incorrect value")
+		}
+		if response4["idRefreshTokenFromCookie"] != "" {
+			t.Error("idRefreshTokenFromCookie is not empty")
+		}
+		if response4["accessTokenExpiry"] != "Thu, 01 Jan 1970 00:00:00 GMT" {
+			t.Error("incorrect value")
+		}
+		if response4["idRefreshTokenExpiry"] != "Thu, 01 Jan 1970 00:00:00 GMT" {
+			t.Error("incorrect value")
+		}
+		if response4["refreshTokenExpiry"] != "Thu, 01 Jan 1970 00:00:00 GMT" {
+			t.Error("incorrect value")
+		}
 	}
 
 	req, _ = http.NewRequest("POST", ts.URL+"/user/handle", nil)
