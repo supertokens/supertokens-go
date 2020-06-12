@@ -26,7 +26,7 @@ import (
 
 	"github.com/supertokens/supertokens-go/supertokens"
 	"github.com/supertokens/supertokens-go/supertokens/core"
-	spErrors "github.com/supertokens/supertokens-go/supertokens/errors"
+	stErrors "github.com/supertokens/supertokens-go/supertokens/errors"
 )
 
 type mockedStruct struct {
@@ -58,7 +58,7 @@ func TestDeviceDriveInfoWithoutFrontendSDK(t *testing.T) {
 	supertokens.Config("localhost:8080")
 	_, err := core.CreateNewSession("", map[string]interface{}{}, map[string]interface{}{})
 	if err != nil {
-		newErr := err.(spErrors.GeneralError)
+		newErr := err.(stErrors.GeneralError)
 		if newErr.ActualError.Error() != "custom error" {
 			t.Error(newErr)
 		}

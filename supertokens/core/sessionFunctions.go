@@ -238,7 +238,7 @@ func UpdateSessionData(sessionHandle string, newSessionData map[string]interface
 	if err != nil {
 		return err
 	}
-	if response["status"] == "Unauthorized" {
+	if response["status"] == "UNAUTHORISED" {
 		return errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
@@ -273,7 +273,7 @@ func UpdateJWTPayload(sessionHandle string, newJWTPayload map[string]interface{}
 	if err != nil {
 		return err
 	}
-	if response["status"] == "Unauthorized" {
+	if response["status"] == "UNAUTHORISED" {
 		return errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
@@ -291,7 +291,7 @@ func RegenerateSession(accessToken string, newJWTPayload map[string]interface{})
 	if err != nil {
 		return SessionInfo{}, err
 	}
-	if response["status"] == "Unauthorized" {
+	if response["status"] == "UNAUTHORISED" {
 		return SessionInfo{}, errors.UnauthorizedError{
 			Msg: response["message"].(string),
 		}
