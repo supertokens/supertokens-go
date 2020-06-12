@@ -51,9 +51,10 @@ fi
 pluginTag=$(echo $pluginInfo | jq .tag | tr -d '"')
 pluginVersion=$(echo $pluginInfo | jq .version | tr -d '"')
 
-echo "Testing with COMMERCIAL core: $coreVersion, plugin-interface: $pluginInterfaceVersion, mysql plugin: $pluginVersion"
+echo "Testing with frontend website: $2, COMMERCIAL core: $coreVersion, plugin-interface: $pluginInterfaceVersion, mysql plugin: $pluginVersion"
 
 (cd / && ./runMySQL.sh)
+mysql -u root --password=root -e "DROP DATABASE IF EXISTS auth_session;"
 mysql -u root --password=root -e "CREATE DATABASE auth_session;"
 cd ../../
 git clone git@bitbucket.org:vrai-labs/com-root.git
@@ -69,5 +70,53 @@ git checkout $pluginTag
 cd ../
 echo $SUPERTOKENS_API_KEY > apiPassword
 ./utils/setupTestEnvLocal
-cd ../project/
-go test ./... -count=1 -v
+cd ../
+git clone git@github.com:supertokens/supertokens-website.git
+cd supertokens-website
+git checkout $2
+
+cd ../project/test/example-http/
+go get ./...
+go run main.go &
+pid=$!
+cd ../../../supertokens-website/test/server
+npm i -d
+npm i git+https://github.com:supertokens/supertokens-node.git#$3
+cd ../../
+npm i -d
+NODE_PORT=8081 INSTALL_PATH=../com-root npm test
+if [[ $? -ne 0 ]]
+then
+    echo "test failed... exiting!"
+    exit 1
+fi
+kill -15 $pid
+
+cd ../../../project/test/example-gorilla/
+go get ./...
+go run main.go &
+pid=$!
+cd ../../../supertokens-website/
+NODE_PORT=8081 INSTALL_PATH=../com-root npm test
+if [[ $? -ne 0 ]]
+then
+    echo "test failed... exiting!"
+    exit 1
+fi
+kill -15 $pid
+
+cd ../../../project/gin/test/example-gin/
+go get ./...
+go run main.go &
+pid=$!
+cd ../../../../supertokens-website/
+NODE_PORT=8081 INSTALL_PATH=../com-root npm test
+if [[ $? -ne 0 ]]
+then
+    echo "test failed... exiting!"
+    exit 1
+fi
+kill -15 $pid
+
+rm -rf ./test/server/node_modules/supertokens-node
+git checkout HEAD -- ./test/server/package.json
