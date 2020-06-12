@@ -378,7 +378,6 @@ func TestManipulationOfJWTPayload(t *testing.T) {
 	} else {
 		t.Error("should not have come here")
 	}
-
 }
 
 func TestNoAntiCSRFRequiredIfDisabledFromCore(t *testing.T) {
