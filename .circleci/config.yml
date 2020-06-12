@@ -4,6 +4,9 @@ jobs:
     docker:
       - image: rishabhpoddar/supertokens_go_driver_testing
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "b6:ef:23:21:21:df:53:19:2f:22:83:97:1e:9c:20:77"
       - checkout
       - run: go get ./...
       - run: (cd .circleci/ && ./doTests.sh)
