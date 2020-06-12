@@ -17,6 +17,7 @@
 package testing
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/supertokens/supertokens-go/supertokens"
@@ -76,10 +77,12 @@ func TestBasicSessionUse(t *testing.T) {
 		t.Error("antiCsrfToken is nil")
 	}
 
+	fmt.Println("Calling getSession!!!!!!!!!!!")
 	_, err = core.GetSession(response.AccessToken.Token, response.AntiCsrfToken, true)
 	if err != nil {
 		t.Error(err)
 	}
+	fmt.Println("After getSession!!!!!!!!!!!")
 
 	p := core.GetProcessStateInstance()
 
