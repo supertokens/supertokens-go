@@ -120,7 +120,6 @@ git tag --delete $currTag
 git push --delete origin $currTag
 
 git tag v$version
-git tag gin/v$version
 git push --tags
 
 
