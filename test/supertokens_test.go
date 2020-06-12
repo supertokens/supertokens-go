@@ -51,9 +51,6 @@ func TestTokenTheftDetected(t *testing.T) {
 				})
 				return
 			}
-			json.NewEncoder(response).Encode(map[string]interface{}{
-				"success": false,
-			})
 		}
 		json.NewEncoder(response).Encode(map[string]interface{}{
 			"success": false,
@@ -473,61 +470,350 @@ func TestSessionRevoking(t *testing.T) {
 	}
 }
 
-// func TestManipulatingSessionData(t *testing.T) {
-// 	beforeEach()
-// 	startST("localhost", "8080")
-// 	supertokens.Config("localhost:8080")
+func TestManipulatingSessionData(t *testing.T) {
+	beforeEach()
+	startST("localhost", "8080")
+	supertokens.Config("localhost:8080")
 
-// 	mux := http.NewServeMux()
-// 	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
-// 		supertokens.CreateNewSession(response, "")
-// 	})
-// 	mux.HandleFunc("/updateSessionData", func(response http.ResponseWriter, request *http.Request) {
-// 		session, err := supertokens.GetSession(response, request, true)
-// 		if err != nil {
-// 			return
-// 		}
-// 		session.UpdateSessionData(map[string]interface{}{
-// 			"key": "value",
-// 		})
+	mux := http.NewServeMux()
+	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
+		supertokens.CreateNewSession(response, "")
+	})
+	mux.HandleFunc("/updateSessionData", func(response http.ResponseWriter, request *http.Request) {
+		session, err := supertokens.GetSession(response, request, true)
+		if err != nil {
+			return
+		}
+		session.UpdateSessionData(map[string]interface{}{
+			"key": "value",
+		})
 
-// 	})
+	})
+	mux.HandleFunc("/getSessionData", func(response http.ResponseWriter, request *http.Request) {
+		session, err := supertokens.GetSession(response, request, true)
+		if err != nil {
+			return
+		}
+		data, err := session.GetSessionData()
+		if err != nil {
+			return
+		}
+		response.Write([]byte(data["key"].(string)))
+	})
+	mux.HandleFunc("/updateSessionData2", func(response http.ResponseWriter, request *http.Request) {
+		session, err := supertokens.GetSession(response, request, true)
+		if err != nil {
+			return
+		}
+		session.UpdateSessionData(map[string]interface{}{
+			"key": "value2",
+		})
 
-// 	/*
+	})
+	mux.HandleFunc("/updateSessionDataInvalidSessionHandle", func(response http.ResponseWriter, request *http.Request) {
 
-// 	  app.post("/updateSessionData", ctx -> {
-// 	     Session s = SuperTokens.getSession(ctx, true);
-// 	     Map<String, Object> data = new HashMap<>();
-// 	     data.put("key", "value");
-// 	     s.updateSessionData(data);
-// 	     ctx.result("");
-// 	  });
+		err := supertokens.UpdateSessionData("InvalidHandle", map[string]interface{}{
+			"key": "value2",
+		})
+		if err != nil {
+			if errors.IsUnauthorizedError(err) {
+				json.NewEncoder(response).Encode(map[string]interface{}{
+					"success": true,
+				})
+				return
+			}
+		}
+		json.NewEncoder(response).Encode(map[string]interface{}{
+			"success": false,
+		})
+	})
 
-// 	  app.post("/getSessionData", ctx -> {
-// 	      Session s = SuperTokens.getSession(ctx, true);
-// 	      Map<String, Object> data = s.getSessionData();
-// 	      ctx.result((String)data.get("key"));
-// 	  });
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
 
-// 	  app.post("/updateSessionData2", ctx -> {
-// 	      Session s = SuperTokens.getSession(ctx, true);
-// 	      Map<String, Object> data = new HashMap<>();
-// 	      data.put("key", "value2");
-// 	      s.updateSessionData(data);
-// 	      ctx.result("");
-// 	  });
+	client := &http.Client{}
+	req, _ := http.NewRequest("POST", ts.URL+"/create", nil)
+	res, _ := client.Do(req)
+	response := extractInfoFromResponseHeader(res)
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/updateSessionData", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
+	}
 
-// 	  app.post("/updateSessionDataInvalidSessionHandle", ctx -> {
-// 	      try {
-// 	          Map<String, Object> data = new HashMap<>();
-// 	          data.put("key", "value3");
-// 	          SuperTokens.updateSessionData("InvalidHandle", data);
-// 	          ctx.result("{\"success\": false}");
-// 	      } catch (UnauthorisedException e) {
-// 	          ctx.result("{\"success\": true}");
-// 	      } catch (Exception e) {
-// 	          ctx.result("{\"success\": false}");
-// 	      }
-// 	  });
-// 	*/
-// }
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/getSessionData", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			t.Error(err)
+		}
+		res.Body.Close()
+		if string(body) != "value" {
+			t.Error("incorrect response")
+		}
+	}
+
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/updateSessionData2", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
+	}
+
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/getSessionData", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			t.Error(err)
+		}
+		res.Body.Close()
+		if string(body) != "value2" {
+			t.Error("incorrect response")
+		}
+	}
+
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/updateSessionDataInvalidSessionHandle", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
+
+		var jsonResponse map[string]interface{}
+		err := json.NewDecoder(res.Body).Decode(&jsonResponse)
+		if err != nil {
+			t.Error(err)
+		}
+		res.Body.Close()
+		if !jsonResponse["success"].(bool) {
+			t.Error("invalid response")
+		}
+	}
+}
+
+func TestManipulatingJWTData(t *testing.T) {
+	beforeEach()
+	startST("localhost", "8080")
+	supertokens.Config("localhost:8080")
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
+		supertokens.CreateNewSession(response, "")
+	})
+	mux.HandleFunc("/updateJWTPayload", func(response http.ResponseWriter, request *http.Request) {
+		session, err := supertokens.GetSession(response, request, true)
+		accessTokenBefore := session.GetAccessToken()
+		if err != nil {
+			return
+		}
+
+		session.UpdateJWTPayload(map[string]interface{}{
+			"key": "value",
+		})
+		if session.GetAccessToken() == accessTokenBefore {
+			response.WriteHeader(500)
+			return
+		}
+
+	})
+	mux.HandleFunc("/getJWTPayload", func(response http.ResponseWriter, request *http.Request) {
+		session, err := supertokens.GetSession(response, request, true)
+		if err != nil {
+			return
+		}
+		data := session.GetJWTPayload()
+
+		response.Write([]byte(data["key"].(string)))
+	})
+	mux.HandleFunc("/updateJWTPayload2", func(response http.ResponseWriter, request *http.Request) {
+		session, err := supertokens.GetSession(response, request, true)
+		if err != nil {
+			return
+		}
+		session.UpdateJWTPayload(map[string]interface{}{
+			"key": "value2",
+		})
+	})
+	mux.HandleFunc("/updateJWTPayloadInvalidSessionHandle", func(response http.ResponseWriter, request *http.Request) {
+		err := supertokens.UpdateJWTPayload("InvalidHandle", map[string]interface{}{
+			"key": "value3",
+		})
+		if err != nil {
+			if errors.IsUnauthorizedError(err) {
+				json.NewEncoder(response).Encode(map[string]interface{}{
+					"success": true,
+				})
+				return
+			}
+		}
+		json.NewEncoder(response).Encode(map[string]interface{}{
+			"success": false,
+		})
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	client := &http.Client{}
+	req, _ := http.NewRequest("POST", ts.URL+"/create", nil)
+	res, _ := client.Do(req)
+	response := extractInfoFromResponseHeader(res)
+
+	var response2 map[string]string
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/updateJWTPayload", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
+		response2 = extractInfoFromResponseHeader(res)
+	}
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/getJWTPayload", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response2["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			t.Error(err)
+		}
+		res.Body.Close()
+		if string(body) != "value" {
+			t.Error("incorrect response")
+		}
+	}
+
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/updateJWTPayload2", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response2["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
+		response2 = extractInfoFromResponseHeader(res)
+	}
+
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/getJWTPayload", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response2["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			t.Error(err)
+		}
+		res.Body.Close()
+		if string(body) != "value2" {
+			t.Error("incorrect response")
+		}
+	}
+
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/updateJWTPayloadInvalidSessionHandle", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
+		res, _ = client.Do(req)
+
+		var jsonResponse map[string]interface{}
+		err := json.NewDecoder(res.Body).Decode(&jsonResponse)
+		if err != nil {
+			t.Error(err)
+		}
+		res.Body.Close()
+		if !jsonResponse["success"].(bool) {
+			t.Error("invalid response")
+		}
+	}
+}
+
+func TestAppendingToExistingHeader(t *testing.T) {
+	beforeEach()
+	startST("localhost", "8080")
+	supertokens.Config("localhost:8080")
+	mux := http.NewServeMux()
+	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
+		response.Header().Add("testHeader", "testValue")
+		response.Header().Add("Access-Control-Expose-Headers", "customValue")
+		supertokens.CreateNewSession(response, "")
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	client := &http.Client{}
+	req, _ := http.NewRequest("POST", ts.URL+"/create", nil)
+	res, _ := client.Do(req)
+
+	if res.Header.Get("testHeader") != "testValue" {
+		t.Error("header value not set")
+	}
+	if res.Header.Get("Access-Control-Expose-Headers") != "customValue, id-refresh-token, anti-csrf" {
+		t.Error("header value not set")
+	}
+
+	response := extractInfoFromResponseHeader(res)
+
+	if response["antiCsrf"] == "" {
+		t.Error("antiCsrf is empty")
+	}
+	if response["accessToken"] == "" {
+		t.Error("accessToken is empty")
+	}
+	if response["refreshToken"] == "" {
+		t.Error("refreshToken is empty")
+	}
+	if response["idRefreshTokenFromHeader"] == "" {
+		t.Error("idRefreshTokenFromHeader is empty")
+	}
+	if response["idRefreshTokenFromCookie"] == "" {
+		t.Error("idRefreshTokenFromCookie is empty")
+	}
+}
+
+func TestAntiCsrfDisabled(t *testing.T) {
+	beforeEach()
+	startST("localhost", "8080")
+	supertokens.Config("localhost:8080")
+	mux := http.NewServeMux()
+	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
+		supertokens.CreateNewSession(response, "")
+	})
+
+	mux.HandleFunc("/session/verify", func(response http.ResponseWriter, request *http.Request) {
+		supertokens.GetSession(response, request, true)
+	})
+
+	mux.HandleFunc("/session/verifyAntiCsrfFalse", func(response http.ResponseWriter, request *http.Request) {
+		supertokens.GetSession(response, request, false)
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	client := &http.Client{}
+	req, _ := http.NewRequest("POST", ts.URL+"/create", nil)
+	res, _ := client.Do(req)
+
+	response := extractInfoFromResponseHeader(res)
+
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/session/verify", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		res, _ = client.Do(req)
+		if res.StatusCode != 200 {
+			t.Error("non 200 status code")
+		}
+	}
+
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/session/verifyAntiCsrfFalse", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
+		res, _ = client.Do(req)
+		if res.StatusCode != 200 {
+			t.Error("non 200 status code")
+		}
+	}
+}
