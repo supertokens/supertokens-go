@@ -45,7 +45,6 @@ func TestMiddleware(t *testing.T) {
 			})
 			return
 		}
-		response.Write([]byte(""))
 	}))
 
 	mux.HandleFunc("/user/handle", supertokens.Middleware(func(response http.ResponseWriter, request *http.Request) {
@@ -56,7 +55,6 @@ func TestMiddleware(t *testing.T) {
 			})
 			return
 		}
-		response.Write([]byte(""))
 	}))
 
 	mux.HandleFunc("/refresh", supertokens.Middleware(func(response http.ResponseWriter, request *http.Request) {
@@ -80,7 +78,6 @@ func TestMiddleware(t *testing.T) {
 			})
 			return
 		}
-		response.Write([]byte(""))
 	}))
 	supertokens.OnTryRefreshToken(func(err error, response http.ResponseWriter) {
 		response.WriteHeader(401)
