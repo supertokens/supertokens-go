@@ -94,7 +94,7 @@ pkill -KILL go && pkill -KILL main
 
 cd ../project/test/example-gorilla/
 go get ./...
-# go run main.go
+go run main.go &
 pid=$!
 cd ../../../supertokens-website/
 NODE_PORT=8081 INSTALL_PATH=../com-root npm test
@@ -103,7 +103,7 @@ then
     echo "test failed... exiting!"
     exit 1
 fi
-kill -15 $pid
+pkill -KILL go && pkill -KILL main
 
 cd ../project/gin/test/example-gin/
 go get ./...
@@ -116,7 +116,7 @@ then
     echo "test failed... exiting!"
     exit 1
 fi
-kill -15 $pid
+pkill -KILL go && pkill -KILL main
 
 rm -rf ./test/server/node_modules/supertokens-node
 git checkout HEAD -- ./test/server/package.json
