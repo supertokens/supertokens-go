@@ -24,6 +24,8 @@ github.com/supertokens/supertokens-go v0.0.0-20200610071952-83ae7e4c0e0b h1:xjhj
 github.com/supertokens/supertokens-go v0.0.0-20200610071952-83ae7e4c0e0b/go.mod h1:7Oc5m5hTp9v4Ko9xDFrjedGrcDuILxEaEEpS84TSDM4=
 github.com/supertokens/supertokens-go v0.0.0-20200610090736-2abfa63f35e3 h1:nZGdeReq6JyL+y8Jqr5J17MhUMIKtL3Sh+AsMS1MVtA=
 github.com/supertokens/supertokens-go v0.0.0-20200610090736-2abfa63f35e3/go.mod h1:JiH9JqjMR70z8q/tczTVnOZv4VPf+J0wE8MmnuoN3+Q=
+github.com/supertokens/supertokens-go v0.0.4-0.20200612155426-e4535bf6ab5f h1:wA4xJcYY75c3GHZGDM9VVksJlCyfTIK9VPulRf34eUM=
+github.com/supertokens/supertokens-go v0.0.4-0.20200612155426-e4535bf6ab5f/go.mod h1:JaBYKL0bKoaL/I4duZi3rIygBAODDc29KM9Qw+61mLY=
 github.com/ugorji/go v1.1.7/go.mod h1:kZn38zHttfInRq0xu/PH0az30d+z6vm202qpg1oXVMw=
 github.com/ugorji/go/codec v1.1.7/go.mod h1:Ax+UKWsSmolVDwsd+7N3ZtXu+yMGCf907BLYF3GoBXY=
 golang.org/x/sys v0.0.0-20200116001909-b77594299b42/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
