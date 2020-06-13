@@ -58,8 +58,15 @@ func (info *deviceInfo) AddToFrontendSDKs(name string, version string) {
 }
 
 // GetFrontendSDKs get info about devices that have queried
-func (info *deviceInfo) GetFrontendSDKs() []device {
-	return info.frontendSDK
+func (info *deviceInfo) GetFrontendSDKs() []map[string]string {
+	result := []map[string]string{}
+	for i := 0; i < len(info.frontendSDK); i++ {
+		result = append(result, map[string]string{
+			"name":    info.frontendSDK[i].name,
+			"version": info.frontendSDK[i].version,
+		})
+	}
+	return result
 }
 
 // ResetDeviceDriverInfo to be used for testing only
