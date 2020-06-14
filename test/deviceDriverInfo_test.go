@@ -217,106 +217,106 @@ func TestFrontendSDK(t *testing.T) {
 		}
 	}
 
-	// {
-	// 	core.GetSession("", nil, false)
-	// 	frontendSDK := verifySessionOutput["frontendSDK"].([]interface{})
-	// 	if len(frontendSDK) != 2 {
-	// 		t.Error("incorrect number of frontendSDK")
-	// 	}
+	{
+		core.GetSession("", nil, false)
+		frontendSDK := verifySessionOutput["frontendSDK"].([]interface{})
+		if len(frontendSDK) != 2 {
+			t.Error("incorrect number of frontendSDK")
+		}
 
-	// 	{
-	// 		data := frontendSDK[0].(map[string]interface{})
-	// 		if data["name"] != "ios" {
-	// 			t.Error("invalid sdk name")
-	// 		}
-	// 		if data["version"] != "0.0.0" {
-	// 			t.Error("invalid sdk version")
-	// 		}
+		{
+			data := frontendSDK[0].(map[string]interface{})
+			if data["name"] != "ios" {
+				t.Error("invalid sdk name")
+			}
+			if data["version"] != "0.0.0" {
+				t.Error("invalid sdk version")
+			}
 
-	// 		data = frontendSDK[1].(map[string]interface{})
-	// 		if data["name"] != "android" {
-	// 			t.Error("invalid sdk name")
-	// 		}
-	// 		if data["version"] != "0.0.1" {
-	// 			t.Error("invalid sdk version")
-	// 		}
-	// 	}
+			data = frontendSDK[1].(map[string]interface{})
+			if data["name"] != "android" {
+				t.Error("invalid sdk name")
+			}
+			if data["version"] != "0.0.1" {
+				t.Error("invalid sdk version")
+			}
+		}
 
-	// 	driver := verifySessionOutput["drive"].(map[string]interface{})
-	// 	if driver["name"] != "go" {
-	// 		t.Error("invalid driver name")
-	// 	}
-	// 	if driver["version"] != core.VERSION {
-	// 		t.Error("invalid driver version")
-	// 	}
-	// }
+		driver := verifySessionOutput["drive"].(map[string]interface{})
+		if driver["name"] != "go" {
+			t.Error("invalid driver name")
+		}
+		if driver["version"] != core.VERSION {
+			t.Error("invalid driver version")
+		}
+	}
 
-	// {
-	// 	core.RefreshSession("")
-	// 	frontendSDK := refreshSessionOutput["frontendSDK"].([]interface{})
-	// 	if len(frontendSDK) != 2 {
-	// 		t.Error("incorrect number of frontendSDK")
-	// 	}
+	{
+		core.RefreshSession("")
+		frontendSDK := refreshSessionOutput["frontendSDK"].([]interface{})
+		if len(frontendSDK) != 2 {
+			t.Error("incorrect number of frontendSDK")
+		}
 
-	// 	{
-	// 		data := frontendSDK[0].(map[string]interface{})
-	// 		if data["name"] != "ios" {
-	// 			t.Error("invalid sdk name")
-	// 		}
-	// 		if data["version"] != "0.0.0" {
-	// 			t.Error("invalid sdk version")
-	// 		}
+		{
+			data := frontendSDK[0].(map[string]interface{})
+			if data["name"] != "ios" {
+				t.Error("invalid sdk name")
+			}
+			if data["version"] != "0.0.0" {
+				t.Error("invalid sdk version")
+			}
 
-	// 		data = frontendSDK[1].(map[string]interface{})
-	// 		if data["name"] != "android" {
-	// 			t.Error("invalid sdk name")
-	// 		}
-	// 		if data["version"] != "0.0.1" {
-	// 			t.Error("invalid sdk version")
-	// 		}
-	// 	}
+			data = frontendSDK[1].(map[string]interface{})
+			if data["name"] != "android" {
+				t.Error("invalid sdk name")
+			}
+			if data["version"] != "0.0.1" {
+				t.Error("invalid sdk version")
+			}
+		}
 
-	// 	driver := refreshSessionOutput["drive"].(map[string]interface{})
-	// 	if driver["name"] != "go" {
-	// 		t.Error("invalid driver name")
-	// 	}
-	// 	if driver["version"] != core.VERSION {
-	// 		t.Error("invalid driver version")
-	// 	}
-	// }
+		driver := refreshSessionOutput["drive"].(map[string]interface{})
+		if driver["name"] != "go" {
+			t.Error("invalid driver name")
+		}
+		if driver["version"] != core.VERSION {
+			t.Error("invalid driver version")
+		}
+	}
 
-	// {
-	// 	core.ResetHandshakeInfo()
-	// 	core.GetHandshakeInfoInstance()
-	// 	frontendSDK := handshakeOutput["frontendSDK"].([]interface{})
-	// 	if len(frontendSDK) != 2 {
-	// 		t.Error("incorrect number of frontendSDK")
-	// 	}
+	{
+		core.ResetHandshakeInfo()
+		core.GetHandshakeInfoInstance()
+		frontendSDK := handshakeOutput["frontendSDK"].([]interface{})
+		if len(frontendSDK) != 2 {
+			t.Error("incorrect number of frontendSDK")
+		}
 
-	// 	{
-	// 		data := frontendSDK[0].(map[string]interface{})
-	// 		if data["name"] != "ios" {
-	// 			t.Error("invalid sdk name")
-	// 		}
-	// 		if data["version"] != "0.0.0" {
-	// 			t.Error("invalid sdk version")
-	// 		}
+		{
+			data := frontendSDK[0].(map[string]interface{})
+			if data["name"] != "ios" {
+				t.Error("invalid sdk name")
+			}
+			if data["version"] != "0.0.0" {
+				t.Error("invalid sdk version")
+			}
 
-	// 		data = frontendSDK[1].(map[string]interface{})
-	// 		if data["name"] != "android" {
-	// 			t.Error("invalid sdk name")
-	// 		}
-	// 		if data["version"] != "0.0.1" {
-	// 			t.Error("invalid sdk version")
-	// 		}
-	// 	}
+			data = frontendSDK[1].(map[string]interface{})
+			if data["name"] != "android" {
+				t.Error("invalid sdk name")
+			}
+			if data["version"] != "0.0.1" {
+				t.Error("invalid sdk version")
+			}
+		}
 
-	// 	driver := handshakeOutput["drive"].(map[string]interface{})
-	// 	if driver["name"] != "go" {
-	// 		t.Error("invalid driver name")
-	// 	}
-	// 	if driver["version"] != core.VERSION {
-	// 		t.Error("invalid driver version")
-	// 	}
-	// }
+		driver := handshakeOutput["drive"].(map[string]interface{})
+		if driver["name"] != "go" {
+			t.Error("invalid driver name")
+		}
+		if driver["version"] != core.VERSION {
+			t.Error("invalid driver version")
+		}
+	}
 }
