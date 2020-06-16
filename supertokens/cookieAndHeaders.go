@@ -44,24 +44,24 @@ func configCookieAndHeaders(config ConfigMap) {
 
 func attachAccessTokenToCookie(response http.ResponseWriter, token string,
 	expiry uint64, domain string, secure bool, path string, sameSite string) {
-	if configMap != nil && configMap.accessTokenPath != "" {
-		path = configMap.accessTokenPath
+	if configMap != nil && configMap.AccessTokenPath != "" {
+		path = configMap.AccessTokenPath
 	}
 	setCookie(response, accessTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
 func attachRefreshTokenToCookie(response http.ResponseWriter, token string,
 	expiry uint64, domain string, secure bool, path string, sameSite string) {
-	if configMap != nil && configMap.refreshAPIPath != "" {
-		path = configMap.refreshAPIPath
+	if configMap != nil && configMap.RefreshAPIPath != "" {
+		path = configMap.RefreshAPIPath
 	}
 	setCookie(response, refreshTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
 func setIDRefreshTokenInHeaderAndCookie(response http.ResponseWriter, token string,
 	expiry uint64, domain string, secure bool, path string, sameSite string) {
-	if configMap != nil && configMap.accessTokenPath != "" {
-		path = configMap.accessTokenPath
+	if configMap != nil && configMap.AccessTokenPath != "" {
+		path = configMap.AccessTokenPath
 	}
 	setHeader(response, idRefreshTokenHeaderKey, token+";"+fmt.Sprint(expiry))
 	setHeader(response, "Access-Control-Expose-Headers", idRefreshTokenHeaderKey)
@@ -111,15 +111,15 @@ func setCookie(response http.ResponseWriter, name string, value string,
 	domain string, secure bool, httpOnly bool, expires uint64, path string, sameSite string) {
 
 	if configMap != nil {
-		if configMap.cookieDomain != "" {
-			domain = configMap.cookieDomain
+		if configMap.CookieDomain != "" {
+			domain = configMap.CookieDomain
 		}
-		if configMap.cookieSecure != nil {
-			secure = *configMap.cookieSecure
+		if configMap.CookieSecure != nil {
+			secure = *configMap.CookieSecure
 		}
-		if configMap.cookieSameSite == "none" || configMap.cookieSameSite == "lax" ||
-			configMap.cookieSameSite == "strict" {
-			sameSite = configMap.cookieSameSite
+		if configMap.CookieSameSite == "none" || configMap.CookieSameSite == "lax" ||
+			configMap.CookieSameSite == "strict" {
+			sameSite = configMap.CookieSameSite
 		}
 	}
 
