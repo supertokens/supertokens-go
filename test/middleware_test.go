@@ -30,7 +30,9 @@ import (
 func TestMiddleware(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080/",
+	})
 	mux := http.NewServeMux()
 	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
 		supertokens.CreateNewSession(response, "testing-userID")

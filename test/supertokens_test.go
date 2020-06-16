@@ -31,7 +31,9 @@ import (
 func TestTokenTheftDetected(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 	mux := http.NewServeMux()
 	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
 		supertokens.CreateNewSession(response, "id1")
@@ -131,7 +133,9 @@ func TestTokenTheftDetected(t *testing.T) {
 func TestBasicUsage(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
@@ -278,7 +282,9 @@ func TestBasicUsage(t *testing.T) {
 func TestSessionVerifyWithAntiCsrf(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 	mux := http.NewServeMux()
 	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
 		supertokens.CreateNewSession(response, "id1")
@@ -323,7 +329,9 @@ func TestSessionVerifyWithAntiCsrf(t *testing.T) {
 func TestSessionVerifyWithoutAntiCsrf(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 	mux := http.NewServeMux()
 	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
 		supertokens.CreateNewSession(response, "id1")
@@ -366,7 +374,9 @@ func TestSessionVerifyWithoutAntiCsrf(t *testing.T) {
 func TestSessionRevoking(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 	supertokens.RevokeAllSessionsForUser("someUniqueUserId")
 
 	mux := http.NewServeMux()
@@ -473,7 +483,9 @@ func TestSessionRevoking(t *testing.T) {
 func TestManipulatingSessionData(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
@@ -600,7 +612,9 @@ func TestManipulatingSessionData(t *testing.T) {
 func TestManipulatingJWTData(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
@@ -732,7 +746,9 @@ func TestManipulatingJWTData(t *testing.T) {
 func TestAppendingToExistingHeader(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 	mux := http.NewServeMux()
 	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
 		response.Header().Add("testHeader", "testValue")
@@ -776,7 +792,9 @@ func TestAppendingToExistingHeader(t *testing.T) {
 func TestAntiCsrfDisabled(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 	mux := http.NewServeMux()
 	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
 		supertokens.CreateNewSession(response, "")

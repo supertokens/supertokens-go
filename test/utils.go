@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"time"
 
 	"github.com/supertokens/supertokens-go/supertokens/core"
@@ -203,9 +204,14 @@ func extractInfoFromCookies(cookies []*http.Cookie) map[string]string {
 	for _, cookie := range cookies {
 		if cookie.Name == "sAccessToken" {
 			response["accessToken"] = cookie.Value
+			response["accessTokenPath"] = cookie.Path
+			response["accessTokenDomain"] = cookie.Domain
 			response["accessTokenExpiry"] = cookie.RawExpires
+			response["accessTokenSecure"] = strconv.FormatBool(cookie.Secure)
 		} else if cookie.Name == "sRefreshToken" {
 			response["refreshToken"] = cookie.Value
+			response["refreshTokenPath"] = cookie.Path
+			response["refreshTokenDomain"] = cookie.Domain
 			response["refreshTokenExpiry"] = cookie.RawExpires
 
 		} else {

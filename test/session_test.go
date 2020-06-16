@@ -27,7 +27,9 @@ import (
 func TestTokenTheftDetection(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 
 	response, err := core.CreateNewSession("", map[string]interface{}{}, map[string]interface{}{})
 	if err != nil {
@@ -53,7 +55,9 @@ func TestTokenTheftDetection(t *testing.T) {
 func TestBasicSessionUse(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 
 	response, err := core.CreateNewSession("", map[string]interface{}{}, map[string]interface{}{})
 	if err != nil {
@@ -168,7 +172,9 @@ func TestBasicSessionUse(t *testing.T) {
 func TestSessionVerifyWithAntiCSRF(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 
 	response, err := core.CreateNewSession("", map[string]interface{}{}, map[string]interface{}{})
 	if err != nil {
@@ -189,7 +195,9 @@ func TestSessionVerifyWithAntiCSRF(t *testing.T) {
 func TestSessionVerifyWithoutAntiCSRF(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 
 	response, err := core.CreateNewSession("", map[string]interface{}{}, map[string]interface{}{})
 	if err != nil {
@@ -210,7 +218,9 @@ func TestSessionVerifyWithoutAntiCSRF(t *testing.T) {
 func TestRevokingOfSessions(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 
 	_, err := core.RevokeAllSessionsForUser("someUniqueID")
 	if err != nil {
@@ -284,7 +294,9 @@ func TestRevokingOfSessions(t *testing.T) {
 func TestManipulationOfSessionData(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 
 	response, err := core.CreateNewSession("someUniqueUserId", map[string]interface{}{}, map[string]interface{}{})
 	if err != nil {
@@ -332,7 +344,9 @@ func TestManipulationOfSessionData(t *testing.T) {
 func TestManipulationOfJWTPayload(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 
 	response, err := core.CreateNewSession("someUniqueUserId", map[string]interface{}{}, map[string]interface{}{})
 	if err != nil {
@@ -384,7 +398,9 @@ func TestNoAntiCSRFRequiredIfDisabledFromCore(t *testing.T) {
 	beforeEach()
 	setKeyValueInConfig("enable_anti_csrf", "false")
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 
 	response, err := core.CreateNewSession("", map[string]interface{}{}, map[string]interface{}{})
 	if err != nil {

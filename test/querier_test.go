@@ -17,6 +17,7 @@
 package testing
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -38,7 +39,9 @@ func TestQuerierCalledWithoutInit(t *testing.T) {
 
 func TestCoreNotAvailable(t *testing.T) {
 	beforeEach()
-	supertokens.Config("localhost:8080;localhost:8081")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080;http://localhost:8081",
+	})
 	q := core.GetQuerierInstance()
 	_, err := q.SendGetRequest("", "/", map[string]string{})
 	if err == nil && err.Error() != "Error while querying SuperTokens core" {
@@ -51,7 +54,9 @@ func TestThreeCoresAndRoundRobin(t *testing.T) {
 	startST("localhost", "8080")
 	startST("localhost", "8081")
 	startST("localhost", "8082")
-	supertokens.Config("localhost:8080;localhost:8081;localhost:8082")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080;http://localhost:8081;http://localhost:8082",
+	})
 	q := core.GetQuerierInstance()
 	response, _ := q.SendGetRequest("", "/hello", map[string]string{})
 	if response == nil || response["result"].(string) != "Hello\n" {
@@ -69,8 +74,9 @@ func TestThreeCoresAndRoundRobin(t *testing.T) {
 		t.Error("failed")
 	}
 
-	if !(containsHost(hostAlive, "localhost:8080") &&
-		containsHost(hostAlive, "localhost:8081") && containsHost(hostAlive, "localhost:8082")) {
+	if !(containsHost(hostAlive, "http://localhost:8080") &&
+		containsHost(hostAlive, "http://localhost:8081") && containsHost(hostAlive, "http://localhost:8082")) {
+		fmt.Println(hostAlive)
 		t.Error("failed")
 	}
 }
@@ -79,7 +85,9 @@ func TestThreeCoresOneDeadRoundRobin(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
 	startST("localhost", "8082")
-	supertokens.Config("localhost:8080;localhost:8081;localhost:8082")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080;http://localhost:8081;http://localhost:8082",
+	})
 	q := core.GetQuerierInstance()
 	response, _ := q.SendGetRequest("", "/hello", map[string]string{})
 	if response == nil || response["result"].(string) != "Hello\n" {
@@ -107,11 +115,11 @@ func TestThreeCoresOneDeadRoundRobin(t *testing.T) {
 		t.Error("failed")
 		return
 	}
-	if !(containsHost(hostAlive, "localhost:8080") &&
-		containsHost(hostAlive, "localhost:8082")) {
+	if !(containsHost(hostAlive, "http://localhost:8080") &&
+		containsHost(hostAlive, "http://localhost:8082")) {
 		t.Error("failed")
 	}
-	if containsHost(hostAlive, "localhost:8081") {
+	if containsHost(hostAlive, "http://localhost:8081") {
 		t.Error("failed")
 	}
 }

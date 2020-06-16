@@ -30,7 +30,9 @@ var noOfTimesGetSessionCalledDuringTest int = 0
 var noOfTimesRefreshCalledDuringTest int = 0
 
 func main() {
-	supertokens.Config("localhost:9000;")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:9000",
+	})
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/testUserConfig", testUserConfig)
 	http.HandleFunc("/multipleInterceptors", multipleInterceptors)

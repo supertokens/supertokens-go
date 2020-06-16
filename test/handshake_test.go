@@ -26,7 +26,9 @@ import (
 func TestDriverInfoCheckWithoutFrontendSDK(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
 	info, err := core.GetHandshakeInfoInstance()
 	if err != nil {
 		t.Error(err)

@@ -56,7 +56,9 @@ func TestDeviceDriveInfoWithoutFrontendSDK(t *testing.T) {
 		doFunc: handler,
 	}
 	core.AddMockedHTTPHandler("newsession", &mock)
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080/",
+	})
 	_, err := core.CreateNewSession("", map[string]interface{}{}, map[string]interface{}{})
 	if err != nil {
 		newErr := err.(stErrors.GeneralError)
@@ -79,7 +81,9 @@ func TestFrontendSDK(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
 
-	supertokens.Config("localhost:8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080/",
+	})
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
