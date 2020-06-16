@@ -22,21 +22,14 @@ import (
 	"flag"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/supertokens/supertokens-go/supertokens/errors"
 )
 
-// Hosts to host location of SuperTokens instances.
-type hosts struct {
-	hostname string
-	port     int
-}
-
 type querier struct {
-	hosts          []hosts
+	hosts          []string
 	lastTriedIndex int
 	apiVersion     *string
 }
@@ -58,12 +51,7 @@ func GetQuerierInstance() *querier {
 		defer querierLock.Unlock()
 		if querierInstantiated == nil {
 			querierInstantiated = &querier{
-				hosts: []hosts{
-					hosts{
-						hostname: "localhost",
-						port:     3567,
-					},
-				},
+				hosts:          []string{"http://localhost:3567"},
 				lastTriedIndex: 0,
 				apiVersion:     nil,
 			}
@@ -73,34 +61,25 @@ func GetQuerierInstance() *querier {
 }
 
 // InitQuerier set hosts
-func InitQuerier(hostsStr string) error {
+func InitQuerier(hostsStr string) {
 	if querierInstantiated == nil {
 		querierLock.Lock()
 		defer querierLock.Unlock()
 		if querierInstantiated == nil {
 
-			// convert "hostname1:port1;hostname2:port2" to proper data type
-			var hostsArr = make([]hosts, 0)
+			// convert "http://hostname1:port1;https://hostname2:port2" to proper data type
+			var hostsArr = make([]string, 0)
 			var splitted = strings.Split(hostsStr, ";")
 			for i := 0; i < len(splitted); i++ {
 				var curr = splitted[i]
 				if curr == "" {
 					continue
 				}
-				var hostname = strings.Split(curr, ":")[0]
-				var port, err = strconv.Atoi(strings.Split(curr, ":")[1])
-				if err != nil {
-					return errors.GeneralError{
-						Msg:         "Invalid syntax for connection string",
-						ActualError: nil,
-					}
+				if curr[len(curr)-1:] == "/" { // remove trailing slash from user
+					curr = curr[0 : len(curr)-1]
 				}
-				hostsArr = append(hostsArr, hosts{
-					hostname: hostname,
-					port:     port,
-				})
+				hostsArr = append(hostsArr, curr)
 			}
-
 			querierInstantiated = &querier{
 				hosts:          hostsArr,
 				lastTriedIndex: 0,
@@ -108,7 +87,6 @@ func InitQuerier(hostsStr string) error {
 			}
 		}
 	}
-	return nil
 }
 
 func (querierInstance *querier) getAPIVersion() (string, error) {
@@ -264,9 +242,8 @@ func (querierInstance *querier) sendRequestHelper(path string, httpRequest httpR
 		}
 	}
 	var currentHost = querierInstance.hosts[querierInstance.lastTriedIndex]
-	hostPortString := currentHost.hostname + ":" + strconv.Itoa(currentHost.port)
 	querierInstance.lastTriedIndex = (querierInstance.lastTriedIndex + 1) % len(querierInstance.hosts)
-	var resp, err = httpRequest("http://" + hostPortString + path)
+	var resp, err = httpRequest(currentHost + path)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "connection refused") {
@@ -281,8 +258,8 @@ func (querierInstance *querier) sendRequestHelper(path string, httpRequest httpR
 		}
 	}
 
-	if flag.Lookup("test.v") != nil && !containsHost(hostsAliveForTesting, hostPortString) {
-		hostsAliveForTesting = append(hostsAliveForTesting, hostPortString)
+	if flag.Lookup("test.v") != nil && !containsHost(hostsAliveForTesting, currentHost) {
+		hostsAliveForTesting = append(hostsAliveForTesting, currentHost)
 	}
 
 	defer resp.Body.Close()

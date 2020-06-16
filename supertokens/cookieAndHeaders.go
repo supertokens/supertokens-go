@@ -36,18 +36,33 @@ const antiCsrfHeaderKey = "anti-csrf"
 const frontendSDKNameHeaderKey = "supertokens-sdk-name"
 const frontendSDKVersionHeaderKey = "supertokens-sdk-version"
 
+var configMap *ConfigMap = nil
+
+func configCookieAndHeaders(config ConfigMap) {
+	configMap = &config
+}
+
 func attachAccessTokenToCookie(response http.ResponseWriter, token string,
 	expiry uint64, domain string, secure bool, path string, sameSite string) {
+	if configMap != nil && configMap.accessTokenPath != "" {
+		path = configMap.accessTokenPath
+	}
 	setCookie(response, accessTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
 func attachRefreshTokenToCookie(response http.ResponseWriter, token string,
 	expiry uint64, domain string, secure bool, path string, sameSite string) {
+	if configMap != nil && configMap.refreshAPIPath != "" {
+		path = configMap.refreshAPIPath
+	}
 	setCookie(response, refreshTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
 func setIDRefreshTokenInHeaderAndCookie(response http.ResponseWriter, token string,
 	expiry uint64, domain string, secure bool, path string, sameSite string) {
+	if configMap != nil && configMap.accessTokenPath != "" {
+		path = configMap.accessTokenPath
+	}
 	setHeader(response, idRefreshTokenHeaderKey, token+";"+fmt.Sprint(expiry))
 	setHeader(response, "Access-Control-Expose-Headers", idRefreshTokenHeaderKey)
 
@@ -94,6 +109,19 @@ func getRefreshTokenFromCookie(request *http.Request) *string {
 
 func setCookie(response http.ResponseWriter, name string, value string,
 	domain string, secure bool, httpOnly bool, expires uint64, path string, sameSite string) {
+
+	if configMap != nil {
+		if configMap.cookieDomain != "" {
+			domain = configMap.cookieDomain
+		}
+		if configMap.cookieSecure != nil {
+			secure = *configMap.cookieSecure
+		}
+		if configMap.cookieSameSite == "none" || configMap.cookieSameSite == "lax" ||
+			configMap.cookieSameSite == "strict" {
+			sameSite = configMap.cookieSameSite
+		}
+	}
 
 	var sameSiteField = http.SameSiteNoneMode
 	if sameSite == "lax" {

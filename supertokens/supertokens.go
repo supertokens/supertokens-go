@@ -27,9 +27,20 @@ type contextKey int
 
 const sessionContext contextKey = iota
 
+// ConfigMap add key value params for session behaviour
+type ConfigMap struct {
+	hosts           string
+	accessTokenPath string
+	refreshAPIPath  string
+	cookieDomain    string
+	cookieSecure    *bool
+	cookieSameSite  string
+}
+
 // Config used to set locations of SuperTokens instances
-func Config(hosts string) error {
-	return core.Config(hosts)
+func Config(config ConfigMap) {
+	configCookieAndHeaders(config)
+	core.Config(config.hosts)
 }
 
 // CreateNewSession function used to create a new SuperTokens session
