@@ -26,9 +26,26 @@ import (
 // SessionContext string to get session struct from context if using Gin
 const sessionContext string = "supertokens_session_key"
 
+// ConfigMap add key value params for session behaviour
+type ConfigMap struct {
+	Hosts           string
+	AccessTokenPath string
+	RefreshAPIPath  string
+	CookieDomain    string
+	CookieSecure    *bool
+	CookieSameSite  string
+}
+
 // Config used to set locations of SuperTokens instances
-func Config(hosts string) error {
-	return supertokens.Config(hosts)
+func Config(config ConfigMap) {
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts:           config.Hosts,
+		AccessTokenPath: config.AccessTokenPath,
+		RefreshAPIPath:  config.RefreshAPIPath,
+		CookieDomain:    config.CookieDomain,
+		CookieSecure:    config.CookieSecure,
+		CookieSameSite:  config.CookieSameSite,
+	})
 }
 
 // CreateNewSession function used to create a new SuperTokens session

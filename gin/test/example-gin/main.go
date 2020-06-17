@@ -31,7 +31,9 @@ var noOfTimesGetSessionCalledDuringTest int = 0
 var noOfTimesRefreshCalledDuringTest int = 0
 
 func main() {
-	supertokens.Config("localhost:9000;")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:9000",
+	})
 	r := gin.Default()
 	r.Any("/login", login)
 	r.Any("/testUserConfig", testUserConfig)

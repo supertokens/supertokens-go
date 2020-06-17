@@ -32,7 +32,9 @@ var noOfTimesGetSessionCalledDuringTest int = 0
 var noOfTimesRefreshCalledDuringTest int = 0
 
 func main() {
-	supertokens.Config("localhost:9000;")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:9000",
+	})
 	r := mux.NewRouter()
 	r.HandleFunc("/login", login)
 	r.HandleFunc("/testUserConfig", testUserConfig)
