@@ -17,6 +17,7 @@
 package testing
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -158,6 +159,12 @@ func TestConfigPathsAreSet(t *testing.T) {
 	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
 		supertokens.CreateNewSession(response, "id1")
 	})
+	mux.HandleFunc("/customRefreshPath", supertokens.Middleware(
+		func(response http.ResponseWriter, request *http.Request) {
+			json.NewEncoder(response).Encode(map[string]interface{}{
+				"success": true,
+			})
+		}))
 
 	ts := httptest.NewServer(mux)
 	defer ts.Close()
@@ -182,6 +189,17 @@ func TestConfigPathsAreSet(t *testing.T) {
 	}
 	if response["refreshTokenPath"] != "/customRefreshPath" {
 		t.Error("refreshTokenPath not set")
+	}
+
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/customRefreshPath", nil)
+		req.Header.Add("Cookie", "sRefreshToken="+response["refreshToken"])
+		res, _ = client.Do(req)
+		response2 := extractInfoFromResponseHeader(res)
+		if response2["accessToken"] == response["accesToken"] {
+			t.Error("refresh did not take place")
+		}
+
 	}
 }
 
