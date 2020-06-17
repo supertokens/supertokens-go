@@ -41,9 +41,13 @@ func Middleware(theirHandler http.HandlerFunc, extraParams ...interface{}) http.
 			}
 			return
 		}
-		if (handshakeInfo.RefreshTokenPath == path ||
-			(handshakeInfo.RefreshTokenPath+"/") == path ||
-			handshakeInfo.RefreshTokenPath == (path+"/")) &&
+		refreshTokenPath := handshakeInfo.RefreshTokenPath
+		if configMap != nil && configMap.RefreshAPIPath != "" {
+			refreshTokenPath = configMap.RefreshAPIPath
+		}
+		if (refreshTokenPath == path ||
+			(refreshTokenPath+"/") == path ||
+			refreshTokenPath == (path+"/")) &&
 			r.Method == "POST" {
 			session, sessionError := RefreshSession(w, r)
 			if sessionError != nil {
