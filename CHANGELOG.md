@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changes
 - Adds ability to set more config values like cookie domain, cookies paths etc.
 - Adds ability to connect to https instance
+- Changes how SuperTokens hosts are given
 
 ## [1.0.1] - 2020-06-14
 ### Fixed
