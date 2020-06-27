@@ -261,9 +261,9 @@ func TestTrySupertokensHostPath(t *testing.T) {
 		req, _ = http.NewRequest("POST", ts.URL+"/session/verify", nil)
 		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"]+";sIdRefreshToken="+response["idRefreshTokenFromCookie"])
 		req.Header.Add("anti-csrf", response["antiCsrf"])
-		res, _ = client.Do(req)
-		if core.GetProcessStateInstance().GetLastEventByName(core.CallingServiceInVerify) != nil {
-			t.Error("processState contains CallingServiceInVerify")
+		_, err := client.Do(req)
+		if err != nil {
+			t.Error(err)
 		}
 	}
 	var response2 map[string]string
@@ -308,9 +308,9 @@ func TestTrySupertokensHostPath(t *testing.T) {
 		req, _ = http.NewRequest("POST", ts.URL+"/session/verify", nil)
 		req.Header.Add("Cookie", "sAccessToken="+response3["accessToken"]+";sIdRefreshToken="+response3["idRefreshTokenFromCookie"])
 		req.Header.Add("anti-csrf", response2["antiCsrf"])
-		res, _ = client.Do(req)
-		if core.GetProcessStateInstance().GetLastEventByName(core.CallingServiceInVerify) != nil {
-			t.Error("processState contains CallingServiceInVerify")
+		_, err := client.Do(req)
+		if err != nil {
+			t.Error(err)
 		}
 	}
 
