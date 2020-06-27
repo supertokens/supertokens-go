@@ -136,7 +136,7 @@ func setCookie(response http.ResponseWriter, name string, value string,
 		Domain:   domain,
 		Secure:   secure,
 		HttpOnly: httpOnly,
-		Expires:  time.Unix(int64(expires), 0),
+		Expires:  time.Unix(int64(expires/1000), 0),
 		Path:     path,
 		SameSite: sameSiteField,
 	}
