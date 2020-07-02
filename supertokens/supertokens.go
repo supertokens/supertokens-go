@@ -35,12 +35,13 @@ type ConfigMap struct {
 	CookieDomain    string
 	CookieSecure    *bool
 	CookieSameSite  string
+	APIKey          string
 }
 
 // Config used to set locations of SuperTokens instances
 func Config(config ConfigMap) {
 	configCookieAndHeaders(config)
-	core.Config(config.Hosts)
+	core.Config(config.Hosts, config.APIKey)
 }
 
 // CreateNewSession function used to create a new SuperTokens session

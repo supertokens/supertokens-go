@@ -21,8 +21,8 @@ import (
 )
 
 // Config used to set locations of SuperTokens instances
-func Config(hosts string) {
-	InitQuerier(hosts)
+func Config(hosts string, apiKey string) {
+	InitQuerier(hosts, apiKey)
 }
 
 // SessionInfo carrier of session token information

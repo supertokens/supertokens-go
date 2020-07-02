@@ -17,6 +17,7 @@
 package testing
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/supertokens/supertokens-go/supertokens"
@@ -49,6 +50,51 @@ func TestTokenTheftDetection(t *testing.T) {
 		t.Error("should not have come here")
 	} else if !errors.IsTokenTheftDetectedError(err) {
 		t.Error("failed")
+	}
+}
+
+func TestTokenTheftDetectionWithAPIKey(t *testing.T) {
+	beforeEach()
+	setKeyValueInConfig("api_keys", "fdhfilewuv9w9vviushaiduhasdu")
+	startST("localhost", "8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts:  "http://localhost:8080",
+		APIKey: "fdhfilewuv9w9vviushaiduhasdu",
+	})
+
+	response, err := core.CreateNewSession("", map[string]interface{}{}, map[string]interface{}{})
+	if err != nil {
+		t.Error(err)
+	}
+
+	response2, err := core.RefreshSession(response.RefreshToken.Token)
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = core.GetSession(response2.AccessToken.Token, response2.AntiCsrfToken, true)
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = core.RefreshSession(response.RefreshToken.Token)
+	if err == nil {
+		t.Error("should not have come here")
+	} else if !errors.IsTokenTheftDetectedError(err) {
+		t.Error("failed")
+	}
+}
+
+func TestTokenTheftDetectionWithoutAPIKey(t *testing.T) {
+	beforeEach()
+	setKeyValueInConfig("api_keys", "fdhfilewuv9w9vviushaiduhasdu")
+	startST("localhost", "8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
+	apiVersion, err := core.GetQuerierInstance().GetAPIVersion()
+	if apiVersion != "2.0" && strings.Contains(GetInstallationDir(), "com-") {
+		if err.Error() != "401" {
+			t.Error("failed")
+		}
 	}
 }
 

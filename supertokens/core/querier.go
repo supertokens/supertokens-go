@@ -22,6 +22,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -32,6 +33,7 @@ type querier struct {
 	hosts          []string
 	lastTriedIndex int
 	apiVersion     *string
+	apiKey         string
 }
 
 var querierInstantiated *querier
@@ -54,6 +56,7 @@ func GetQuerierInstance() *querier {
 				hosts:          []string{"http://localhost:3567"},
 				lastTriedIndex: 0,
 				apiVersion:     nil,
+				apiKey:         "",
 			}
 		}
 	}
@@ -61,7 +64,7 @@ func GetQuerierInstance() *querier {
 }
 
 // InitQuerier set hosts
-func InitQuerier(hostsStr string) {
+func InitQuerier(hostsStr string, apiKey string) {
 	if querierInstantiated == nil {
 		querierLock.Lock()
 		defer querierLock.Unlock()
@@ -84,12 +87,14 @@ func InitQuerier(hostsStr string) {
 				hosts:          hostsArr,
 				lastTriedIndex: 0,
 				apiVersion:     nil,
+				apiKey:         apiKey,
 			}
 		}
 	}
 }
 
-func (querierInstance *querier) getAPIVersion() (string, error) {
+// GetAPIVersion get's the supported CDI version
+func (querierInstance *querier) GetAPIVersion() (string, error) {
 	if querierInstance.apiVersion != nil {
 		return *(querierInstance.apiVersion), nil
 	}
@@ -99,7 +104,15 @@ func (querierInstance *querier) getAPIVersion() (string, error) {
 		return *(querierInstance.apiVersion), nil
 	}
 	response, err := querierInstance.sendRequestHelper("/apiversion", func(url string) (*http.Response, error) {
-		return http.Get(url)
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return nil, err
+		}
+		if querierInstance.apiKey != "" {
+			req.Header.Set("api-key", querierInstance.apiKey)
+		}
+		client := &http.Client{}
+		return client.Do(req)
 	}, len(querierInstance.hosts))
 
 	if err != nil {
@@ -143,13 +156,16 @@ func (querierInstance *querier) SendPostRequest(requestID string, path string, d
 			return nil, err
 		}
 
-		apiVerion, apiVersionError := querierInstance.getAPIVersion()
+		apiVerion, apiVersionError := querierInstance.GetAPIVersion()
 		if apiVersionError != nil {
 			return nil, apiVersionError
 		}
 
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("cdi-version", apiVerion)
+		if querierInstance.apiKey != "" {
+			req.Header.Set("api-key", querierInstance.apiKey)
+		}
 
 		client := getHTTPClient(requestID)
 		return client.Do(req)
@@ -172,13 +188,16 @@ func (querierInstance *querier) SendDeleteRequest(requestID string, path string,
 			return nil, err
 		}
 
-		apiVerion, apiVersionError := querierInstance.getAPIVersion()
+		apiVerion, apiVersionError := querierInstance.GetAPIVersion()
 		if apiVersionError != nil {
 			return nil, apiVersionError
 		}
 
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("cdi-version", apiVerion)
+		if querierInstance.apiKey != "" {
+			req.Header.Set("api-key", querierInstance.apiKey)
+		}
 
 		client := getHTTPClient(requestID)
 		return client.Do(req)
@@ -199,11 +218,14 @@ func (querierInstance *querier) SendGetRequest(requestID string, path string, pa
 		}
 		req.URL.RawQuery = q.Encode()
 
-		apiVerion, apiVersionError := querierInstance.getAPIVersion()
+		apiVerion, apiVersionError := querierInstance.GetAPIVersion()
 		if apiVersionError != nil {
 			return nil, apiVersionError
 		}
 		req.Header.Set("cdi-version", apiVerion)
+		if querierInstance.apiKey != "" {
+			req.Header.Set("api-key", querierInstance.apiKey)
+		}
 
 		client := getHTTPClient(requestID)
 		return client.Do(req)
@@ -218,13 +240,16 @@ func (querierInstance *querier) SendPutRequest(requestID string, path string, da
 			return nil, err
 		}
 
-		apiVerion, apiVersionError := querierInstance.getAPIVersion()
+		apiVerion, apiVersionError := querierInstance.GetAPIVersion()
 		if apiVersionError != nil {
 			return nil, apiVersionError
 		}
 
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("cdi-version", apiVerion)
+		if querierInstance.apiKey != "" {
+			req.Header.Set("api-key", querierInstance.apiKey)
+		}
 
 		client := getHTTPClient(requestID)
 		return client.Do(req)
@@ -253,7 +278,7 @@ func (querierInstance *querier) sendRequestHelper(path string, httpRequest httpR
 			resp.Body.Close()
 		}
 		return nil, errors.GeneralError{
-			Msg:         "Error while querying SuperTokens core",
+			Msg:         err.Error(),
 			ActualError: err,
 		}
 	}
@@ -266,7 +291,7 @@ func (querierInstance *querier) sendRequestHelper(path string, httpRequest httpR
 
 	if resp.StatusCode >= 400 {
 		return nil, errors.GeneralError{
-			Msg:         resp.Status,
+			Msg:         strconv.Itoa(resp.StatusCode),
 			ActualError: nil,
 		}
 	}
@@ -274,7 +299,7 @@ func (querierInstance *querier) sendRequestHelper(path string, httpRequest httpR
 	var body, readErr = ioutil.ReadAll(resp.Body)
 	if readErr != nil {
 		return nil, errors.GeneralError{
-			Msg:         "Error while querying SuperTokens core",
+			Msg:         readErr.Error(),
 			ActualError: readErr,
 		}
 	}

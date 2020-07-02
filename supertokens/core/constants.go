@@ -17,7 +17,7 @@
 package core
 
 // VERSION current version of the lib
-const VERSION = "1.1.1"
+const VERSION = "1.2.0"
 
 // CdiVersion core driver interface version supported
-var CdiVersion = []string{"2.0"}
+var CdiVersion = []string{"2.0", "2.1"}

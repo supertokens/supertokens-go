@@ -27,7 +27,8 @@ import (
 	"github.com/supertokens/supertokens-go/supertokens/core"
 )
 
-func getInstallationDir() string {
+// GetInstallationDir install dir for supertokens
+func GetInstallationDir() string {
 	// INSTALL_DIR=../supertokens-root go test ./... -count=1
 	var installDir = os.Getenv("INSTALL_DIR")
 	if installDir == "" {
@@ -37,7 +38,7 @@ func getInstallationDir() string {
 }
 
 func setKeyValueInConfig(key string, value string) {
-	f, err := os.OpenFile(getInstallationDir()+"/config.yaml", os.O_APPEND|os.O_WRONLY, 0600)
+	f, err := os.OpenFile(GetInstallationDir()+"/config.yaml", os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +52,7 @@ func setKeyValueInConfig(key string, value string) {
 
 func executeCommand(waitFor bool, name string, args ...string) {
 	cmd := exec.Command(name, args...)
-	cmd.Dir = getInstallationDir()
+	cmd.Dir = GetInstallationDir()
 	err := cmd.Start()
 	if err != nil {
 		panic(err)
@@ -78,7 +79,7 @@ func cleanST() {
 
 func getListOfPids() []string {
 	result := []string{}
-	installationDir := getInstallationDir()
+	installationDir := GetInstallationDir()
 	if _, err := os.Stat(installationDir + "/.started"); os.IsNotExist(err) {
 		return result
 	}
