@@ -34,6 +34,7 @@ type ConfigMap struct {
 	CookieDomain    string
 	CookieSecure    *bool
 	CookieSameSite  string
+	APIKey          string
 }
 
 // Config used to set locations of SuperTokens instances
@@ -45,6 +46,7 @@ func Config(config ConfigMap) {
 		CookieDomain:    config.CookieDomain,
 		CookieSecure:    config.CookieSecure,
 		CookieSameSite:  config.CookieSameSite,
+		APIKey:          config.APIKey,
 	})
 }
 
