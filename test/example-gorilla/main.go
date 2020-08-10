@@ -60,7 +60,7 @@ func main() {
 	supertokens.OnUnauthorized(customOnUnauthorizedError)
 	supertokens.OnGeneralError(customOnGeneralError)
 	http.ListenAndServe("0.0.0.0:8080", handlers.CORS(
-		handlers.AllowedHeaders(append([]string{"Content-Type"}, []string{"anti-csrf", "supertokens-sdk-name", "supertokens-sdk-version"}...)),
+		handlers.AllowedHeaders(append([]string{"Content-Type"}, supertokens.GetCORSAllowedHeaders()...)),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}),
 		handlers.AllowedOrigins([]string{"http://127.0.0.1:8080"}),
 		handlers.AllowCredentials(),
