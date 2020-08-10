@@ -180,3 +180,9 @@ func setRelevantHeadersForOptionsAPI(response http.ResponseWriter) {
 	setHeader(response, "Access-Control-Allow-Headers", frontendSDKVersionHeaderKey)
 	setHeader(response, "Access-Control-Allow-Credentials", "true")
 }
+
+func getCORSAllowedHeaders() []string {
+	return []string{
+		antiCsrfHeaderKey, frontendSDKNameHeaderKey, frontendSDKVersionHeaderKey,
+	}
+}

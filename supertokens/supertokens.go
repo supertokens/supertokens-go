@@ -318,6 +318,11 @@ func SetRelevantHeadersForOptionsAPI(response http.ResponseWriter) {
 	setRelevantHeadersForOptionsAPI(response)
 }
 
+// GetCORSAllowedHeaders function is used to get header keys that are used by SuperTokens
+func GetCORSAllowedHeaders() []string {
+	return getCORSAllowedHeaders()
+}
+
 // GetJWTPayload function used to get jwt payload for the given handle
 func GetJWTPayload(sessionHandle string) (map[string]interface{}, error) {
 	return core.GetJWTPayload(sessionHandle)
