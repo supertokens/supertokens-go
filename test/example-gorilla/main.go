@@ -98,8 +98,6 @@ func login(response http.ResponseWriter, request *http.Request) {
 		supertokens.HandleErrorAndRespond(err, response)
 		return
 	}
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.Write([]byte(userID))
 
 }
@@ -136,15 +134,11 @@ func defaultHandler(response http.ResponseWriter, request *http.Request) {
 	}
 	noOfTimesGetSessionCalledDuringTest++
 	session := supertokens.GetSessionFromRequest(request)
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.Write([]byte(session.GetUserID()))
 }
 
 func updateJwt(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "GET" {
-		response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-		response.Header().Set("Access-Control-Allow-Credentials", "true")
 		session := supertokens.GetSessionFromRequest(request)
 		json.NewEncoder(response).Encode(session.GetJWTPayload())
 	} else if request.Method == "POST" {
@@ -156,8 +150,6 @@ func updateJwt(response http.ResponseWriter, request *http.Request) {
 		}
 		session := supertokens.GetSessionFromRequest(request)
 		session.UpdateJWTPayload(body)
-		response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-		response.Header().Set("Access-Control-Allow-Credentials", "true")
 		json.NewEncoder(response).Encode(session.GetJWTPayload())
 	} else {
 		response.Write([]byte("incorrect Method, requires POST or GET"))
@@ -195,8 +187,6 @@ func logout(response http.ResponseWriter, request *http.Request) {
 		supertokens.HandleErrorAndRespond(err, response)
 		return
 	}
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.Write([]byte("success"))
 
 }
@@ -218,8 +208,6 @@ func refresh(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 	noOfTimesRefreshCalledDuringTest++
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.Write([]byte("refresh success"))
 }
 
@@ -228,7 +216,6 @@ func refreshCalledTime(response http.ResponseWriter, request *http.Request) {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
 	}
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Write([]byte(strconv.Itoa(noOfTimesRefreshCalledDuringTest)))
 }
 
@@ -237,7 +224,6 @@ func getSessionCalledTime(response http.ResponseWriter, request *http.Request) {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
 	}
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Write([]byte(strconv.Itoa(noOfTimesGetSessionCalledDuringTest)))
 }
 
@@ -289,16 +275,12 @@ func testError(response http.ResponseWriter, request *http.Request) {
 }
 
 func customOnTryRefreshTokenError(err error, response http.ResponseWriter) {
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.WriteHeader(440)
 	response.Write([]byte(""))
 
 }
 
 func customOnUnauthorizedError(err error, response http.ResponseWriter) {
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.WriteHeader(440)
 	response.Write([]byte(""))
 }

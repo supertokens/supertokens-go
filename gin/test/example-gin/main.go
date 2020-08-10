@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/supertokens/supertokens-go/gin/supertokens"
 	"github.com/supertokens/supertokens-go/supertokens/core"
@@ -35,6 +36,14 @@ func main() {
 		Hosts: "http://localhost:9000",
 	})
 	r := gin.Default()
+
+	// it's important to set CORS before any route. Otherwise it will not work
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://127.0.0.1:8080"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "HEAD", "OPTIONS"},
+		AllowHeaders:     append([]string{"Content-Type"}, supertokens.GetCORSAllowedHeaders()...),
+		AllowCredentials: true,
+	}))
 	r.Any("/login", login)
 	r.Any("/testUserConfig", testUserConfig)
 	r.Any("/multipleInterceptors", multipleInterceptors)
@@ -73,21 +82,10 @@ func index(c *gin.Context) {
 	w.Write(dat)
 }
 
-func options(c *gin.Context) {
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	c.Writer.Header().Set("Access-Control-Allow-Headers", "content-type")
-	c.Writer.Header().Set("Access-Control-Allow-Methods", "*")
-	supertokens.SetRelevantHeadersForOptionsAPI(c)
-	c.Writer.Write([]byte(""))
-}
-
 func login(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "POST" {
+	if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
 	}
@@ -105,8 +103,6 @@ func login(c *gin.Context) {
 		supertokens.HandleErrorAndRespond(err, c)
 		return
 	}
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.Write([]byte(userID))
 
 }
@@ -114,10 +110,7 @@ func login(c *gin.Context) {
 func testUserConfig(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "POST" {
+	if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
 	}
@@ -127,10 +120,7 @@ func testUserConfig(c *gin.Context) {
 func multipleInterceptors(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "POST" {
+	if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
 	}
@@ -149,28 +139,19 @@ func multipleInterceptors(c *gin.Context) {
 func defaultHandler(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "GET" {
+	if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
 	}
 	noOfTimesGetSessionCalledDuringTest++
 	var session *supertokens.Session = supertokens.GetSessionFromRequest(c)
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.Write([]byte(session.GetUserID()))
 }
 
 func updateJwt(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-	} else if request.Method == "GET" {
-		response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-		response.Header().Set("Access-Control-Allow-Credentials", "true")
+	if request.Method == "GET" {
 		session := supertokens.GetSessionFromRequest(c)
 		json.NewEncoder(response).Encode(session.GetJWTPayload())
 	} else if request.Method == "POST" {
@@ -182,8 +163,6 @@ func updateJwt(c *gin.Context) {
 		}
 		session := supertokens.GetSessionFromRequest(c)
 		session.UpdateJWTPayload(body)
-		response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-		response.Header().Set("Access-Control-Allow-Credentials", "true")
 		json.NewEncoder(response).Encode(session.GetJWTPayload())
 	} else {
 		response.Write([]byte("incorrect Method, requires POST or GET"))
@@ -193,10 +172,7 @@ func updateJwt(c *gin.Context) {
 func beforeeach(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "POST" {
+	if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
 	}
@@ -209,10 +185,6 @@ func beforeeach(c *gin.Context) {
 func testing(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	}
 	value := request.Header.Get("testing")
 	if value != "" {
 		response.Header().Set("testing", value)
@@ -223,10 +195,7 @@ func testing(c *gin.Context) {
 func logout(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "POST" {
+	if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
 	}
@@ -237,8 +206,6 @@ func logout(c *gin.Context) {
 		supertokens.HandleErrorAndRespond(err, c)
 		return
 	}
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.Write([]byte("success"))
 
 }
@@ -246,10 +213,7 @@ func logout(c *gin.Context) {
 func revokeAll(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "POST" {
+	if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
 	}
@@ -262,54 +226,38 @@ func revokeAll(c *gin.Context) {
 func refresh(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "POST" {
+	if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
 	}
 	noOfTimesRefreshCalledDuringTest++
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.Write([]byte("refresh success"))
 }
 
 func refreshCalledTime(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "GET" {
+	if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
 	}
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Write([]byte(strconv.Itoa(noOfTimesRefreshCalledDuringTest)))
 }
 
 func getSessionCalledTime(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "GET" {
+	if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
 	}
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Write([]byte(strconv.Itoa(noOfTimesGetSessionCalledDuringTest)))
 }
 
 func ping(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "GET" {
+	if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
 	}
@@ -319,10 +267,7 @@ func ping(c *gin.Context) {
 func testHeader(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "GET" {
+	if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
 	}
@@ -336,10 +281,7 @@ func testHeader(c *gin.Context) {
 func checkDeviceInfo(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "GET" {
+	if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
 	}
@@ -351,10 +293,7 @@ func checkDeviceInfo(c *gin.Context) {
 func checkAllowCredentials(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "POST" {
+	if request.Method != "POST" {
 		response.Write([]byte("incorrect Method, requires POST"))
 		return
 	}
@@ -364,10 +303,7 @@ func checkAllowCredentials(c *gin.Context) {
 func testError(c *gin.Context) {
 	response := c.Writer
 	request := c.Request
-	if request.Method == "OPTIONS" {
-		options(c)
-		return
-	} else if request.Method != "GET" {
+	if request.Method != "GET" {
 		response.Write([]byte("incorrect Method, requires GET"))
 		return
 	}
@@ -376,16 +312,12 @@ func testError(c *gin.Context) {
 }
 
 func customOnTryRefreshTokenError(err error, response http.ResponseWriter) {
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.WriteHeader(440)
 	response.Write([]byte(""))
 
 }
 
 func customOnUnauthorizedError(err error, response http.ResponseWriter) {
-	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
-	response.Header().Set("Access-Control-Allow-Credentials", "true")
 	response.WriteHeader(440)
 	response.Write([]byte(""))
 }
