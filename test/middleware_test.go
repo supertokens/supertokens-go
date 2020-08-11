@@ -157,7 +157,7 @@ func TestMiddleware(t *testing.T) {
 		req.Header.Add("anti-csrf", response["antiCsrf"])
 		res, _ = client.Do(req)
 
-		if res.StatusCode != 440 {
+		if res.StatusCode != 440 && res.StatusCode != 401 {
 			t.Error("incorrect status code")
 		}
 		body, err := ioutil.ReadAll(res.Body)
