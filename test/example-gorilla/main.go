@@ -275,13 +275,13 @@ func testError(response http.ResponseWriter, request *http.Request) {
 }
 
 func customOnTryRefreshTokenError(err error, response http.ResponseWriter) {
-	response.WriteHeader(440)
+	response.WriteHeader(401)
 	response.Write([]byte(""))
 
 }
 
 func customOnUnauthorizedError(err error, response http.ResponseWriter) {
-	response.WriteHeader(440)
+	response.WriteHeader(401)
 	response.Write([]byte(""))
 }
 

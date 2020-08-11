@@ -312,13 +312,13 @@ func testError(c *gin.Context) {
 }
 
 func customOnTryRefreshTokenError(err error, response http.ResponseWriter) {
-	response.WriteHeader(440)
+	response.WriteHeader(401)
 	response.Write([]byte(""))
 
 }
 
 func customOnUnauthorizedError(err error, response http.ResponseWriter) {
-	response.WriteHeader(440)
+	response.WriteHeader(401)
 	response.Write([]byte(""))
 }
 

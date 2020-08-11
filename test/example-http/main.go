@@ -341,7 +341,7 @@ func testError(response http.ResponseWriter, request *http.Request) {
 func customOnTryRefreshTokenError(err error, response http.ResponseWriter) {
 	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Header().Set("Access-Control-Allow-Credentials", "true")
-	response.WriteHeader(440)
+	response.WriteHeader(401)
 	response.Write([]byte(""))
 
 }
@@ -349,7 +349,7 @@ func customOnTryRefreshTokenError(err error, response http.ResponseWriter) {
 func customOnUnauthorizedError(err error, response http.ResponseWriter) {
 	response.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 	response.Header().Set("Access-Control-Allow-Credentials", "true")
-	response.WriteHeader(440)
+	response.WriteHeader(401)
 	response.Write([]byte(""))
 }
 
