@@ -22,7 +22,7 @@ import (
 
 type handshakeInfo struct {
 	JwtSigningPublicKey            string
-	CookieDomain                   string
+	CookieDomain                   *string
 	CookieSecure                   bool
 	AccessTokenPath                string
 	RefreshTokenPath               string
@@ -46,9 +46,14 @@ func GetHandshakeInfoInstance() (*handshakeInfo, error) {
 			if err != nil {
 				return nil, err
 			}
+			var domain *string = nil
+			if response["cookieDomain"] != nil {
+				temp := response["cookieDomain"].(string)
+				domain = &temp
+			}
 			handshakeInfoInstantiated = &handshakeInfo{
 				JwtSigningPublicKey:            response["jwtSigningPublicKey"].(string),
-				CookieDomain:                   response["cookieDomain"].(string),
+				CookieDomain:                   domain,
 				CookieSecure:                   response["cookieSecure"].(bool),
 				AccessTokenPath:                response["accessTokenPath"].(string),
 				RefreshTokenPath:               response["refreshTokenPath"].(string),

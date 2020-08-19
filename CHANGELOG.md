@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.0] - 2020-08-10
 ### Addition
 - Adds `GetCORSAllowedHeaders` function to make CORS handling easier
+- Compatibility with CDI 2.2
 
 ## [1.2.0] - 2020-07-02
 ### Addition

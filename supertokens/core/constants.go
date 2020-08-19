@@ -20,4 +20,4 @@ package core
 const VERSION = "1.3.0"
 
 // CdiVersion core driver interface version supported
-var CdiVersion = []string{"2.0", "2.1"}
+var CdiVersion = []string{"2.0", "2.1", "2.2"}

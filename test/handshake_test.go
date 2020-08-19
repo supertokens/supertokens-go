@@ -37,10 +37,8 @@ func TestDriverInfoCheckWithoutFrontendSDK(t *testing.T) {
 	if info.AccessTokenPath != "/" {
 		t.Error("AccessToken path is not /")
 	}
-	if info.CookieDomain != "supertokens.io" {
-		if info.CookieDomain != "localhost" {
-			t.Error("incorrect cookie domain")
-		}
+	if info.CookieDomain != nil && *info.CookieDomain != "supertokens.io" && *info.CookieDomain != "localhost" {
+		t.Error("incorrect cookie domain")
 	}
 	if info.CookieSecure {
 		t.Error("cookie secure set as true")

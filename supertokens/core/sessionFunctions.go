@@ -44,7 +44,7 @@ type TokenInfo struct {
 	CreatedTime  uint64
 	CookiePath   string
 	CookieSecure bool
-	Domain       string
+	Domain       *string
 	SameSite     string
 }
 

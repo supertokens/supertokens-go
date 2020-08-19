@@ -215,10 +215,10 @@ func extractInfoFromCookies(cookies []*http.Cookie) map[string]string {
 			response["refreshTokenPath"] = cookie.Path
 			response["refreshTokenDomain"] = cookie.Domain
 			response["refreshTokenExpiry"] = cookie.RawExpires
-
 		} else {
 			response["idRefreshTokenFromCookie"] = cookie.Value
 			response["idRefreshTokenExpiry"] = cookie.RawExpires
+			response["idRefreshTokenDomain"] = cookie.Domain
 		}
 	}
 	return response

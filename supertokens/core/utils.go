@@ -41,37 +41,52 @@ func convertJSONResponseToSessionInfo(response map[string]interface{}) SessionIn
 
 	var accessToken *TokenInfo = nil
 	if accessTokenJSON != nil {
+		var domain *string = nil
+		if accessTokenJSON["domain"] != nil {
+			temp := accessTokenJSON["domain"].(string)
+			domain = &temp
+		}
 		accessToken = &TokenInfo{
 			Token:        accessTokenJSON["token"].(string),
 			Expiry:       uint64(accessTokenJSON["expiry"].(float64)),
 			CreatedTime:  uint64(accessTokenJSON["createdTime"].(float64)),
 			CookiePath:   accessTokenJSON["cookiePath"].(string),
 			CookieSecure: accessTokenJSON["cookieSecure"].(bool),
-			Domain:       accessTokenJSON["domain"].(string),
+			Domain:       domain,
 			SameSite:     accessTokenJSON["sameSite"].(string),
 		}
 	}
 	var refreshToken *TokenInfo = nil
 	if refreshTokenJSON != nil {
+		var domain *string = nil
+		if refreshTokenJSON["domain"] != nil {
+			temp := refreshTokenJSON["domain"].(string)
+			domain = &temp
+		}
 		refreshToken = &TokenInfo{
 			Token:        refreshTokenJSON["token"].(string),
 			Expiry:       uint64(refreshTokenJSON["expiry"].(float64)),
 			CreatedTime:  uint64(refreshTokenJSON["createdTime"].(float64)),
 			CookiePath:   refreshTokenJSON["cookiePath"].(string),
 			CookieSecure: refreshTokenJSON["cookieSecure"].(bool),
-			Domain:       refreshTokenJSON["domain"].(string),
+			Domain:       domain,
 			SameSite:     refreshTokenJSON["sameSite"].(string),
 		}
 	}
 	var idRefreshToken *TokenInfo = nil
 	if idRefreshTokenJSON != nil {
+		var domain *string = nil
+		if idRefreshTokenJSON["domain"] != nil {
+			temp := idRefreshTokenJSON["domain"].(string)
+			domain = &temp
+		}
 		idRefreshToken = &TokenInfo{
 			Token:        idRefreshTokenJSON["token"].(string),
 			Expiry:       uint64(idRefreshTokenJSON["expiry"].(float64)),
 			CreatedTime:  uint64(idRefreshTokenJSON["createdTime"].(float64)),
 			CookiePath:   idRefreshTokenJSON["cookiePath"].(string),
 			CookieSecure: idRefreshTokenJSON["cookieSecure"].(bool),
-			Domain:       idRefreshTokenJSON["domain"].(string),
+			Domain:       domain,
 			SameSite:     idRefreshTokenJSON["sameSite"].(string),
 		}
 	}
@@ -110,12 +125,13 @@ func getLargestVersionFromIntersection(v1 []string, v2 []string) *string {
 	}
 	maxVersionSoFar := intersection[0]
 	for i := 1; i < len(intersection); i++ {
-		maxVersionSoFar = maxVersion(intersection[i], maxVersionSoFar)
+		maxVersionSoFar = MaxVersion(intersection[i], maxVersionSoFar)
 	}
 	return &maxVersionSoFar
 }
 
-func maxVersion(version1 string, version2 string) string {
+// MaxVersion returns max of v1 and v2
+func MaxVersion(version1 string, version2 string) string {
 	var splittedv1 = strings.Split(version1, ".")
 	var splittedv2 = strings.Split(version2, ".")
 	var minLength = len(splittedv1)

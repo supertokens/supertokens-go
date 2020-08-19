@@ -43,17 +43,17 @@ func configCookieAndHeaders(config ConfigMap) {
 }
 
 func attachAccessTokenToCookie(response http.ResponseWriter, token string,
-	expiry uint64, domain string, secure bool, path string, sameSite string) {
+	expiry uint64, domain *string, secure bool, path string, sameSite string) {
 	setCookie(response, accessTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
 func attachRefreshTokenToCookie(response http.ResponseWriter, token string,
-	expiry uint64, domain string, secure bool, path string, sameSite string) {
+	expiry uint64, domain *string, secure bool, path string, sameSite string) {
 	setCookie(response, refreshTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
 }
 
 func setIDRefreshTokenInHeaderAndCookie(response http.ResponseWriter, token string,
-	expiry uint64, domain string, secure bool, path string, sameSite string) {
+	expiry uint64, domain *string, secure bool, path string, sameSite string) {
 	setHeader(response, idRefreshTokenHeaderKey, token+";"+fmt.Sprint(expiry))
 	setHeader(response, "Access-Control-Expose-Headers", idRefreshTokenHeaderKey)
 
@@ -85,7 +85,7 @@ func getIDRefreshTokenFromCookie(request *http.Request) *string {
 	return getCookieValue(request, idRefreshTokenCookieKey)
 }
 
-func clearSessionFromCookie(response http.ResponseWriter, domain string,
+func clearSessionFromCookie(response http.ResponseWriter, domain *string,
 	secure bool, accessTokenPath string, refreshTokenPath string, idRefreshTokenPath string, sameSite string) {
 	setCookie(response, accessTokenCookieKey, "", domain, secure, true, 0, accessTokenPath, sameSite)
 	setCookie(response, refreshTokenCookieKey, "", domain, secure, true, 0, refreshTokenPath, sameSite)
@@ -99,11 +99,11 @@ func getRefreshTokenFromCookie(request *http.Request) *string {
 }
 
 func setCookie(response http.ResponseWriter, name string, value string,
-	domain string, secure bool, httpOnly bool, expires uint64, path string, sameSite string) {
+	domain *string, secure bool, httpOnly bool, expires uint64, path string, sameSite string) {
 
 	if configMap != nil {
 		if configMap.CookieDomain != "" {
-			domain = configMap.CookieDomain
+			domain = &configMap.CookieDomain
 		}
 		if configMap.CookieSecure != nil {
 			secure = *configMap.CookieSecure
@@ -130,17 +130,30 @@ func setCookie(response http.ResponseWriter, name string, value string,
 		sameSiteField = http.SameSiteStrictMode
 	}
 
-	cookie := http.Cookie{
-		Name:     name,
-		Value:    url.QueryEscape(value),
-		Domain:   domain,
-		Secure:   secure,
-		HttpOnly: httpOnly,
-		Expires:  time.Unix(int64(expires/1000), 0),
-		Path:     path,
-		SameSite: sameSiteField,
+	if domain != nil {
+		cookie := http.Cookie{
+			Name:     name,
+			Value:    url.QueryEscape(value),
+			Domain:   *domain,
+			Secure:   secure,
+			HttpOnly: httpOnly,
+			Expires:  time.Unix(int64(expires/1000), 0),
+			Path:     path,
+			SameSite: sameSiteField,
+		}
+		http.SetCookie(response, &cookie)
+	} else {
+		cookie := http.Cookie{
+			Name:     name,
+			Value:    url.QueryEscape(value),
+			Secure:   secure,
+			HttpOnly: httpOnly,
+			Expires:  time.Unix(int64(expires/1000), 0),
+			Path:     path,
+			SameSite: sameSiteField,
+		}
+		http.SetCookie(response, &cookie)
 	}
-	http.SetCookie(response, &cookie)
 }
 
 func setHeader(response http.ResponseWriter, key string, value string) {

@@ -102,6 +102,20 @@ func TestTokenTheftDetected(t *testing.T) {
 	}
 
 	{
+		version, _ := core.GetQuerierInstance().GetAPIVersion()
+		if core.MaxVersion(version, "2.1") == "2.1" {
+			if response3["accessTokenDomain"] != "localhost" ||
+				response3["refreshTokenDomain"] != "localhost" ||
+				response3["idRefreshTokenDomain"] != "localhost" {
+				t.Error("incorrect cookie domain")
+			}
+		} else {
+			if response3["accessTokenDomain"] != "" ||
+				response3["refreshTokenDomain"] != "" ||
+				response3["idRefreshTokenDomain"] != "" {
+				t.Error("incorrect cookie domain")
+			}
+		}
 		if response3["antiCsrf"] != "" {
 			t.Error("antiCsrf is not empty")
 		}
