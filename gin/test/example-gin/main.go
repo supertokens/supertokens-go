@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gin-contrib/cors"
@@ -33,13 +34,14 @@ var noOfTimesRefreshCalledDuringTest int = 0
 
 func main() {
 	supertokens.Config(supertokens.ConfigMap{
-		Hosts: "http://localhost:9000",
+		Hosts:          "http://localhost:9000",
+		CookieSameSite: "lax",
 	})
 	r := gin.Default()
 
 	// it's important to set CORS before any route. Otherwise it will not work
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://127.0.0.1:8080"},
+		AllowOrigins:     []string{"http://localhost.org:8080"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "HEAD", "OPTIONS"},
 		AllowHeaders:     append([]string{"Content-Type"}, supertokens.GetCORSAllowedHeaders()...),
 		AllowCredentials: true,
@@ -66,7 +68,11 @@ func main() {
 	supertokens.OnTryRefreshToken(customOnTryRefreshTokenError)
 	supertokens.OnUnauthorized(customOnUnauthorizedError)
 	supertokens.OnGeneralError(customOnGeneralError)
-	r.Run("0.0.0.0:8080")
+	port := "8080"
+	if len(os.Args) == 2 {
+		port = os.Args[1]
+	}
+	r.Run("0.0.0.0:" + port)
 }
 
 func fail(c *gin.Context) {

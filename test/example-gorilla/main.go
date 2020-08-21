@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/handlers"
@@ -34,7 +35,8 @@ var noOfTimesRefreshCalledDuringTest int = 0
 
 func main() {
 	supertokens.Config(supertokens.ConfigMap{
-		Hosts: "http://localhost:9000",
+		Hosts:          "http://localhost:9000",
+		CookieSameSite: "lax",
 	})
 	r := mux.NewRouter()
 	r.HandleFunc("/login", login)
@@ -59,10 +61,14 @@ func main() {
 	supertokens.OnTryRefreshToken(customOnTryRefreshTokenError)
 	supertokens.OnUnauthorized(customOnUnauthorizedError)
 	supertokens.OnGeneralError(customOnGeneralError)
-	http.ListenAndServe("0.0.0.0:8080", handlers.CORS(
+	port := "8080"
+	if len(os.Args) == 2 {
+		port = os.Args[1]
+	}
+	http.ListenAndServe("0.0.0.0:"+port, handlers.CORS(
 		handlers.AllowedHeaders(append([]string{"Content-Type"}, supertokens.GetCORSAllowedHeaders()...)),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}),
-		handlers.AllowedOrigins([]string{"http://127.0.0.1:8080"}),
+		handlers.AllowedOrigins([]string{"http://localhost.org:8080"}),
 		handlers.AllowCredentials(),
 	)(r))
 }
