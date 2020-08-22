@@ -70,4 +70,4 @@ cd ../
 echo $SUPERTOKENS_API_KEY > apiPassword
 ./utils/setupTestEnvLocal
 cd ../project/
-# go test ./... -count=1 -v
+go test ./... -count=1 -v

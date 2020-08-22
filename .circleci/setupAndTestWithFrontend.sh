@@ -77,8 +77,10 @@ git checkout $2
 
 cd ../project/test/example-http/
 go get ./...
+echo "starting process 1"
 go run main.go &
 pid=$!
+echo "starting process 2"
 go run main.go 8082 &
 pid2=$!
 cd ../../../supertokens-website/test/server
@@ -86,7 +88,7 @@ npm i -d
 npm i git+https://github.com:supertokens/supertokens-node.git#$3
 cd ../../
 npm i -d
-NODE_PORT=8081 INSTALL_PATH=../com-root npm test
+NODE_PORT=8081 INSTALL_PATH=../com-root npm test -- -grep "cross domain"
 if [[ $? -ne 0 ]]
 then
     echo "test failed... exiting!"
