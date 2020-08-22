@@ -104,9 +104,12 @@ func TestTokenTheftDetected(t *testing.T) {
 	{
 		version, _ := core.GetQuerierInstance().GetAPIVersion()
 		if core.MaxVersion(version, "2.1") == "2.1" {
-			if response3["accessTokenDomain"] != "localhost" ||
-				response3["refreshTokenDomain"] != "localhost" ||
-				response3["idRefreshTokenDomain"] != "localhost" {
+			if (response3["accessTokenDomain"] != "localhost" &&
+				response3["accessTokenDomain"] != "supertokens.io") ||
+				(response3["refreshTokenDomain"] != "localhost" &&
+					response3["refreshTokenDomain"] != "supertokens.io") ||
+				(response3["idRefreshTokenDomain"] != "localhost" &&
+					response3["idRefreshTokenDomain"] != "supertokens.io") {
 				t.Error("incorrect cookie domain")
 			}
 		} else {
