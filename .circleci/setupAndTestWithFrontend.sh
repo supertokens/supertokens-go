@@ -80,6 +80,7 @@ go get ./...
 go run main.go &
 pid=$!
 go run main.go 8082 &
+pid2=$!
 cd ../../../supertokens-website/test/server
 npm i -d
 npm i git+https://github.com:supertokens/supertokens-node.git#$3
@@ -98,6 +99,7 @@ go get ./...
 go run main.go &
 pid=$!
 go run main.go 8082 &
+pid2=$!
 cd ../../../supertokens-website/
 NODE_PORT=8081 INSTALL_PATH=../com-root npm test
 if [[ $? -ne 0 ]]
@@ -112,6 +114,7 @@ go get ./...
 go run main.go &
 pid=$!
 go run main.go 8082 &
+pid2=$!
 cd ../../../../supertokens-website/
 NODE_PORT=8081 INSTALL_PATH=../com-root npm test
 if [[ $? -ne 0 ]]
