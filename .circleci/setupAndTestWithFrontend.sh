@@ -73,6 +73,8 @@ echo $SUPERTOKENS_API_KEY > apiPassword
 cd ../
 git clone git@github.com:supertokens/supertokens-website.git
 cd supertokens-website
+echo "HERE!!!!!"
+echo $2
 git checkout $2
 
 cd ../project/test/example-http/

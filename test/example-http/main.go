@@ -18,7 +18,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -62,7 +61,6 @@ func main() {
 	if len(os.Args) == 2 {
 		port = os.Args[1]
 	}
-	fmt.Println("PORT: " + port)
 	http.ListenAndServe("0.0.0.0:"+port, nil)
 }
 
