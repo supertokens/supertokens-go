@@ -77,11 +77,9 @@ git checkout $2
 
 cd ../project/test/example-http/
 go get ./...
-echo "starting process 1"
 go run main.go &
 pid=$!
-echo "starting process 2"
-go run main.go 8082 &
+go run main.go 8082
 pid2=$!
 cd ../../../supertokens-website/test/server
 npm i -d
