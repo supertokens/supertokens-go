@@ -86,7 +86,7 @@ npm i -d
 npm i git+https://github.com:supertokens/supertokens-node.git#$3
 cd ../../
 npm i -d
-NODE_PORT=8081 INSTALL_PATH=../com-root npm test -- -grep "cross domain"
+NODE_PORT=8081 INSTALL_PATH=../com-root npm test
 if [[ $? -ne 0 ]]
 then
     echo "test failed... exiting!"
