@@ -79,7 +79,7 @@ cd ../project/test/example-http/
 go get ./...
 go run main.go &
 pid=$!
-go run main.go 8082
+go run main.go 8082 &
 pid2=$!
 cd ../../../supertokens-website/test/server
 npm i -d
