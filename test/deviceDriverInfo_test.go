@@ -256,7 +256,7 @@ func TestFrontendSDK(t *testing.T) {
 	}
 
 	{
-		core.RefreshSession("")
+		core.RefreshSession("", nil)
 		frontendSDK := refreshSessionOutput["frontendSDK"].([]interface{})
 		if len(frontendSDK) != 2 {
 			t.Error("incorrect number of frontendSDK")

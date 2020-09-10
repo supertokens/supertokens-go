@@ -72,6 +72,7 @@ func TestTokenTheftDetected(t *testing.T) {
 	{
 		req, _ = http.NewRequest("POST", ts.URL+"/session/refresh", nil)
 		req.Header.Add("Cookie", "sRefreshToken="+response["refreshToken"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
 		res, _ = client.Do(req)
 		response2 = extractInfoFromResponseHeader(res)
 	}
@@ -87,6 +88,7 @@ func TestTokenTheftDetected(t *testing.T) {
 	{
 		req, _ = http.NewRequest("POST", ts.URL+"/session/refresh", nil)
 		req.Header.Add("Cookie", "sRefreshToken="+response["refreshToken"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
 		res, _ = client.Do(req)
 		response3 = extractInfoFromResponseHeader(res)
 
@@ -216,6 +218,7 @@ func TestBasicUsage(t *testing.T) {
 	{
 		req, _ = http.NewRequest("POST", ts.URL+"/session/refresh", nil)
 		req.Header.Add("Cookie", "sRefreshToken="+response["refreshToken"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
 		res, _ = client.Do(req)
 		response2 = extractInfoFromResponseHeader(res)
 	}

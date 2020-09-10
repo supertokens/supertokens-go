@@ -172,6 +172,7 @@ func TestMiddleware(t *testing.T) {
 
 	req, _ = http.NewRequest("POST", ts.URL+"/refresh", nil)
 	req.Header.Add("Cookie", "sRefreshToken="+response["refreshToken"])
+	req.Header.Add("anti-csrf", response["antiCsrf"])
 	res, _ = client.Do(req)
 
 	response2 := extractInfoFromResponseHeader(res)
@@ -210,6 +211,7 @@ func TestMiddleware(t *testing.T) {
 	{
 		req, _ = http.NewRequest("POST", ts.URL+"/refresh", nil)
 		req.Header.Add("Cookie", "sRefreshToken="+response["refreshToken"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
 		res, _ = client.Do(req)
 
 		if res.StatusCode != 403 {

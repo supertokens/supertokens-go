@@ -137,11 +137,14 @@ func GetSession(accessToken string, antiCsrfToken *string, doAntiCsrfCheck bool)
 }
 
 // RefreshSession function used to refresh a session
-func RefreshSession(refreshToken string) (SessionInfo, error) {
-	response, err := GetQuerierInstance().SendPostRequest("refresh", "/session/refresh",
-		map[string]interface{}{
-			"refreshToken": refreshToken,
-		})
+func RefreshSession(refreshToken string, antiCsrfToken *string) (SessionInfo, error) {
+	body := map[string]interface{}{
+		"refreshToken": refreshToken,
+	}
+	if antiCsrfToken != nil {
+		body["antiCsrfToken"] = *antiCsrfToken
+	}
+	response, err := GetQuerierInstance().SendPostRequest("refresh", "/session/refresh", body)
 	if err != nil {
 		return SessionInfo{}, err
 	}

@@ -66,13 +66,18 @@ func executeCommand(waitFor bool, name string, args ...string) {
 }
 
 func setupST() {
-	executeCommand(true, "cp", "temp/licenseKey", "./licenseKey")
+	if GetInstallationDir() == "../../com-root" {
+		executeCommand(true, "cp", "temp/licenseKey", "./licenseKey")
+	}
 	executeCommand(true, "cp", "temp/config.yaml", "./config.yaml")
 	setKeyValueInConfig("refresh_api_path", "/refresh")
+	setKeyValueInConfig("enable_anti_csrf", "true")
 }
 
 func cleanST() {
-	executeCommand(true, "rm", "licenseKey")
+	if GetInstallationDir() == "../../com-root" {
+		executeCommand(true, "rm", "licenseKey")
+	}
 	executeCommand(true, "rm", "config.yaml")
 	executeCommand(true, "rm", "-rf", ".webserver-temp-*")
 	executeCommand(true, "rm", "-rf", ".started")

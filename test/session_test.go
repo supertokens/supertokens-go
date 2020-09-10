@@ -37,7 +37,7 @@ func TestTokenTheftDetection(t *testing.T) {
 		t.Error(err)
 	}
 
-	response2, err := core.RefreshSession(response.RefreshToken.Token)
+	response2, err := core.RefreshSession(response.RefreshToken.Token, response.AntiCsrfToken)
 	if err != nil {
 		t.Error(err)
 	}
@@ -45,7 +45,7 @@ func TestTokenTheftDetection(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = core.RefreshSession(response.RefreshToken.Token)
+	_, err = core.RefreshSession(response.RefreshToken.Token, response.AntiCsrfToken)
 	if err == nil {
 		t.Error("should not have come here")
 	} else if !errors.IsTokenTheftDetectedError(err) {
@@ -67,7 +67,7 @@ func TestTokenTheftDetectionWithAPIKey(t *testing.T) {
 		t.Error(err)
 	}
 
-	response2, err := core.RefreshSession(response.RefreshToken.Token)
+	response2, err := core.RefreshSession(response.RefreshToken.Token, response.AntiCsrfToken)
 	if err != nil {
 		t.Error(err)
 	}
@@ -75,7 +75,7 @@ func TestTokenTheftDetectionWithAPIKey(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = core.RefreshSession(response.RefreshToken.Token)
+	_, err = core.RefreshSession(response.RefreshToken.Token, response.AntiCsrfToken)
 	if err == nil {
 		t.Error("should not have come here")
 	} else if !errors.IsTokenTheftDetectedError(err) {
@@ -137,7 +137,7 @@ func TestBasicSessionUse(t *testing.T) {
 		t.Error("processState contains CallingServiceInVerify")
 	}
 
-	response2, err := core.RefreshSession(response.RefreshToken.Token)
+	response2, err := core.RefreshSession(response.RefreshToken.Token, response.AntiCsrfToken)
 	if err != nil {
 		t.Error(err)
 	}

@@ -66,7 +66,7 @@ func TestTrailingSlashInHostPath(t *testing.T) {
 		t.Error("processState contains CallingServiceInVerify")
 	}
 
-	response2, err := core.RefreshSession(response.RefreshToken.Token)
+	response2, err := core.RefreshSession(response.RefreshToken.Token, response.AntiCsrfToken)
 	if err != nil {
 		t.Error(err)
 	}
@@ -194,6 +194,7 @@ func TestConfigPathsAreSet(t *testing.T) {
 	{
 		req, _ = http.NewRequest("POST", ts.URL+"/customRefreshPath", nil)
 		req.Header.Add("Cookie", "sRefreshToken="+response["refreshToken"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
 		res, _ = client.Do(req)
 		response2 := extractInfoFromResponseHeader(res)
 		if response2["accessToken"] == response["accesToken"] {
@@ -207,7 +208,8 @@ func TestTrySupertokensHostPath(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
 	supertokens.Config(supertokens.ConfigMap{
-		Hosts: "https://try.supertokens.io",
+		Hosts:          "https://try.supertokens.io",
+		RefreshAPIPath: "/refresh",
 	})
 
 	mux := http.NewServeMux()

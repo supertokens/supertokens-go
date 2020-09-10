@@ -214,7 +214,8 @@ func RefreshSession(response http.ResponseWriter, request *http.Request) (Sessio
 		}
 	}
 
-	session, refreshError := core.RefreshSession(*inputRefreshToken)
+	antiCsrfToken := getAntiCsrfTokenFromHeaders(request)
+	session, refreshError := core.RefreshSession(*inputRefreshToken, antiCsrfToken)
 
 	if refreshError != nil {
 
