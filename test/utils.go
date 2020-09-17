@@ -53,31 +53,21 @@ func setKeyValueInConfig(key string, value string) {
 func executeCommand(waitFor bool, name string, args ...string) {
 	cmd := exec.Command(name, args...)
 	cmd.Dir = GetInstallationDir()
-	err := cmd.Start()
-	if err != nil {
-		panic(err)
-	}
+	cmd.Start()
 	if waitFor {
-		err := cmd.Wait()
-		if err != nil {
-			panic(err)
-		}
+		cmd.Wait()
 	}
 }
 
 func setupST() {
-	if GetInstallationDir() == "../../com-root" {
-		executeCommand(true, "cp", "temp/licenseKey", "./licenseKey")
-	}
+	executeCommand(true, "cp", "temp/licenseKey", "./licenseKey")
 	executeCommand(true, "cp", "temp/config.yaml", "./config.yaml")
 	setKeyValueInConfig("refresh_api_path", "/refresh")
 	setKeyValueInConfig("enable_anti_csrf", "true")
 }
 
 func cleanST() {
-	if GetInstallationDir() == "../../com-root" {
-		executeCommand(true, "rm", "licenseKey")
-	}
+	executeCommand(true, "rm", "licenseKey")
 	executeCommand(true, "rm", "config.yaml")
 	executeCommand(true, "rm", "-rf", ".webserver-temp-*")
 	executeCommand(true, "rm", "-rf", ".started")
