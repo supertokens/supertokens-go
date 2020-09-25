@@ -29,13 +29,13 @@ We're so excited you're interested in helping with SuperTokens! We are happy to 
 3. `cd supertokens-go`
 
 4. Install the project dependencies  
-```
-go get ./...
-```
+   ```
+   go get ./...
+   ```
 5. Add git pre-commit hooks  
-```
-./addGitHook.sh
-```
+   ```
+   ./addGitHook.sh
+   ```
 
 ## Modifying Code  
 1. Open the `supertokens-go` project in your IDE  
@@ -44,17 +44,17 @@ go get ./...
 ## Testing  
 1. Navigate to the `supertokens-root` repository  
 2. Start the testing environment      
-```
-./startTestingEnv --wait
-```  
+   ```
+   ./startTestingEnv --wait
+   ```  
 3. Navigate to the `supertokens-go` repository  
-```
-cd ../supertokens-go/
-```  
+   ```
+   cd ../supertokens-go/
+   ```  
 4. Run all tests    
-```
-INSTALL_DIR=../../supertokens-root go test ./... -count=1 -v
-```
+   ```
+   INSTALL_DIR=../../supertokens-root go test ./... -count=1 -v
+   ```
 5. If all tests pass the output should be:  
 ![go tests passing](https://github.com/supertokens/supertokens-logo/blob/master/images/supertokens-go-tests-passing.png) 
 
