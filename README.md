@@ -13,7 +13,10 @@ This is a Golang library that is used to interface between a Golang API process 
 Learn more at https://supertokens.io
 
 ## Documentation
-To see documentation, please click [here](https://supertokens.io/docs/go/installation).
+To see documentation, please click [here](https://supertokens.io/docs/go/installation).  
+
+## Contributing  
+Please see the [CONTRIBUTING.md](https://github.com/supertokens/supertokens-go/blob/master/CONTRIBUTING.md) file for instructions.
 
 ## Contact us
 For any queries, or support requests, please email us at team@supertokens.io, or join our [Discord](supertokens.io/discord) server.
