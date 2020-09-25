@@ -5,7 +5,7 @@ We're so excited you're interested in helping with SuperTokens! We are happy to 
 
 ## New to Open Source?
 1. Take a look at [How to Contribute to an Open Source Project on GitHub](https://egghead.io/courses/how-to-contribute-to-an-open-source-project-on-github)
-2. Go thorugh the [SuperTokens Code of Conduct](https://github.com/supertokens/supertokens-node/blob/master/CODE_OF_CONDUCT.md)
+2. Go thorugh the [SuperTokens Code of Conduct](https://github.com/supertokens/supertokens-go/blob/master/CODE_OF_CONDUCT.md)
 
 ## Where to ask Questions?
 1. Check our [Github Issues](https://github.com/supertokens/supertokens-go/issues) to see if someone has already answered your question.  
@@ -20,17 +20,22 @@ We're so excited you're interested in helping with SuperTokens! We are happy to 
 ### Prerequisites
 - OS: Linux or macOS
 - Go
-- IDE: [VSCode](https://code.visualstudio.com/download)(recommended) or equivalent IDE  
+- IDE: VSCode(recommended) or equivalent IDE  
 
 ### Project Setup
 1. Fork the [supertokens-go](https://github.com/supertokens/supertokens-go) repository
 2. Clone the forked repository in the parent directory of the previously setup `supertokens-root`.  
 `supertokens-go` and `supertokens-root` should exist side by side within the same parent directory
 3. `cd supertokens-go`
+
 4. Install the project dependencies  
-`go get ./...`
+```
+go get ./...
+```
 5. Add git pre-commit hooks  
-`./addGitHook.sh`
+```
+./addGitHook.sh
+```
 
 ## Modifying Code  
 1. Open the `supertokens-go` project in your IDE  
@@ -39,11 +44,17 @@ We're so excited you're interested in helping with SuperTokens! We are happy to 
 ## Testing  
 1. Navigate to the `supertokens-root` repository  
 2. Start the testing environment      
-`./startTestingEnv --wait`  
+```
+./startTestingEnv --wait
+```  
 3. Navigate to the `supertokens-go` repository  
-`cd ../supertokens-go/`  
+```
+cd ../supertokens-go/
+```  
 4. Run all tests    
-`INSTALL_DIR=../../supertokens-root go test ./... -count=1 -v`
+```
+INSTALL_DIR=../../supertokens-root go test ./... -count=1 -v
+```
 5. If all tests pass the output should be:  
 ![go tests passing](https://github.com/supertokens/supertokens-logo/blob/master/images/supertokens-go-tests-passing.png) 
 
