@@ -19,7 +19,7 @@ We're so excited you're interested in helping with SuperTokens! We are happy to 
 
 ### Prerequisites
 - OS: Linux or macOS
-- Go
+- Go, version >= 1.13
 - IDE: VSCode(recommended) or equivalent IDE  
 
 ### Project Setup
