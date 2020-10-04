@@ -130,29 +130,21 @@ func setCookie(response http.ResponseWriter, name string, value string,
 		sameSiteField = http.SameSiteStrictMode
 	}
 
+	cookie := http.Cookie{
+		Name:     name,
+		Value:    url.QueryEscape(value),
+		Secure:   secure,
+		HttpOnly: httpOnly,
+		Expires:  time.Unix(int64(expires/1000), 0),
+		Path:     path,
+		SameSite: sameSiteField,
+	}
 	if domain != nil {
-		cookie := http.Cookie{
-			Name:     name,
-			Value:    url.QueryEscape(value),
-			Domain:   *domain,
-			Secure:   secure,
-			HttpOnly: httpOnly,
-			Expires:  time.Unix(int64(expires/1000), 0),
-			Path:     path,
-			SameSite: sameSiteField,
-		}
-		http.SetCookie(response, &cookie)
-	} else {
-		cookie := http.Cookie{
-			Name:     name,
-			Value:    url.QueryEscape(value),
-			Secure:   secure,
-			HttpOnly: httpOnly,
-			Expires:  time.Unix(int64(expires/1000), 0),
-			Path:     path,
-			SameSite: sameSiteField,
-		}
-		http.SetCookie(response, &cookie)
+		cookie.Domain = *domain
+	}
+
+	if v := cookie.String(); v != "" {
+		response.Header().Set("Set-Cookie", v)
 	}
 }
 
