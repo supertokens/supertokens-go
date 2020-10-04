@@ -91,7 +91,8 @@ func TestTokenTheftDetectionWithoutAPIKey(t *testing.T) {
 		Hosts: "http://localhost:8080",
 	})
 	apiVersion, err := core.GetQuerierInstance().GetAPIVersion()
-	if apiVersion != "2.0" && strings.Contains(GetInstallationDir(), "com-") {
+	if (apiVersion != "2.0" && strings.Contains(GetInstallationDir(), "com-")) ||
+		(core.MaxVersion(apiVersion, "2.3") == apiVersion && strings.Contains(GetInstallationDir(), "supertokens-")) {
 		if err.Error() != "401" {
 			t.Error("failed")
 		}

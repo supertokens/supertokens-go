@@ -208,7 +208,7 @@ func TestTrySupertokensHostPath(t *testing.T) {
 	beforeEach()
 	startST("localhost", "8080")
 	supertokens.Config(supertokens.ConfigMap{
-		Hosts:          "https://try.supertokens.io",
+		Hosts:          "http://localhost:8080",
 		RefreshAPIPath: "/refresh",
 	})
 
@@ -272,6 +272,7 @@ func TestTrySupertokensHostPath(t *testing.T) {
 	{
 		req, _ = http.NewRequest("POST", ts.URL+"/refresh", nil)
 		req.Header.Add("Cookie", "sRefreshToken="+response["refreshToken"])
+		req.Header.Add("anti-csrf", response["antiCsrf"])
 		res, _ = client.Do(req)
 		response2 = extractInfoFromResponseHeader(res)
 	}
