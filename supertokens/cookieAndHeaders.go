@@ -141,7 +141,7 @@ func setCookie(response http.ResponseWriter, name string, value string,
 			Path:     path,
 			SameSite: sameSiteField,
 		}
-		http.SetCookie(response, &cookie)
+		setCookieValue(response, &cookie)
 	} else {
 		cookie := http.Cookie{
 			Name:     name,
@@ -152,7 +152,7 @@ func setCookie(response http.ResponseWriter, name string, value string,
 			Path:     path,
 			SameSite: sameSiteField,
 		}
-		http.SetCookie(response, &cookie)
+		setCookieValue(response, &cookie)
 	}
 }
 
@@ -185,6 +185,13 @@ func getCookieValue(request *http.Request, key string) *string {
 		}
 	}
 	return nil
+}
+
+// setCookieValue replaces cookie.go SetCookie, it replaces the cookie values instead of appending them
+func setCookieValue(w http.ResponseWriter, cookie *http.Cookie) {
+	if v := cookie.String(); v != "" {
+		w.Header().Set("Set-Cookie", v)
+	}
 }
 
 func setRelevantHeadersForOptionsAPI(response http.ResponseWriter) {
