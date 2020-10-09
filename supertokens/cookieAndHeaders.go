@@ -19,6 +19,7 @@ package supertokens
 import (
 	"fmt"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"strings"
 	"time"
@@ -141,7 +142,7 @@ func setCookie(response http.ResponseWriter, name string, value string,
 			Path:     path,
 			SameSite: sameSiteField,
 		}
-		http.SetCookie(response, &cookie)
+		setCookieValue(response, &cookie)
 	} else {
 		cookie := http.Cookie{
 			Name:     name,
@@ -152,7 +153,7 @@ func setCookie(response http.ResponseWriter, name string, value string,
 			Path:     path,
 			SameSite: sameSiteField,
 		}
-		http.SetCookie(response, &cookie)
+		setCookieValue(response, &cookie)
 	}
 }
 
@@ -187,6 +188,31 @@ func getCookieValue(request *http.Request, key string) *string {
 	return nil
 }
 
+// setCookieValue replaces cookie.go SetCookie, it replaces the cookie values instead of appending them
+func setCookieValue(w http.ResponseWriter, cookie *http.Cookie) {
+	if v := cookie.String(); v != "" {
+		return
+	}
+	cookieHeader := w.Header().Values("Set-Cookie")
+	if len(cookieHeader) == 0 {
+		w.Header().Set("Set-Cookie", cookie.String())
+		return
+	}
+	existingCookies := make(map[string]string, len(cookieHeader))
+	// map existing cookies by cookie name
+	for _, ch := range cookieHeader {
+		existingCookies[getCookieName(ch)] = ch
+	}
+	// replace if already existing
+	existingCookies[getCookieName(cookie.String())] = cookie.String()
+	// clear previous cookies from the headers
+	w.Header().Del("Set-Cookie")
+	// and add them back
+	for _, ck := range existingCookies {
+		w.Header().Add("Set-Cookie", ck)
+	}
+}
+
 func setRelevantHeadersForOptionsAPI(response http.ResponseWriter) {
 	setHeader(response, "Access-Control-Allow-Headers", antiCsrfHeaderKey)
 	setHeader(response, "Access-Control-Allow-Headers", frontendSDKNameHeaderKey)
@@ -198,4 +224,17 @@ func getCORSAllowedHeaders() []string {
 	return []string{
 		antiCsrfHeaderKey, frontendSDKNameHeaderKey, frontendSDKVersionHeaderKey,
 	}
+}
+
+func getCookieName(cookie string) string {
+	parts := strings.Split(textproto.TrimString(cookie), ";")
+	if len(parts) == 1 && parts[0] == "" {
+		return ""
+	}
+	parts[0] = textproto.TrimString(parts[0])
+	kv := strings.Split(parts[0], "=")
+	if len(kv) == 0 {
+		return ""
+	}
+	return kv[0]
 }
