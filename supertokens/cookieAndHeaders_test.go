@@ -12,29 +12,50 @@ func Test_setCookie_Once(t *testing.T) {
 	w := httptest.NewRecorder()
 	setCookie(w, "abc", "someVal", nil, false,
 		false, 0, "/cookie", "lax")
-	cookieValue := joinCookieValues(w)
-	assert.Equal(t,"abc=someVal", cookieValue)
+	cookieMap := getCookieNameValuesMap(w)
+	assert.Equal(t,"someVal", cookieMap["abc"])
 }
 
-func Test_setCookie_Twice(t *testing.T) {
+func Test_setCookie_Replace(t *testing.T) {
 	w := httptest.NewRecorder()
 	setCookie(w, "abc", "someVal", nil, false,
 		false, 0, "/cookie", "lax")
-	joinedCookie := joinCookieValues(w)
-	assert.Equal(t,"abc=someVal", joinedCookie)
+	cookieMap := getCookieNameValuesMap(w)
+	assert.Equal(t,"someVal", cookieMap["abc"])
 
 	setCookie(w, "abc", "someOtherVal", nil, false,
 		false, 0, "/cookie", "lax")
-	updatedCookie := joinCookieValues(w)
-	assert.Equal(t,"abc=someOtherVal", updatedCookie)
+	cookieMap = getCookieNameValuesMap(w)
+	assert.Equal(t,"someOtherVal", cookieMap["abc"])
 }
 
-func joinCookieValues(w http.ResponseWriter) string {
-	cookie := w.Header().Values("Set-Cookie")
-	var values []string
-	for _, v := range cookie {
-		cv := strings.Split(v, ";")
-		values = append(values, cv[0])
+func Test_setCookie_Multiple(t *testing.T) {
+	w := httptest.NewRecorder()
+	setCookie(w, "abc", "valOne", nil, false,
+		false, 0, "/cookie", "lax")
+	cookieMap := getCookieNameValuesMap(w)
+	assert.Equal(t,"valOne", cookieMap["abc"])
+
+	setCookie(w, "xyz", "valOne", nil, false,
+		false, 0, "/cookie", "lax")
+	cookieMap = getCookieNameValuesMap(w)
+	assert.Equal(t,"valOne", cookieMap["abc"])
+	assert.Equal(t,"valOne", cookieMap["xyz"])
+
+	setCookie(w, "abc", "valTwo", nil, false,
+		false, 0, "/cookie", "lax")
+	cookieMap = getCookieNameValuesMap(w)
+	assert.Equal(t,"valTwo", cookieMap["abc"])
+	assert.Equal(t,"valOne", cookieMap["xyz"])
+}
+
+func getCookieNameValuesMap(w http.ResponseWriter) map[string]string {
+	cookieHeader := w.Header().Values("Set-Cookie")
+	cookies := make(map[string]string, len(cookieHeader))
+	for _, ch := range cookieHeader {
+		parts := strings.Split(ch, ";")
+		nameValue := strings.Split(parts[0], "=")
+		cookies[getCookieName(ch)] = nameValue[1]
 	}
-	return strings.Join(values, ";")
+	return cookies
 }
