@@ -1,11 +1,12 @@
 package supertokens
 
 import (
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_setCookie_Once(t *testing.T) {
@@ -13,7 +14,7 @@ func Test_setCookie_Once(t *testing.T) {
 	setCookie(w, "abc", "someVal", nil, false,
 		false, 0, "/cookie", "lax")
 	cookieMap := getCookieNameValuesMap(w)
-	assert.Equal(t,"someVal", cookieMap["abc"])
+	assert.Equal(t, "someVal", cookieMap["abc"])
 }
 
 func Test_setCookie_Replace(t *testing.T) {
@@ -21,12 +22,12 @@ func Test_setCookie_Replace(t *testing.T) {
 	setCookie(w, "abc", "someVal", nil, false,
 		false, 0, "/cookie", "lax")
 	cookieMap := getCookieNameValuesMap(w)
-	assert.Equal(t,"someVal", cookieMap["abc"])
+	assert.Equal(t, "someVal", cookieMap["abc"])
 
 	setCookie(w, "abc", "someOtherVal", nil, false,
 		false, 0, "/cookie", "lax")
 	cookieMap = getCookieNameValuesMap(w)
-	assert.Equal(t,"someOtherVal", cookieMap["abc"])
+	assert.Equal(t, "someOtherVal", cookieMap["abc"])
 }
 
 func Test_setCookie_Multiple(t *testing.T) {
@@ -34,19 +35,19 @@ func Test_setCookie_Multiple(t *testing.T) {
 	setCookie(w, "abc", "valOne", nil, false,
 		false, 0, "/cookie", "lax")
 	cookieMap := getCookieNameValuesMap(w)
-	assert.Equal(t,"valOne", cookieMap["abc"])
+	assert.Equal(t, "valOne", cookieMap["abc"])
 
 	setCookie(w, "xyz", "valOne", nil, false,
 		false, 0, "/cookie", "lax")
 	cookieMap = getCookieNameValuesMap(w)
-	assert.Equal(t,"valOne", cookieMap["abc"])
-	assert.Equal(t,"valOne", cookieMap["xyz"])
+	assert.Equal(t, "valOne", cookieMap["abc"])
+	assert.Equal(t, "valOne", cookieMap["xyz"])
 
 	setCookie(w, "abc", "valTwo", nil, false,
 		false, 0, "/cookie", "lax")
 	cookieMap = getCookieNameValuesMap(w)
-	assert.Equal(t,"valTwo", cookieMap["abc"])
-	assert.Equal(t,"valOne", cookieMap["xyz"])
+	assert.Equal(t, "valTwo", cookieMap["abc"])
+	assert.Equal(t, "valOne", cookieMap["xyz"])
 }
 
 func getCookieNameValuesMap(w http.ResponseWriter) map[string]string {

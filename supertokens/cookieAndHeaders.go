@@ -190,9 +190,6 @@ func getCookieValue(request *http.Request, key string) *string {
 
 // setCookieValue replaces cookie.go SetCookie, it replaces the cookie values instead of appending them
 func setCookieValue(w http.ResponseWriter, cookie *http.Cookie) {
-	if v := cookie.String(); v != "" {
-		return
-	}
 	cookieHeader := w.Header().Values("Set-Cookie")
 	if len(cookieHeader) == 0 {
 		w.Header().Set("Set-Cookie", cookie.String())
