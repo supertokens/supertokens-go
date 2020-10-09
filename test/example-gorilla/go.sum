@@ -21,6 +21,7 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
+github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/supertokens/supertokens-go v0.0.0-20200319141133-1d010a73d3cc h1:Zi/rNm+kFJOoyF1rsocCZKCwAGpkyxD8uc4/qp4SI3c=
 github.com/supertokens/supertokens-go v0.0.0-20200610071952-83ae7e4c0e0b h1:xjhjFLd8VkxztsHka22kGy93WJ5nGA3LqtssPq0zqkg=
 github.com/supertokens/supertokens-go v0.0.0-20200610071952-83ae7e4c0e0b/go.mod h1:7Oc5m5hTp9v4Ko9xDFrjedGrcDuILxEaEEpS84TSDM4=
@@ -44,6 +45,8 @@ github.com/supertokens/supertokens-go v1.2.1-0.20200819200510-de2d6bce5212 h1:OS
 github.com/supertokens/supertokens-go v1.2.1-0.20200819200510-de2d6bce5212/go.mod h1:JaBYKL0bKoaL/I4duZi3rIygBAODDc29KM9Qw+61mLY=
 github.com/supertokens/supertokens-go v1.3.1-0.20200910182647-9e3dcd7f0e68 h1:+Yu27CMQWleEMwFnQUBJ7/+wTj9WPIKFWJu/5fGMfgA=
 github.com/supertokens/supertokens-go v1.3.1-0.20200910182647-9e3dcd7f0e68/go.mod h1:JaBYKL0bKoaL/I4duZi3rIygBAODDc29KM9Qw+61mLY=
+github.com/supertokens/supertokens-go v1.4.1-0.20201009111228-0d46e34911fa h1:w/WnM04y1oq/9dNvOW8lGiVGuJ+9OZ9SufQc8OWmXs4=
+github.com/supertokens/supertokens-go v1.4.1-0.20201009111228-0d46e34911fa/go.mod h1:agUvzCgb52n2F4u2tQFXfclGASbia58r0Gjj510SwIU=
 github.com/ugorji/go v1.1.7/go.mod h1:kZn38zHttfInRq0xu/PH0az30d+z6vm202qpg1oXVMw=
 github.com/ugorji/go/codec v1.1.7/go.mod h1:Ax+UKWsSmolVDwsd+7N3ZtXu+yMGCf907BLYF3GoBXY=
 golang.org/x/sys v0.0.0-20200116001909-b77594299b42/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
@@ -52,3 +55,4 @@ golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGm
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.8/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
+gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
