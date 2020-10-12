@@ -17,6 +17,8 @@
 package supertokens
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/textproto"
@@ -36,6 +38,14 @@ const idRefreshTokenHeaderKey = "id-refresh-token"
 const antiCsrfHeaderKey = "anti-csrf"
 const frontendSDKNameHeaderKey = "supertokens-sdk-name"
 const frontendSDKVersionHeaderKey = "supertokens-sdk-version"
+
+const frontTokenHeaderKey = "front-token"
+
+type TokenInfo struct {
+	Uid string                 `json:"uid"`
+	Ate uint64                 `json:"ate"`
+	Up  map[string]interface{} `json:"up"`
+}
 
 var configMap *ConfigMap = nil
 
@@ -59,6 +69,15 @@ func setIDRefreshTokenInHeaderAndCookie(response http.ResponseWriter, token stri
 	setHeader(response, "Access-Control-Expose-Headers", idRefreshTokenHeaderKey)
 
 	setCookie(response, idRefreshTokenCookieKey, token, domain, secure, true, expiry, path, sameSite)
+}
+
+func attachFrontTokenInHeaders(response http.ResponseWriter, userId string,
+	atExpirey uint64, jwtPayload map[string]interface{}) {
+	tokenInfo := &TokenInfo{userId, atExpirey, jwtPayload}
+	parsed, _ := json.Marshal(tokenInfo)
+	data := []byte(parsed)
+	setHeader(response, frontTokenHeaderKey, base64.StdEncoding.EncodeToString(data))
+	setHeader(response, "Access-Control-Expose-Headers", frontTokenHeaderKey)
 }
 
 func setAntiCsrfTokenInHeaders(response http.ResponseWriter, antiCsrfToken string) {

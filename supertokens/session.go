@@ -144,6 +144,14 @@ func (session *Session) UpdateJWTPayload(newJWTPayload map[string]interface{}) e
 	session.userDataInJWT = sessionInfo.UserDataInJWT
 	if sessionInfo.AccessToken != nil {
 		session.accessToken = (*sessionInfo.AccessToken).Token
+
+		attachFrontTokenInHeaders(
+			session.response,
+			session.userID,
+			(*sessionInfo.AccessToken).Expiry,
+			session.userDataInJWT,
+		)
+
 		attachAccessTokenToCookie(
 			session.response,
 			(*sessionInfo.AccessToken).Token,
