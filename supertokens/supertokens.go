@@ -72,6 +72,13 @@ func CreateNewSession(response http.ResponseWriter,
 	refreshToken := session.RefreshToken
 	idRefreshToken := session.IDRefreshToken
 
+	attachFrontTokenInHeaders(
+		response,
+		session.UserID,
+		accessToken.Expiry,
+		session.UserDataInJWT,
+	)
+
 	attachAccessTokenToCookie(
 		response,
 		accessToken.Token,
@@ -171,6 +178,14 @@ func GetSession(response http.ResponseWriter, request *http.Request,
 	}
 
 	if session.AccessToken != nil {
+
+		attachFrontTokenInHeaders(
+			response,
+			session.UserID,
+			session.AccessToken.Expiry,
+			session.UserDataInJWT,
+		)
+
 		attachAccessTokenToCookie(
 			response,
 			session.AccessToken.Token,
@@ -240,6 +255,13 @@ func RefreshSession(response http.ResponseWriter, request *http.Request) (Sessio
 	accessToken := session.AccessToken
 	refreshToken := session.RefreshToken
 	idRefreshToken := session.IDRefreshToken
+
+	attachFrontTokenInHeaders(
+		response,
+		session.UserID,
+		accessToken.Expiry,
+		session.UserDataInJWT,
+	)
 
 	attachAccessTokenToCookie(
 		response,

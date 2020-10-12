@@ -786,7 +786,7 @@ func TestAppendingToExistingHeader(t *testing.T) {
 	if res.Header.Get("testHeader") != "testValue" {
 		t.Error("header value not set")
 	}
-	if res.Header.Get("Access-Control-Expose-Headers") != "customValue, id-refresh-token, anti-csrf" {
+	if res.Header.Get("Access-Control-Expose-Headers") != "customValue, front-token, id-refresh-token, anti-csrf" {
 		t.Error("header value not set")
 	}
 
