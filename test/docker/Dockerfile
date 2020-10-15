@@ -8,7 +8,7 @@ RUN apt-get install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libc
 RUN apt install -y wget
 RUN cd /tmp
 RUN wget https://dl.google.com/go/go1.13.linux-amd64.tar.gz
-RUN tar -xvf go1.12.linux-amd64.tar.gz
+RUN tar -xvf go1.13.linux-amd64.tar.gz
 RUN mv go /usr/local
 env  GOROOT /usr/local/go
 env GOPATH $HOME/go
