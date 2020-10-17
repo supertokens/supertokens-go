@@ -855,3 +855,83 @@ func TestAntiCsrfDisabled(t *testing.T) {
 		}
 	}
 }
+
+func TestGetSessionDontClearCookies(t *testing.T) {
+	beforeEach()
+	startST("localhost", "8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
+	mux := http.NewServeMux()
+	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
+		supertokens.CreateNewSession(response, "")
+	})
+
+	mux.HandleFunc("/session/verify", func(response http.ResponseWriter, request *http.Request) {
+		_, err := supertokens.GetSession(response, request, true)
+		if err != nil {
+			response.WriteHeader(http.StatusOK)
+			return
+		}
+		response.WriteHeader(http.StatusInternalServerError)
+		return
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	client := &http.Client{}
+	req, _ := http.NewRequest("POST", ts.URL+"/create", nil)
+	res, _ := client.Do(req)
+
+	response := extractInfoFromResponseHeader(res)
+
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/session/verify", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"])
+		res, _ = client.Do(req)
+		if res.StatusCode != 200 {
+			t.Error("non 200 status code")
+		}
+	}
+}
+
+func TestRefreshSessionDontClearCookies(t *testing.T) {
+	beforeEach()
+	startST("localhost", "8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
+	mux := http.NewServeMux()
+	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
+		supertokens.CreateNewSession(response, "")
+	})
+
+	mux.HandleFunc("/session/refresh", func(response http.ResponseWriter, request *http.Request) {
+		_, err := supertokens.RefreshSession(response, request)
+		if err != nil {
+			response.WriteHeader(http.StatusOK)
+			return
+		}
+		response.WriteHeader(http.StatusInternalServerError)
+		return
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	client := &http.Client{}
+	req, _ := http.NewRequest("POST", ts.URL+"/create", nil)
+	res, _ := client.Do(req)
+
+	response := extractInfoFromResponseHeader(res)
+
+	{
+		req, _ = http.NewRequest("POST", ts.URL+"/session/refresh", nil)
+		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"])
+		res, _ = client.Do(req)
+		if res.StatusCode != 200 {
+			t.Error("non 200 status code")
+		}
+	}
+}

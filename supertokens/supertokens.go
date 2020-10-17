@@ -130,18 +130,6 @@ func GetSession(response http.ResponseWriter, request *http.Request,
 
 	idRefreshToken := getIDRefreshTokenFromCookie(request)
 	if idRefreshToken == nil {
-		handShakeInfo, handshakeInfoError := core.GetHandshakeInfoInstance()
-		if handshakeInfoError != nil {
-			return Session{}, handshakeInfoError
-		}
-		clearSessionFromCookie(response,
-			handShakeInfo.CookieDomain,
-			handShakeInfo.CookieSecure,
-			handShakeInfo.AccessTokenPath,
-			handShakeInfo.RefreshTokenPath,
-			handShakeInfo.IDRefreshTokenPath,
-			handShakeInfo.CookieSameSite,
-		)
 		return Session{}, errors.UnauthorizedError{
 			Msg: "idRefreshToken missing",
 		}
@@ -212,18 +200,6 @@ func RefreshSession(response http.ResponseWriter, request *http.Request) (Sessio
 	saveFrontendInfoFromRequest(request)
 	inputRefreshToken := getRefreshTokenFromCookie(request)
 	if inputRefreshToken == nil {
-		handShakeInfo, handshakeInfoError := core.GetHandshakeInfoInstance()
-		if handshakeInfoError != nil {
-			return Session{}, handshakeInfoError
-		}
-		clearSessionFromCookie(
-			response,
-			handShakeInfo.CookieDomain,
-			handShakeInfo.CookieSecure,
-			handShakeInfo.AccessTokenPath,
-			handShakeInfo.RefreshTokenPath,
-			handShakeInfo.IDRefreshTokenPath,
-			handShakeInfo.CookieSameSite)
 		return Session{}, errors.UnauthorizedError{
 			Msg: "Missing auth tokens in cookies. Have you set the correct refresh API path in your frontend and SuperTokens config?",
 		}
