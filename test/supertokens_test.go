@@ -855,3 +855,78 @@ func TestAntiCsrfDisabled(t *testing.T) {
 		}
 	}
 }
+
+func TestGetSessionDontClearCookies(t *testing.T) {
+	beforeEach()
+	startST("localhost", "8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/session/verify", func(response http.ResponseWriter, request *http.Request) {
+		_, err := supertokens.GetSession(response, request, true)
+		if err != nil && errors.IsUnauthorizedError(err) {
+			response.WriteHeader(http.StatusOK)
+			return
+		}
+		response.WriteHeader(http.StatusInternalServerError)
+		return
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	client := &http.Client{}
+
+	{
+		req, _ := http.NewRequest("POST", ts.URL+"/session/verify", nil)
+		res, _ := client.Do(req)
+
+		response := extractInfoFromResponseHeader(res)
+		if response["antiCsrf"] != "" || response["accessToken"] != "" || response["refreshToken"] != "" || response["idRefreshTokenFromHeader"] != "" || response["idRefreshTokenFromCookie"] != "" || response["accessTokenExpiry"] != "" || response["idRefreshTokenExpiry"] != "" || response["refreshTokenExpiry"] != "" {
+			t.Error("Cookie is being returned")
+		}
+
+		if res.StatusCode != 200 {
+			t.Error("non 200 status code")
+		}
+	}
+}
+
+func TestRefreshSessionDontClearCookies(t *testing.T) {
+	beforeEach()
+	startST("localhost", "8080")
+	supertokens.Config(supertokens.ConfigMap{
+		Hosts: "http://localhost:8080",
+	})
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/session/refresh", func(response http.ResponseWriter, request *http.Request) {
+		_, err := supertokens.RefreshSession(response, request)
+		if err != nil && errors.IsUnauthorizedError(err) {
+			response.WriteHeader(http.StatusOK)
+			return
+		}
+		response.WriteHeader(http.StatusInternalServerError)
+		return
+	})
+
+	ts := httptest.NewServer(mux)
+	defer ts.Close()
+
+	client := &http.Client{}
+
+	{
+		req, _ := http.NewRequest("POST", ts.URL+"/session/refresh", nil)
+		res, _ := client.Do(req)
+
+		response := extractInfoFromResponseHeader(res)
+		if response["antiCsrf"] != "" || response["accessToken"] != "" || response["refreshToken"] != "" || response["idRefreshTokenFromHeader"] != "" || response["idRefreshTokenFromCookie"] != "" || response["accessTokenExpiry"] != "" || response["idRefreshTokenExpiry"] != "" || response["refreshTokenExpiry"] != "" {
+			t.Error("Cookie is being returned")
+		}
+		if res.StatusCode != 200 {
+			t.Error("non 200 status code")
+		}
+	}
+}
