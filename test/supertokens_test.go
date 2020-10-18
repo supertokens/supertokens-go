@@ -863,13 +863,10 @@ func TestGetSessionDontClearCookies(t *testing.T) {
 		Hosts: "http://localhost:8080",
 	})
 	mux := http.NewServeMux()
-	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
-		supertokens.CreateNewSession(response, "")
-	})
 
 	mux.HandleFunc("/session/verify", func(response http.ResponseWriter, request *http.Request) {
 		_, err := supertokens.GetSession(response, request, true)
-		if err != nil {
+		if err != nil && errors.IsUnauthorizedError(err) {
 			response.WriteHeader(http.StatusOK)
 			return
 		}
@@ -881,15 +878,16 @@ func TestGetSessionDontClearCookies(t *testing.T) {
 	defer ts.Close()
 
 	client := &http.Client{}
-	req, _ := http.NewRequest("POST", ts.URL+"/create", nil)
-	res, _ := client.Do(req)
-
-	response := extractInfoFromResponseHeader(res)
 
 	{
-		req, _ = http.NewRequest("POST", ts.URL+"/session/verify", nil)
-		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"])
-		res, _ = client.Do(req)
+		req, _ := http.NewRequest("POST", ts.URL+"/session/verify", nil)
+		res, _ := client.Do(req)
+
+		response := extractInfoFromResponseHeader(res)
+		if response["antiCsrf"] != "" || response["accessToken"] != "" || response["refreshToken"] != "" || response["idRefreshTokenFromHeader"] != "" || response["idRefreshTokenFromCookie"] != "" || response["accessTokenExpiry"] != "" || response["idRefreshTokenExpiry"] != "" || response["refreshTokenExpiry"] != "" {
+			t.Error("Cookie is being returned")
+		}
+
 		if res.StatusCode != 200 {
 			t.Error("non 200 status code")
 		}
@@ -903,13 +901,10 @@ func TestRefreshSessionDontClearCookies(t *testing.T) {
 		Hosts: "http://localhost:8080",
 	})
 	mux := http.NewServeMux()
-	mux.HandleFunc("/create", func(response http.ResponseWriter, request *http.Request) {
-		supertokens.CreateNewSession(response, "")
-	})
 
 	mux.HandleFunc("/session/refresh", func(response http.ResponseWriter, request *http.Request) {
 		_, err := supertokens.RefreshSession(response, request)
-		if err != nil {
+		if err != nil && errors.IsUnauthorizedError(err) {
 			response.WriteHeader(http.StatusOK)
 			return
 		}
@@ -921,15 +916,15 @@ func TestRefreshSessionDontClearCookies(t *testing.T) {
 	defer ts.Close()
 
 	client := &http.Client{}
-	req, _ := http.NewRequest("POST", ts.URL+"/create", nil)
-	res, _ := client.Do(req)
-
-	response := extractInfoFromResponseHeader(res)
 
 	{
-		req, _ = http.NewRequest("POST", ts.URL+"/session/refresh", nil)
-		req.Header.Add("Cookie", "sAccessToken="+response["accessToken"])
-		res, _ = client.Do(req)
+		req, _ := http.NewRequest("POST", ts.URL+"/session/refresh", nil)
+		res, _ := client.Do(req)
+
+		response := extractInfoFromResponseHeader(res)
+		if response["antiCsrf"] != "" || response["accessToken"] != "" || response["refreshToken"] != "" || response["idRefreshTokenFromHeader"] != "" || response["idRefreshTokenFromCookie"] != "" || response["accessTokenExpiry"] != "" || response["idRefreshTokenExpiry"] != "" || response["refreshTokenExpiry"] != "" {
+			t.Error("Cookie is being returned")
+		}
 		if res.StatusCode != 200 {
 			t.Error("non 200 status code")
 		}
